@@ -550,17 +550,24 @@ function normalizeRows(raw) {
       return '';
     };
 
-    // Date: Col X — header "date"
-    let rawDate = get('date', 'Date', 'DATE');
+    // Date: Column A logic (Handling M/D/YYYY HH:mm:ss)
+    let rawDate = get('Date', 'date', 'DATE', 'Timestamp');
 
-    // Handle DD/MMM/YY format (e.g., 21/Mar/26)
-    const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-    const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
-    if (sheetMatch) {
-      const dd = sheetMatch[1].padStart(2, '0');
-      const mm = monthMap[sheetMatch[2]] || '01';
-      const yy = '20' + sheetMatch[3];
-      rawDate = `${yy}-${mm}-${dd}`;
+    const mdyMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (mdyMatch) {
+      const mm = mdyMatch[1].padStart(2, '0');
+      const dd = mdyMatch[2].padStart(2, '0');
+      const yyyy = mdyMatch[3];
+      rawDate = `${yyyy}-${mm}-${dd}`;
+    } else {
+      const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
+      const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
+      if (sheetMatch) {
+        const dd = sheetMatch[1].padStart(2, '0');
+        const mm = monthMap[sheetMatch[2]] || '01';
+        const yy = '20' + sheetMatch[3];
+        rawDate = `${yy}-${mm}-${dd}`;
+      }
     }
 
     // Fallback for other formats
@@ -571,11 +578,11 @@ function normalizeRows(raw) {
 
     return {
       date:         rawDate,
-      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer').trim(),
-      cityName:     get('City Name', 'CityName', 'City'),             // Col I
-      status:       get('Status', 'status').trim(),
-      trainingMode: get('Training Mode', 'TrainingMode', 'Mode'),     // Col D
-      language:     get('Languages', 'Language', 'Virtual Language'), // Col S
+      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer', 'Agent Name').trim().toUpperCase(),
+      cityName:     get('City Name', 'CityName', 'City', 'Restaurantname'), 
+      status:       get('Status', 'status', 'Status1').trim(),
+      trainingMode: get('Training Mode', 'TrainingMode', 'Mode', 'Category'), 
+      language:     get('Languages', 'Language', 'Virtual Language'), 
     };
   }).filter(r => r.trainerName || r.date);
 }
@@ -652,8 +659,8 @@ function renderKPIs() {
   const total = filteredRows.length;
   const done = filteredRows.filter(r=>r.status.toLowerCase()==='done').length;
   const close = filteredRows.filter(r=>r.status.toLowerCase()==='close').length;
-  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='not related').length;
-  const reVisit = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical re-training').length;
+  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='not related to inventory/done by someone').length;
+  const reVisit = filteredRows.filter(r=>['physical re-training', 're-visit'].includes(r.trainingMode.toLowerCase())).length;
   const virtual = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='virtual').length;
   const physical = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical visit').length;
   const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
@@ -813,7 +820,14 @@ function renderTicketStatus() {
   const counts = {};
   filteredRows.forEach(r => { if(r.status) counts[r.status] = (counts[r.status]||0)+1; });
   const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const statusColors = { Done: 'var(--green)', Close: 'var(--red)', 'Not Related': 'var(--blue)', 'Re-schedule': 'var(--purple)', 'Tech Concern': 'var(--orange)' };
+  const statusColors = { 
+    'Done': 'var(--green)', 
+    'Close': 'var(--red)', 
+    'Re-schedule': 'var(--purple)', 
+    'Not related to inventory/Done by someone': 'var(--blue)', 
+    'Tech concern': 'var(--orange)',
+    'Need other languge / Physical visit': 'var(--teal)'
+  };
   const body = document.getElementById('ticket-status-body');
   body.innerHTML = `<div class="ticket-list">` + sorted.map(([s,cnt]) => `
     <div class="ticket-item">
