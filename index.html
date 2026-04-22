@@ -460,8 +460,8 @@ let filteredRows = [];
 let charts = {};
 
 const TRAINING_MODES = [
-  'Virtual', 'Physical Visit', 'Physical Re-training', 'Feedback Visit',
-  'Out of Station Visit', 'Incomplete Physical Visit', 'OFS (On-Field Support)'
+  'Physical Visit','Physical Re-training','Out of Station Visit',
+  'OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'
 ];
 const MODE_COLORS = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6','#2dd4bf'];
 
@@ -469,9 +469,20 @@ const MODE_COLORS = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6'
 // DEMO DATA (mirrors your sheet structure)
 // ─────────────────────────────────────────────────────────────────
 function generateDemoData() {
-  const trainers = ['NOMAN KHAN','ANKIT DAS','DASTAGIR ALAM','MANOJ SINGH','PRABHU V','DEEPAK PATEL','ABDUL REHMAN','RAHUL KUMAR','AMIT SHARMA','PRIYA SINGH'];
+  const trainers = [
+    'KUNAL ARSEKAR', 'KRUNAL MAHULKAR', 'KEYUR KADU', 'GLADSON ANTO', 
+    'GAUTAM M', 'DEVENDRA PRASAD', 'DEEPAK PATEL', 'DASTAGIR ALAM', 
+    'ARPIT DUBEY', 'ANTAREKSH KAKARIYA', 'ANKIT DAS', 'ANIKET SHIRFULE', 
+    'ABDUL REHMAN', 'AAKASH VAMJA', 'PRAKHAR TIWARI', 'PRABUDDHA GAIKWAD', 
+    'PRABHU V', 'NOMAN KHAN', 'NIHAL KA', 'NIBHUN T', 'NEERAJ KUMAR1', 
+    'MANOJ SINGH', 'LAXMISAI MUDUNURI'
+  ];
   const cities = ['Delhi','Mumbai','Bangalore','Hyderabad','Pune','Chennai','Kolkata','Ahmedabad','Surat','Jaipur','Lucknow','Kanpur'];
-  const statuses = ['Done','Close','Not Related','Re-schedule','Tech Concern'];
+  const statuses = [
+    'Done', 'Close', 'Re-schedule', 
+    'Not related to inventory/Done by someone', 
+    'Tech concern', 'Need other languge / Physical visit'
+  ];
   const modes = TRAINING_MODES;
   const languages = ['Telugu','Kannada','Oriya','Hindi','Tamil','Marathi','Bengali','Gujarati'];
   const rows = [];
@@ -528,8 +539,7 @@ async function loadData() {
   }
 
   populateFilters();
-  filteredRows = [...allRows];
-  render();
+  applyFilters();
   overlay.style.display = 'none';
   document.getElementById('main-content').style.display = 'flex';
   document.getElementById('last-updated').textContent = '🟢 Live · ' + new Date().toLocaleTimeString();
@@ -545,29 +555,25 @@ function normalizeRows(raw) {
   return raw.map(r => {
     const get = (...names) => {
       for (const n of names) {
-        if (r[n] !== undefined && String(r[n]).trim() !== '') return String(r[n]).trim();
+        if (r[n] !== undefined) {
+          const val = String(r[n]).trim();
+          if (val !== '' && val.toLowerCase() !== 'null') return val;
+        }
       }
       return '';
     };
 
-    // Date: Column A logic (Handling M/D/YYYY HH:mm:ss)
-    let rawDate = get('Date', 'date', 'DATE', 'Timestamp');
+    // Date: Col X — header "date"
+    let rawDate = get('date', 'Date', 'DATE');
 
-    const mdyMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-    if (mdyMatch) {
-      const mm = mdyMatch[1].padStart(2, '0');
-      const dd = mdyMatch[2].padStart(2, '0');
-      const yyyy = mdyMatch[3];
-      rawDate = `${yyyy}-${mm}-${dd}`;
-    } else {
-      const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-      const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
-      if (sheetMatch) {
-        const dd = sheetMatch[1].padStart(2, '0');
-        const mm = monthMap[sheetMatch[2]] || '01';
-        const yy = '20' + sheetMatch[3];
-        rawDate = `${yy}-${mm}-${dd}`;
-      }
+    // Handle DD/MMM/YY format (e.g., 21/Mar/26)
+    const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
+    const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
+    if (sheetMatch) {
+      const dd = sheetMatch[1].padStart(2, '0');
+      const mm = monthMap[sheetMatch[2]] || '01';
+      const yy = '20' + sheetMatch[3];
+      rawDate = `${yy}-${mm}-${dd}`;
     }
 
     // Fallback for other formats
@@ -578,11 +584,11 @@ function normalizeRows(raw) {
 
     return {
       date:         rawDate,
-      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer', 'Agent Name').trim().toUpperCase(),
-      cityName:     get('City Name', 'CityName', 'City', 'Restaurantname'), 
-      status:       get('Status', 'status', 'Status1').trim(),
-      trainingMode: get('Training Mode', 'TrainingMode', 'Mode', 'Category'), 
-      language:     get('Languages', 'Language', 'Virtual Language'), 
+      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer').trim(),
+      cityName:     get('City Name', 'CityName', 'City'),             // Col I
+      status:       get('Status', 'status').trim(),
+      trainingMode: get('Training Mode', 'TrainingMode', 'Mode'),     // Col D
+      language:     get('Languages', 'Language', 'Virtual Language'), // Col S
     };
   }).filter(r => r.trainerName || r.date);
 }
@@ -595,11 +601,13 @@ function populateFilters() {
   fillSelect('f-city', [...new Set(allRows.map(r=>r.cityName).filter(Boolean))].sort());
   fillSelect('f-status', [...new Set(allRows.map(r=>r.status).filter(Boolean))].sort());
   fillSelect('f-mode', [...new Set(allRows.map(r=>r.trainingMode).filter(Boolean))].sort());
-  const dates = allRows.map(r=>r.date).filter(Boolean).sort();
-  if(dates.length) {
-    document.getElementById('f-from').value = dates[0];
-    document.getElementById('f-to').value = dates[dates.length-1];
-  }
+  
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  document.getElementById('f-from').value = `${y}-${m}-01`;
+  document.getElementById('f-to').value = `${y}-${m}-${d}`;
 }
 
 function fillSelect(id, vals) {
@@ -635,8 +643,7 @@ function resetFilters() {
   document.getElementById('f-status').value = '';
   document.getElementById('f-mode').value = '';
   populateFilters();
-  filteredRows = [...allRows];
-  render();
+  applyFilters();
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -659,7 +666,7 @@ function renderKPIs() {
   const total = filteredRows.length;
   const done = filteredRows.filter(r=>r.status.toLowerCase()==='done').length;
   const close = filteredRows.filter(r=>r.status.toLowerCase()==='close').length;
-  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='not related').length;
+  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='not related to inventory/done by someone').length;
   const reVisit = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical re-training').length;
   const virtual = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='virtual').length;
   const physical = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical visit').length;
@@ -668,7 +675,7 @@ function renderKPIs() {
   const kpis = [
     { label:'Total Ticket', val:total, pct:'100%', pctType:'neutral', color:'gold', bar:100, barColor:'var(--gold)' },
     { label:'Done Count', val:done, pct:(total?(done/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'green', bar:total?done/total*100:0, barColor:'var(--green)' },
-    { label:'No Training (Close)', val:close, pct:(total?(close/total*100).toFixed(1)+'%':'–'), pctType:'down', color:'red', bar:total?close/total*100:0, barColor:'var(--red)' },
+    { label:'No Training Count', val:close, pct:(total?(close/total*100).toFixed(1)+'%':'–'), pctType:'down', color:'red', bar:total?close/total*100:0, barColor:'var(--red)' },
     { label:'Re-Visit Count', val:reVisit, pct:(total?(reVisit/total*100).toFixed(1)+'%':'–'), pctType:'neutral', color:'blue', bar:total?reVisit/total*100:0, barColor:'var(--blue)' },
     { label:'Virtual Done', val:virtual, pct:(total?(virtual/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'purple', bar:total?virtual/total*100:0, barColor:'var(--purple)' },
     { label:'Physical Visit', val:physical, pct:(total?(physical/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'orange', bar:total?physical/total*100:0, barColor:'var(--orange)' },
