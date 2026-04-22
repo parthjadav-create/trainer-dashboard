@@ -552,18 +552,28 @@ function normalizeRows(raw) {
 
     // Date: Col X — header "date"
     let rawDate = get('date', 'Date', 'DATE');
-    // Handle MM/DD/YYYY format
+
+    // Handle DD/MMM/YY format (e.g., 21/Mar/26)
+    const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
+    const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
+    if (sheetMatch) {
+      const dd = sheetMatch[1].padStart(2, '0');
+      const mm = monthMap[sheetMatch[2]] || '01';
+      const yy = '20' + sheetMatch[3];
+      rawDate = `${yy}-${mm}-${dd}`;
+    }
+
+    // Fallback for other formats
     const slashMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (slashMatch) rawDate = `${slashMatch[3]}-${slashMatch[1].padStart(2,'0')}-${slashMatch[2].padStart(2,'0')}`;
-    // Handle DD-MM-YYYY format
     const dashMatch = rawDate.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
     if (dashMatch) rawDate = `${dashMatch[3]}-${dashMatch[2].padStart(2,'0')}-${dashMatch[1].padStart(2,'0')}`;
 
     return {
       date:         rawDate,
-      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer'),   // Col W
+      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer').trim(),
       cityName:     get('City Name', 'CityName', 'City'),             // Col I
-      status:       get('Status', 'status'),                          // Col H
+      status:       get('Status', 'status').trim(),
       trainingMode: get('Training Mode', 'TrainingMode', 'Mode'),     // Col D
       language:     get('Languages', 'Language', 'Virtual Language'), // Col S
     };
@@ -640,18 +650,19 @@ function render() {
 // ── KPIs ──
 function renderKPIs() {
   const total = filteredRows.length;
-  const done = filteredRows.filter(r=>r.status==='Done').length;
-  const close = filteredRows.filter(r=>r.status==='Close').length;
-  const notRel = filteredRows.filter(r=>r.status==='Not Related').length;
-  const virtual = filteredRows.filter(r=>r.trainingMode==='Virtual').length;
-  const physical = filteredRows.filter(r=>r.trainingMode==='Physical Visit').length;
+  const done = filteredRows.filter(r=>r.status.toLowerCase()==='done').length;
+  const close = filteredRows.filter(r=>r.status.toLowerCase()==='close').length;
+  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='not related').length;
+  const reVisit = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical re-training').length;
+  const virtual = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='virtual').length;
+  const physical = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical visit').length;
   const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
 
   const kpis = [
     { label:'Total Ticket', val:total, pct:'100%', pctType:'neutral', color:'gold', bar:100, barColor:'var(--gold)' },
-    { label:'Done', val:done, pct:(total?(done/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'green', bar:total?done/total*100:0, barColor:'var(--green)' },
-    { label:'Close', val:close, pct:(total?(close/total*100).toFixed(1)+'%':'–'), pctType:'down', color:'red', bar:total?close/total*100:0, barColor:'var(--red)' },
-    { label:'Not Related', val:notRel, pct:(total?(notRel/total*100).toFixed(1)+'%':'–'), pctType:'neutral', color:'blue', bar:total?notRel/total*100:0, barColor:'var(--blue)' },
+    { label:'Done Count', val:done, pct:(total?(done/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'green', bar:total?done/total*100:0, barColor:'var(--green)' },
+    { label:'No Training (Close)', val:close, pct:(total?(close/total*100).toFixed(1)+'%':'–'), pctType:'down', color:'red', bar:total?close/total*100:0, barColor:'var(--red)' },
+    { label:'Re-Visit Count', val:reVisit, pct:(total?(reVisit/total*100).toFixed(1)+'%':'–'), pctType:'neutral', color:'blue', bar:total?reVisit/total*100:0, barColor:'var(--blue)' },
     { label:'Virtual Done', val:virtual, pct:(total?(virtual/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'purple', bar:total?virtual/total*100:0, barColor:'var(--purple)' },
     { label:'Physical Visit', val:physical, pct:(total?(physical/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'orange', bar:total?physical/total*100:0, barColor:'var(--orange)' },
     { label:'Trainers', val:trainers, pct:'Active', pctType:'neutral', color:'teal', bar:100, barColor:'var(--teal)' },
@@ -675,7 +686,7 @@ function renderTrainerTable() {
     if(!r.trainerName) return;
     if(!trainerMap[r.trainerName]) trainerMap[r.trainerName] = { present: 0, done: 0 };
     trainerMap[r.trainerName].present++;
-    if(r.status==='Done') trainerMap[r.trainerName].done++;
+    if(r.status.toLowerCase()==='done') trainerMap[r.trainerName].done++;
   });
   const arr = Object.entries(trainerMap).map(([name,d])=>({name,...d,avg:(d.done/Math.max(1,d.present)).toFixed(2)}));
   arr.sort((a,b)=>b.done-a.done);
