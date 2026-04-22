@@ -460,8 +460,8 @@ let filteredRows = [];
 let charts = {};
 
 const TRAINING_MODES = [
-  'Physical Visit','Physical Re-training','Out of Station Visit',
-  'OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'
+  'Virtual', 'Physical Visit', 'Physical Re-training', 'Feedback Visit',
+  'Out of Station Visit', 'Incomplete Physical Visit', 'OFS (On-Field Support)'
 ];
 const MODE_COLORS = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6','#2dd4bf'];
 
@@ -659,8 +659,8 @@ function renderKPIs() {
   const total = filteredRows.length;
   const done = filteredRows.filter(r=>r.status.toLowerCase()==='done').length;
   const close = filteredRows.filter(r=>r.status.toLowerCase()==='close').length;
-  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='not related to inventory/done by someone').length;
-  const reVisit = filteredRows.filter(r=>['physical re-training', 're-visit'].includes(r.trainingMode.toLowerCase())).length;
+  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='not related').length;
+  const reVisit = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical re-training').length;
   const virtual = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='virtual').length;
   const physical = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical visit').length;
   const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
