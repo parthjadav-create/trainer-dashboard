@@ -219,10 +219,10 @@
     padding: 2px 8px; border-radius: 20px;
     font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
   }
-  .pill-Done { background: rgba(34,197,94,0.15); color: var(--green); }
-  .pill-Close { background: rgba(239,68,68,0.15); color: var(--red); }
-  .pill-Virtual { background: rgba(56,189,248,0.15); color: var(--blue); }
-  .pill-Physical { background: rgba(245,197,24,0.15); color: var(--gold); }
+  .pill-done { background: rgba(34,197,94,0.15); color: var(--green); }
+  .pill-close { background: rgba(239,68,68,0.15); color: var(--red); }
+  .pill-virtual { background: rgba(56,189,248,0.15); color: var(--blue); }
+  .pill-physical { background: rgba(245,197,24,0.15); color: var(--gold); }
 
   /* ── HORIZONTAL BAR ── */
   .hbar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
@@ -664,12 +664,12 @@ function render() {
 // ── KPIs ──
 function renderKPIs() {
   const total = filteredRows.length;
-  const Done = filteredRows.filter(r=>r.status==='Done').length;
-  const Close = filteredRows.filter(r=>r.status.toLowerCase()==='Close').length;
-  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='Not related to inventory/Done by someone').length;
-  const reVisit = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='Physical Re-training').length;
-  const virtual = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='Virtual').length;
-  const physical = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='Physical Visit').length;
+  const done = filteredRows.filter(r=>r.status === 'Done').length;
+  const close = filteredRows.filter(r=>r.status === 'Close').length;
+  const notRel = filteredRows.filter(r=>r.status === 'Not related to inventory/Done by someone').length;
+  const reVisit = filteredRows.filter(r=>r.trainingMode === 'Physical Re-training').length;
+  const virtual = filteredRows.filter(r=>r.trainingMode === 'Virtual').length;
+  const physical = filteredRows.filter(r=>r.trainingMode === 'Physical Visit').length;
   const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
 
   const kpis = [
@@ -700,7 +700,7 @@ function renderTrainerTable() {
     if(!r.trainerName) return;
     if(!trainerMap[r.trainerName]) trainerMap[r.trainerName] = { present: 0, done: 0 };
     trainerMap[r.trainerName].present++;
-    if(r.status.toLowerCase()==='done') trainerMap[r.trainerName].done++;
+    if(r.status === 'Done') trainerMap[r.trainerName].done++;
   });
   const arr = Object.entries(trainerMap).map(([name,d])=>({name,...d,avg:(d.done/Math.max(1,d.present)).toFixed(2)}));
   arr.sort((a,b)=>b.done-a.done);
