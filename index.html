@@ -664,12 +664,12 @@ function render() {
 // ── KPIs ──
 function renderKPIs() {
   const total = filteredRows.length;
-  const done = filteredRows.filter(r=>r.status.toLowerCase()==='done').length;
-  const close = filteredRows.filter(r=>r.status.toLowerCase()==='close').length;
-  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='not related to inventory/done by someone').length;
-  const reVisit = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical re-training').length;
-  const virtual = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='virtual').length;
-  const physical = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='physical visit').length;
+  const Done = filteredRows.filter(r=>r.status.toLowerCase()==='Done').length;
+  const Close = filteredRows.filter(r=>r.status.toLowerCase()==='Close').length;
+  const notRel = filteredRows.filter(r=>r.status.toLowerCase()==='Not related to inventory/Done by someone').length;
+  const reVisit = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='Physical Re-training').length;
+  const virtual = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='Virtual').length;
+  const physical = filteredRows.filter(r=>r.trainingMode.toLowerCase()==='Physical Visit').length;
   const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
 
   const kpis = [
