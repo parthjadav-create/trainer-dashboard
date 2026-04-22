@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Inventory Team On-Site Trainer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --gold: #f5c518;
+    --gold-light: #fde87c;
+    --gold-dark: #c9a000;
+    --bg: #0f1117;
+    --bg2: #181c28;
+    --bg3: #1e2336;
+    --card: #1a1f30;
+    --card2: #222840;
+    --border: rgba(245,197,24,0.18);
+    --text: #e8eaf0;
+    --muted: #8892a4;
+    --green: #22c55e;
+    --red: #ef4444;
+    --blue: #38bdf8;
+    --purple: #a78bfa;
+    --orange: #fb923c;
+    --pink: #f472b6;
+    --teal: #2dd4bf;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #1a1200 0%, #3a2800 40%, #1a1200 100%);
+    border-bottom: 2px solid var(--gold);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 30px rgba(245,197,24,0.15);
+  }
+  .header h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(245,197,24,0.4);
+  }
+  .header-right { display:flex; align-items:center; gap:10px; }
+  .refresh-btn {
+    background: var(--gold);
+    color: #000;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .refresh-btn:hover { background: var(--gold-light); transform: scale(1.05); }
+  .last-updated { color: var(--muted); font-size: 11px; }
+
+  /* ── FILTERS ── */
+  .filters {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-group { display:flex; align-items:center; gap:6px; }
+  .filter-label { color: var(--gold); font-size: 11px; font-weight: 600; text-transform:uppercase; letter-spacing:.5px; }
+  select, .date-input {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color .2s;
+    min-width: 130px;
+  }
+  select:focus, .date-input:focus { border-color: var(--gold); }
+  .filter-sep { color: var(--border); font-size: 18px; }
+
+  /* ── MAIN WRAPPER ── */
+  .main { padding: 20px 24px; display:flex; flex-direction:column; gap:20px; }
+
+  /* ── KPI CARDS ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 14px 10px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(245,197,24,0.12); }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi-card.gold::before { background: var(--gold); }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-card.blue::before { background: var(--blue); }
+  .kpi-card.purple::before { background: var(--purple); }
+  .kpi-card.orange::before { background: var(--orange); }
+  .kpi-card.teal::before { background: var(--teal); }
+
+  .kpi-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom:6px; }
+  .kpi-value { font-family: 'Rajdhani', sans-serif; font-size: 30px; font-weight: 700; color: var(--text); line-height:1; }
+  .kpi-pct { font-size: 11px; font-weight: 600; margin-top: 4px; }
+  .kpi-pct.up { color: var(--green); }
+  .kpi-pct.down { color: var(--red); }
+  .kpi-pct.neutral { color: var(--muted); }
+  .kpi-bar-track { background: rgba(255,255,255,0.07); border-radius: 4px; height: 4px; margin-top: 8px; overflow:hidden; }
+  .kpi-bar-fill { height: 4px; border-radius: 4px; transition: width 1s ease; }
+
+  /* ── TWO-COL ROW ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .panel-header {
+    background: linear-gradient(90deg, rgba(245,197,24,0.12) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: .8px;
+    text-transform: uppercase;
+  }
+  .panel-body { padding: 14px 16px; }
+
+  /* ── CHART CONTAINER ── */
+  .chart-wrap { position: relative; }
+
+  /* ── TABLE ── */
+  .dash-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .dash-table th {
+    background: rgba(245,197,24,0.08);
+    color: var(--gold);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .dash-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .dash-table tr:last-child td { border-bottom: none; }
+  .dash-table tr:hover td { background: rgba(245,197,24,0.05); }
+  .rank-badge {
+    display: inline-flex; align-items:center; justify-content:center;
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 10px; font-weight: 700;
+    background: rgba(245,197,24,0.15); color: var(--gold);
+  }
+  .rank-badge.r1 { background: rgba(255,215,0,0.25); color: gold; }
+  .rank-badge.r2 { background: rgba(192,192,192,0.2); color: silver; }
+  .rank-badge.r3 { background: rgba(205,127,50,0.2); color: #cd7f32; }
+
+  .avg-bar-wrap { display:flex; align-items:center; gap:6px; }
+  .avg-bar { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+
+  /* ── STATUS PILLS ── */
+  .pill {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
+  }
+  .pill-done { background: rgba(34,197,94,0.15); color: var(--green); }
+  .pill-close { background: rgba(239,68,68,0.15); color: var(--red); }
+  .pill-virtual { background: rgba(56,189,248,0.15); color: var(--blue); }
+  .pill-physical { background: rgba(245,197,24,0.15); color: var(--gold); }
+
+  /* ── HORIZONTAL BAR ── */
+  .hbar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .hbar-label { width: 160px; font-size: 11px; color: var(--muted); flex-shrink:0; text-align:right; }
+  .hbar-track { flex: 1; height: 10px; background: rgba(255,255,255,0.06); border-radius:5px; overflow:hidden; }
+  .hbar-fill { height: 100%; border-radius: 5px; transition: width 1s ease; }
+  .hbar-val { width: 36px; text-align: right; font-size: 11px; font-weight: 600; color: var(--text); flex-shrink:0; }
+
+  /* ── TICKET STATUS ── */
+  .ticket-list { display:flex; flex-direction:column; gap:8px; }
+  .ticket-item { display:flex; align-items:center; justify-content:space-between; }
+  .ticket-item-label { font-size: 12px; color: var(--muted); }
+  .ticket-item-val {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px; font-weight: 700;
+  }
+
+  /* ── LANGUAGE TABLE ── */
+  .lang-table { width:100%; font-size:12px; border-collapse:collapse; }
+  .lang-table th { color: var(--gold); font-size:10px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border); text-align:left; }
+  .lang-table td { padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .lang-table tr:last-child td { font-weight:700; color: var(--gold); }
+
+  /* ── LOADING ── */
+  #loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index: 1000;
+    gap: 16px;
+  }
+  .loader-ring {
+    width: 48px; height: 48px;
+    border: 3px solid rgba(245,197,24,0.15);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-overlay p { color: var(--muted); font-size: 13px; }
+
+  /* ── ERROR ── */
+  .error-banner {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    color: var(--red);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .info-banner {
+    background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.25);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    color: var(--blue);
+    font-size: 12px;
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+
+  /* ── CITY BAR CHART ── */
+  .city-chart-wrap { overflow-x: auto; }
+  .city-bars { display: flex; gap: 6px; align-items: flex-end; min-height: 100px; padding: 8px 4px 0; min-width: max-content; }
+  .city-bar-col { display: flex; flex-direction:column; align-items:center; gap: 4px; }
+  .city-bar { width: 28px; border-radius: 4px 4px 0 0; transition: height .8s ease; cursor: default; position:relative; }
+  .city-bar:hover::after {
+    content: attr(data-val);
+    position: absolute; bottom: 100%; left:50%; transform: translateX(-50%);
+    background: var(--bg3); color: var(--gold); font-size: 10px; font-weight:700;
+    padding: 2px 6px; border-radius: 4px; white-space:nowrap; margin-bottom:2px;
+    border: 1px solid var(--border);
+  }
+  .city-bar-name { font-size: 9px; color: var(--muted); transform: rotate(-40deg); transform-origin: top center; white-space: nowrap; margin-top: 6px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1200px) {
+    .kpi-row { grid-template-columns: repeat(4,1fr); }
+    .three-col { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    .kpi-row { grid-template-columns: repeat(2,1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .main { padding: 14px; }
+    .filters { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="loader-ring"></div>
+  <p>Loading dashboard data…</p>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>🏷️ Inventory Team On-Site Trainer Dashboard</h1>
+  <div class="header-right">
+    <span class="last-updated" id="last-updated">–</span>
+    <button class="refresh-btn" onclick="loadData()">⟳ Refresh</button>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <div class="filter-group">
+    <span class="filter-label">Trainer</span>
+    <select id="f-trainer"><option value="">All Trainers</option></select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">City</span>
+    <select id="f-city"><option value="">All Cities</option></select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Status</span>
+    <select id="f-status"><option value="">All Status</option></select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Training Mode</span>
+    <select id="f-mode"><option value="">All Modes</option></select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">From</span>
+    <input type="date" id="f-from" class="date-input"/>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">To</span>
+    <input type="date" id="f-to" class="date-input"/>
+  </div>
+  <button class="refresh-btn" onclick="applyFilters()">Apply</button>
+  <button class="refresh-btn" style="background:var(--bg3);color:var(--gold);border:1px solid var(--gold);" onclick="resetFilters()">Reset</button>
+</div>
+
+<div class="main" id="main-content" style="display:none;">
+
+  <!-- INFO BANNER -->
+  <div class="info-banner" id="info-banner" style="display:none;"></div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <!-- ROW 2: Daily Call Chart + Trainer Table -->
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">📞 Daily Call / Status Trend</span></div>
+      <div class="panel-body chart-wrap" style="height:220px;">
+        <canvas id="dailyChart"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">🏆 Trainer Leaderboard</span>
+        <span style="font-size:11px;color:var(--muted);" id="trainer-count"></span>
+      </div>
+      <div class="panel-body" style="padding:0; max-height:220px; overflow-y:auto;">
+        <table class="dash-table" id="trainer-table">
+          <thead><tr><th>#</th><th>Trainer Name</th><th>Present</th><th>Training Done</th><th>Avg / Day</th></tr></thead>
+          <tbody id="trainer-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Date-wise line chart -->
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">📅 Date-Wise Ticket Trend</span></div>
+    <div class="panel-body chart-wrap" style="height:240px;">
+      <canvas id="dateChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ROW 4: Training Mode + Ticket Status + Virtual Language -->
+  <div class="three-col">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">🎯 Training Mode</span></div>
+      <div class="panel-body" id="training-mode-body"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">🎫 Ticket Status</span></div>
+      <div class="panel-body" id="ticket-status-body"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">🌐 Virtual Training Language</span></div>
+      <div class="panel-body" style="padding:0; max-height:260px; overflow-y:auto;">
+        <table class="lang-table" id="lang-table">
+          <thead><tr><th>Language</th><th>Training</th></tr></thead>
+          <tbody id="lang-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 5: City Bar Chart -->
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">🏙️ Training Mode by City</span></div>
+    <div class="panel-body city-chart-wrap" style="padding:16px 16px 8px;">
+      <div id="city-bars-container" class="city-bars"></div>
+    </div>
+  </div>
+
+  <!-- ROW 6: Trainer-wise Training Done Table -->
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">📋 Trainer-Wise Training Done</span></div>
+    <div class="panel-body" style="padding:0; overflow-x:auto;">
+      <table class="dash-table" id="trainer-detail-table">
+        <thead>
+          <tr>
+            <th>Trainer Name</th>
+            <th>Physical Visit</th>
+            <th>Physical Re-training</th>
+            <th>Out of Station Visit</th>
+            <th>OFS (On-Field Support)</th>
+            <th>Virtual</th>
+            <th>Incomplete Physical Visit</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="trainer-detail-tbody"></tbody>
+        <tfoot id="trainer-detail-tfoot"></tfoot>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+// CONFIG — Live Google Apps Script endpoint
+// ─────────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJSWqkwB7Z8vkGIfGBwfoSzMrd-YbJBenn5FNzro7pQDM_sjchNOR6QqQ5n9q8izebzw/exec';
+let allRows = [];
+let filteredRows = [];
+let charts = {};
+
+const TRAINING_MODES = [
+  'Physical Visit','Physical Re-training','Out of Station Visit',
+  'OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'
+];
+const MODE_COLORS = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6','#2dd4bf'];
+
+// ─────────────────────────────────────────────────────────────────
+// DEMO DATA (mirrors your sheet structure)
+// ─────────────────────────────────────────────────────────────────
+function generateDemoData() {
+  const trainers = ['NOMAN KHAN','ANKIT DAS','DASTAGIR ALAM','MANOJ SINGH','PRABHU V','DEEPAK PATEL','ABDUL REHMAN','RAHUL KUMAR','AMIT SHARMA','PRIYA SINGH'];
+  const cities = ['Delhi','Mumbai','Bangalore','Hyderabad','Pune','Chennai','Kolkata','Ahmedabad','Surat','Jaipur','Lucknow','Kanpur'];
+  const statuses = ['Done','Close','Not Related','Re-schedule','Tech Concern'];
+  const modes = TRAINING_MODES;
+  const languages = ['Telugu','Kannada','Oriya','Hindi','Tamil','Marathi','Bengali','Gujarati'];
+  const rows = [];
+  const baseDate = new Date('2026-04-01');
+
+  for(let i=0;i<1071;i++){
+    const d = new Date(baseDate);
+    d.setDate(d.getDate() + Math.floor(Math.random()*22));
+    const trainer = trainers[Math.floor(Math.random()*trainers.length)];
+    const city = cities[Math.floor(Math.random()*cities.length)];
+    const status = statuses[Math.floor(Math.random()*(statuses.length))];
+    const mode = modes[Math.floor(Math.random()*modes.length)];
+    const lang = (mode==='Virtual') ? languages[Math.floor(Math.random()*languages.length)] : '';
+    rows.push({
+      date: d.toISOString().split('T')[0],
+      trainerName: trainer,
+      cityName: city,
+      status: status,
+      trainingMode: mode,
+      language: lang
+    });
+  }
+  return rows;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// LOAD DATA — fetches from Google Apps Script Web App
+// ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  const overlay = document.getElementById('loading-overlay');
+  const overlayMsg = overlay.querySelector('p');
+  overlay.style.display = 'flex';
+  overlayMsg.textContent = 'Fetching live data from Google Sheet…';
+
+  try {
+    const resp = await fetch(APPS_SCRIPT_URL);
+    if (!resp.ok) throw new Error('Network error: ' + resp.status);
+    const json = await resp.json();
+    if (json.status === 'error') throw new Error(json.message);
+    if (!json.data || json.data.length === 0) throw new Error('Sheet returned no rows');
+    allRows = normalizeRows(json.data);
+    document.getElementById('info-banner').style.display = 'none';
+    console.log(`✅ Loaded ${allRows.length} live rows`);
+  } catch (e) {
+    console.warn('⚠️ Live fetch failed, using demo data:', e.message);
+    allRows = generateDemoData();
+    const banner = document.getElementById('info-banner');
+    banner.innerHTML = `⚠️ <strong>Could not load live data</strong> — ${e.message}.<br>
+      Make sure the Apps Script is deployed as <em>Anyone</em> access and redeploy as a <em>New Version</em> after any changes.`;
+    banner.style.background = 'rgba(239,68,68,0.08)';
+    banner.style.borderColor = 'rgba(239,68,68,0.3)';
+    banner.style.color = 'var(--red)';
+    banner.style.display = 'block';
+  }
+
+  populateFilters();
+  filteredRows = [...allRows];
+  render();
+  overlay.style.display = 'none';
+  document.getElementById('main-content').style.display = 'flex';
+  document.getElementById('last-updated').textContent = '🟢 Live · ' + new Date().toLocaleTimeString();
+}
+
+function normalizeRows(raw) {
+  // Log first row keys to console for debugging
+  if (raw.length > 0) {
+    console.log('📋 Sheet column keys:', Object.keys(raw[0]));
+    console.log('📋 First row sample:', raw[0]);
+  }
+
+  return raw.map(r => {
+    const get = (...names) => {
+      for (const n of names) {
+        if (r[n] !== undefined && String(r[n]).trim() !== '') return String(r[n]).trim();
+      }
+      return '';
+    };
+
+    // Date: Col X — header "date"
+    let rawDate = get('date', 'Date', 'DATE');
+    // Handle MM/DD/YYYY format
+    const slashMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (slashMatch) rawDate = `${slashMatch[3]}-${slashMatch[1].padStart(2,'0')}-${slashMatch[2].padStart(2,'0')}`;
+    // Handle DD-MM-YYYY format
+    const dashMatch = rawDate.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+    if (dashMatch) rawDate = `${dashMatch[3]}-${dashMatch[2].padStart(2,'0')}-${dashMatch[1].padStart(2,'0')}`;
+
+    return {
+      date:         rawDate,
+      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer'),   // Col W
+      cityName:     get('City Name', 'CityName', 'City'),             // Col I
+      status:       get('Status', 'status'),                          // Col H
+      trainingMode: get('Training Mode', 'TrainingMode', 'Mode'),     // Col D
+      language:     get('Languages', 'Language', 'Virtual Language'), // Col S
+    };
+  }).filter(r => r.trainerName || r.date);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// FILTERS
+// ─────────────────────────────────────────────────────────────────
+function populateFilters() {
+  fillSelect('f-trainer', [...new Set(allRows.map(r=>r.trainerName).filter(Boolean))].sort());
+  fillSelect('f-city', [...new Set(allRows.map(r=>r.cityName).filter(Boolean))].sort());
+  fillSelect('f-status', [...new Set(allRows.map(r=>r.status).filter(Boolean))].sort());
+  fillSelect('f-mode', [...new Set(allRows.map(r=>r.trainingMode).filter(Boolean))].sort());
+  const dates = allRows.map(r=>r.date).filter(Boolean).sort();
+  if(dates.length) {
+    document.getElementById('f-from').value = dates[0];
+    document.getElementById('f-to').value = dates[dates.length-1];
+  }
+}
+
+function fillSelect(id, vals) {
+  const el = document.getElementById(id);
+  const first = el.options[0];
+  el.innerHTML = '';
+  el.appendChild(first);
+  vals.forEach(v => { const o = new Option(v,v); el.appendChild(o); });
+}
+
+function applyFilters() {
+  const trainer = document.getElementById('f-trainer').value;
+  const city = document.getElementById('f-city').value;
+  const status = document.getElementById('f-status').value;
+  const mode = document.getElementById('f-mode').value;
+  const from = document.getElementById('f-from').value;
+  const to = document.getElementById('f-to').value;
+  filteredRows = allRows.filter(r => {
+    if(trainer && r.trainerName !== trainer) return false;
+    if(city && r.cityName !== city) return false;
+    if(status && r.status !== status) return false;
+    if(mode && r.trainingMode !== mode) return false;
+    if(from && r.date < from) return false;
+    if(to && r.date > to) return false;
+    return true;
+  });
+  render();
+}
+
+function resetFilters() {
+  document.getElementById('f-trainer').value = '';
+  document.getElementById('f-city').value = '';
+  document.getElementById('f-status').value = '';
+  document.getElementById('f-mode').value = '';
+  populateFilters();
+  filteredRows = [...allRows];
+  render();
+}
+
+// ─────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────
+function render() {
+  renderKPIs();
+  renderTrainerTable();
+  renderDailyChart();
+  renderDateChart();
+  renderTrainingMode();
+  renderTicketStatus();
+  renderLanguageTable();
+  renderCityBars();
+  renderTrainerDetailTable();
+}
+
+// ── KPIs ──
+function renderKPIs() {
+  const total = filteredRows.length;
+  const done = filteredRows.filter(r=>r.status==='Done').length;
+  const close = filteredRows.filter(r=>r.status==='Close').length;
+  const notRel = filteredRows.filter(r=>r.status==='Not Related').length;
+  const virtual = filteredRows.filter(r=>r.trainingMode==='Virtual').length;
+  const physical = filteredRows.filter(r=>r.trainingMode==='Physical Visit').length;
+  const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
+
+  const kpis = [
+    { label:'Total Ticket', val:total, pct:'100%', pctType:'neutral', color:'gold', bar:100, barColor:'var(--gold)' },
+    { label:'Done', val:done, pct:(total?(done/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'green', bar:total?done/total*100:0, barColor:'var(--green)' },
+    { label:'Close', val:close, pct:(total?(close/total*100).toFixed(1)+'%':'–'), pctType:'down', color:'red', bar:total?close/total*100:0, barColor:'var(--red)' },
+    { label:'Not Related', val:notRel, pct:(total?(notRel/total*100).toFixed(1)+'%':'–'), pctType:'neutral', color:'blue', bar:total?notRel/total*100:0, barColor:'var(--blue)' },
+    { label:'Virtual Done', val:virtual, pct:(total?(virtual/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'purple', bar:total?virtual/total*100:0, barColor:'var(--purple)' },
+    { label:'Physical Visit', val:physical, pct:(total?(physical/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'orange', bar:total?physical/total*100:0, barColor:'var(--orange)' },
+    { label:'Trainers', val:trainers, pct:'Active', pctType:'neutral', color:'teal', bar:100, barColor:'var(--teal)' },
+  ];
+
+  const row = document.getElementById('kpi-row');
+  row.innerHTML = kpis.map(k => `
+    <div class="kpi-card ${k.color}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.val.toLocaleString()}</div>
+      <div class="kpi-pct ${k.pctType}">${k.pct}</div>
+      <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${k.bar}%;background:${k.barColor};"></div></div>
+    </div>
+  `).join('');
+}
+
+// ── TRAINER TABLE ──
+function renderTrainerTable() {
+  const trainerMap = {};
+  filteredRows.forEach(r => {
+    if(!r.trainerName) return;
+    if(!trainerMap[r.trainerName]) trainerMap[r.trainerName] = { present: 0, done: 0 };
+    trainerMap[r.trainerName].present++;
+    if(r.status==='Done') trainerMap[r.trainerName].done++;
+  });
+  const arr = Object.entries(trainerMap).map(([name,d])=>({name,...d,avg:(d.done/Math.max(1,d.present)).toFixed(2)}));
+  arr.sort((a,b)=>b.done-a.done);
+  const maxDone = arr[0]?.done || 1;
+  document.getElementById('trainer-count').textContent = `${arr.length} trainers`;
+  document.getElementById('trainer-tbody').innerHTML = arr.slice(0,15).map((t,i)=>`
+    <tr>
+      <td><span class="rank-badge ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</span></td>
+      <td style="font-weight:500;">${t.name}</td>
+      <td>${t.present}</td>
+      <td>${t.done}</td>
+      <td>
+        <div class="avg-bar-wrap">
+          <div class="avg-bar" style="width:${Math.round(t.done/maxDone*80)+10}px;"></div>
+          <span style="font-size:11px;color:var(--gold);">${t.avg}</span>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── DAILY CHART ──
+function renderDailyChart() {
+  const byDate = {};
+  filteredRows.forEach(r => {
+    if(!r.date) return;
+    const d = r.date.slice(5); // MM-DD
+    if(!byDate[d]) byDate[d] = 0;
+    byDate[d]++;
+  });
+  const labels = Object.keys(byDate).sort();
+  const vals = labels.map(l=>byDate[l]);
+
+  if(charts.daily) charts.daily.destroy();
+  const ctx = document.getElementById('dailyChart').getContext('2d');
+  charts.daily = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Tickets',
+        data: vals,
+        backgroundColor: 'rgba(245,197,24,0.5)',
+        borderColor: 'var(--gold)',
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+}
+
+// ── DATE-WISE LINE CHART ──
+function renderDateChart() {
+  const modeByDate = {};
+  const datesSet = new Set();
+  filteredRows.forEach(r => {
+    if(!r.date) return;
+    datesSet.add(r.date);
+    if(!modeByDate[r.trainingMode]) modeByDate[r.trainingMode] = {};
+    modeByDate[r.trainingMode][r.date] = (modeByDate[r.trainingMode][r.date]||0)+1;
+  });
+  const dates = [...datesSet].sort();
+
+  const topModes = TRAINING_MODES.filter(m => filteredRows.some(r=>r.trainingMode===m));
+  const datasets = topModes.map((mode,i) => ({
+    label: mode,
+    data: dates.map(d => modeByDate[mode]?.[d] || 0),
+    borderColor: MODE_COLORS[i],
+    backgroundColor: MODE_COLORS[i]+'22',
+    borderWidth: 2,
+    pointRadius: 3,
+    tension: 0.3,
+    fill: false
+  }));
+
+  if(charts.date) charts.date.destroy();
+  const ctx = document.getElementById('dateChart').getContext('2d');
+  charts.date = new Chart(ctx, {
+    type: 'line',
+    data: { labels: dates.map(d=>d.slice(5)), datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: '#8892a4', font:{size:10}, boxWidth:12, padding:12 }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8892a4', font:{size:9}, maxTicksLimit:20 }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+}
+
+// ── TRAINING MODE BARS ──
+function renderTrainingMode() {
+  const counts = {};
+  filteredRows.forEach(r => { if(r.trainingMode) counts[r.trainingMode] = (counts[r.trainingMode]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
+  const body = document.getElementById('training-mode-body');
+  body.innerHTML = sorted.map(([mode,cnt],i) => `
+    <div class="hbar-row">
+      <div class="hbar-label">${mode}</div>
+      <div class="hbar-track">
+        <div class="hbar-fill" style="width:${cnt/max*100}%;background:${MODE_COLORS[i%MODE_COLORS.length]};"></div>
+      </div>
+      <div class="hbar-val">${cnt}</div>
+    </div>
+  `).join('');
+}
+
+// ── TICKET STATUS ──
+function renderTicketStatus() {
+  const counts = {};
+  filteredRows.forEach(r => { if(r.status) counts[r.status] = (counts[r.status]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const statusColors = { Done: 'var(--green)', Close: 'var(--red)', 'Not Related': 'var(--blue)', 'Re-schedule': 'var(--purple)', 'Tech Concern': 'var(--orange)' };
+  const body = document.getElementById('ticket-status-body');
+  body.innerHTML = `<div class="ticket-list">` + sorted.map(([s,cnt]) => `
+    <div class="ticket-item">
+      <span class="ticket-item-label" style="display:flex;align-items:center;gap:6px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${statusColors[s]||'var(--muted)'};display:inline-block;"></span>
+        ${s}
+      </span>
+      <span class="ticket-item-val" style="color:${statusColors[s]||'var(--text)'};">${cnt.toLocaleString()}</span>
+    </div>
+  `).join('') + `</div>`;
+}
+
+// ── LANGUAGE TABLE ──
+function renderLanguageTable() {
+  const counts = {};
+  filteredRows.filter(r=>r.language).forEach(r => { counts[r.language] = (counts[r.language]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const total = sorted.reduce((s,[,v])=>s+v,0);
+  const langColors = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6','#2dd4bf','#64748b'];
+  document.getElementById('lang-tbody').innerHTML = sorted.map(([lang,cnt],i) => `
+    <tr>
+      <td style="display:flex;align-items:center;gap:6px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${langColors[i%langColors.length]};display:inline-block;flex-shrink:0;"></span>
+        ${lang}
+      </td>
+      <td style="font-weight:600;color:${langColors[i%langColors.length]};">${cnt}</td>
+    </tr>
+  `).join('') + `<tr><td style="color:var(--gold);font-weight:700;">Grand total</td><td style="font-weight:700;color:var(--gold);">${total}</td></tr>`;
+}
+
+// ── CITY BARS ──
+function renderCityBars() {
+  const counts = {};
+  filteredRows.forEach(r => { if(r.cityName) counts[r.cityName] = (counts[r.cityName]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,30);
+  const max = sorted[0]?.[1] || 1;
+  const container = document.getElementById('city-bars-container');
+  container.innerHTML = sorted.map(([city,cnt],i) => {
+    const h = Math.max(8, Math.round(cnt/max*90));
+    return `
+      <div class="city-bar-col">
+        <div style="font-size:10px;color:var(--text);font-weight:600;">${cnt}</div>
+        <div class="city-bar" style="height:${h}px;background:${MODE_COLORS[i%MODE_COLORS.length]};" data-val="${cnt}" title="${city}: ${cnt}"></div>
+        <div class="city-bar-name">${city}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── TRAINER DETAIL TABLE ──
+function renderTrainerDetailTable() {
+  const trainerMap = {};
+  filteredRows.forEach(r => {
+    const key = r.trainerName || '(Unknown)';
+    if(!trainerMap[key]) {
+      trainerMap[key] = { 'Physical Visit':0,'Physical Re-training':0,'Out of Station Visit':0,'OFS (On-Field Support)':0,'Virtual':0,'Incomplete Physical Visit':0 };
+    }
+    if(TRAINING_MODES.includes(r.trainingMode)) {
+      trainerMap[key][r.trainingMode] = (trainerMap[key][r.trainingMode]||0)+1;
+    }
+  });
+
+  const modeKeys = ['Physical Visit','Physical Re-training','Out of Station Visit','OFS (On-Field Support)','Virtual','Incomplete Physical Visit'];
+  const totals = {};
+  modeKeys.forEach(m => totals[m] = 0);
+  let grandTotal = 0;
+
+  const rows = Object.entries(trainerMap).sort((a,b) => {
+    const at = modeKeys.reduce((s,m)=>s+a[1][m],0);
+    const bt = modeKeys.reduce((s,m)=>s+b[1][m],0);
+    return bt-at;
+  });
+
+  document.getElementById('trainer-detail-tbody').innerHTML = rows.map(([name, data]) => {
+    const rowTotal = modeKeys.reduce((s,m)=>s+data[m],0);
+    grandTotal += rowTotal;
+    modeKeys.forEach(m => totals[m] += data[m]);
+    return `<tr>
+      <td style="font-weight:500;">${name}</td>
+      ${modeKeys.map(m => `<td style="text-align:center;">${data[m]||'–'}</td>`).join('')}
+      <td style="text-align:center;font-weight:700;color:var(--gold);">${rowTotal}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('trainer-detail-tfoot').innerHTML = `
+    <tr style="background:rgba(245,197,24,0.08);font-weight:700;">
+      <td style="color:var(--gold);">Total</td>
+      ${modeKeys.map(m=>`<td style="text-align:center;color:var(--gold);">${totals[m]}</td>`).join('')}
+      <td style="text-align:center;color:var(--gold);">${grandTotal}</td>
+    </tr>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>
