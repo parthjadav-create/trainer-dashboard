@@ -329,37 +329,33 @@ function render() {
 }
 
 function renderKPIs() {
-  const total = filteredData.length;
+  const total = filteredData.length; // Should match 1,215 [cite: 7, 114, 116]
   
-  // 1. Total Done: Any ticket that has a 'Done' status
-  const totalDone = filteredData.filter(r => 
-    r.status && r.status.toLowerCase() === 'done'
-  ).length;
+  // Looker Studio 'Done' includes all training modes with a 'Done' status [cite: 116, 133]
+  const doneCount = filteredData.filter(r => r.status === 'Done').length; // Should match 1,154 [cite: 10, 101, 116]
+  
+  // Looker Studio 'Close' count [cite: 11]
+  const closeCount = filteredData.filter(r => r.status === 'Close').length; // Should match 51 [cite: 11, 116]
 
-  // 2. Virtual Done: Status is 'Done' AND Mode is 'Virtual'
-  const doneVirtual = filteredData.filter(r => 
-    r.status && r.status.toLowerCase() === 'done' && 
-    r.mode && r.mode.toLowerCase().includes('virtual')
-  ).length;
+  // 'Virtual Done' specifically matches the Virtual Training Mode [cite: 14]
+  const virtualDone = filteredData.filter(r => 
+    r.status === 'Done' && r.mode === 'Virtual'
+  ).length; // Should match 37 [cite: 14, 118]
 
-  // 3. Physical Visit: Status is 'Done' AND Mode is 'Physical Visit'
+  // 'Physical Visit' specifically matches the Physical Visit Mode [cite: 15, 16]
   const physicalVisit = filteredData.filter(r => 
-    r.status && r.status.toLowerCase() === 'done' && 
-    r.mode && r.mode.toLowerCase().includes('physical visit')
-  ).length;
+    r.status === 'Done' && r.mode === 'Physical Visit'
+  ).length; // Should match 1,116 [cite: 16]
 
-  // 4. Close/Not Related: Adjusting these based on typical sheet values
-  const close = filteredData.filter(r => r.status && r.status.toLowerCase() === 'close').length;
-  const notRelated = filteredData.filter(r => r.status && r.status.toLowerCase().includes('not related')).length;
-  
-  const trainers = new Set(filteredData.map(r => r.trainer)).size;
+  // Total unique Trainers [cite: 17, 18]
+  const trainers = new Set(filteredData.map(r => r.trainer)).size; // Should match 35 [cite: 18]
 
   const kpis = [
     { label: 'Total Ticket', val: total, color: '' },
-    { label: 'Done', val: totalDone, color: 'neon' },
-    { label: 'Close', val: close, color: 'danger' },
-    { label: 'Not Related', val: notRelated, color: 'warn' },
-    { label: 'Virtual Done', val: doneVirtual, color: '' },
+    { label: 'Done', val: doneCount, color: 'neon' },
+    { label: 'Close', val: closeCount, color: 'danger' },
+    { label: 'Not Related', val: total - (doneCount + closeCount), color: 'warn' },
+    { label: 'Virtual Done', val: virtualDone, color: '' },
     { label: 'Physical Visit', val: physicalVisit, color: '' },
     { label: 'Trainer', val: trainers, color: 'neon' }
   ];
@@ -368,7 +364,7 @@ function renderKPIs() {
     <div class="kpi ${k.color}">
       <div class="kpi-label">${k.label}</div>
       <div class="kpi-val">${k.val.toLocaleString()}</div>
-      <div class="kpi-sub">${total > 0 ? (k.val / total * 100).toFixed(1) : 0}%</div>
+      <div class="kpi-sub">${total > 0 ? (k.val / total * 100).toFixed(1) : 0}% of Total</div>
     </div>
   `).join('');
 }
