@@ -295,30 +295,52 @@ var COLORS=["#4caf50","#2196f3","#9c27b0","#ff9800","#f44336","#00bcd4","#795548
 var SC={"Done":"#4caf50","Close":"#f44336","Re-schedule":"#9c27b0","Not related to inventory/Done by someone":"#2196f3","Tech concern":"#ff9800","Need other languge / Physical visit":"#00bcd4"};
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",status:"",mode:"",lang:""};
 
+let isLoading = false;
+
 function loadData(){
+  if(isLoading) return;
+  isLoading = true;
+
   document.getElementById("lmsg").textContent="Fetching data from Google Sheet...";
   document.getElementById("live-txt").textContent="SYNCING";
-  return fetch(API,{method:"GET",redirect:"follow"})
-    .then(function(r){return r.text();})
-    .then(function(txt){
-      var js=JSON.parse(txt);
-      if(js.status==="error")throw new Error(js.message);
-      if(!js.data||!js.data.length)throw new Error("No data returned from sheet");
-      allRows=parseRows(js.data);
+
+  return fetch(API)
+    .then(r => r.text())
+    .then(txt => {
+      isLoading = false;
+
+      var js = JSON.parse(txt);
+
+      if(js.status === "error") throw new Error(js.message);
+      if(!js.data || !js.data.length) throw new Error("No data returned");
+
+      // ✅ ONLY update if success
+      allRows = parseRows(js.data);
+
+      document.getElementById("alert-box").style.display="none";
+
       document.getElementById("live-txt").textContent="LIVE";
-      document.getElementById("sync-txt").textContent="Synced "+new Date().toLocaleTimeString();
-      document.getElementById("total-bd").textContent=allRows.length.toLocaleString();
-      populateFilters();applyFilters();
+      document.getElementById("sync-txt").textContent="Synced " + new Date().toLocaleTimeString();
+      document.getElementById("total-bd").textContent = allRows.length.toLocaleString();
+
+      populateFilters();
+      applyFilters();
     })
-    .catch(function(e){
-      console.error("Error:",e.message);
-      var al=document.getElementById("alert-box");
-      al.textContent="Could not load live data: "+e.message;
-      al.style.display="block";
-      document.getElementById("live-txt").textContent="ERROR";
+    .catch(e => {
+      isLoading = false;
+
+      console.error("Error:", e.message);
+
+      // ❗ DO NOT clear data
+      // ❗ DO NOT call render()
+
+      var al = document.getElementById("alert-box");
+      al.textContent = "Live sync failed. Showing last data. (" + e.message + ")";
+      al.style.display = "block";
+
+      document.getElementById("live-txt").textContent = "OFFLINE";
     });
 }
-
 function parseRows(raw){
   if(!raw.length)return[];
   var headers=Object.keys(raw[0]),hmap={};
