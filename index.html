@@ -1,763 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Inventory Team On-Site Trainer Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<title>On-Site Trainer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-  :root {
-    --gold: #f5c518;
-    --gold-light: #fde87c;
-    --gold-dark: #c9a000;
-    --bg: #0f1117;
-    --bg2: #181c28;
-    --bg3: #1e2336;
-    --card: #1a1f30;
-    --card2: #222840;
-    --border: rgba(245,197,24,0.18);
-    --text: #e8eaf0;
-    --muted: #8892a4;
-    --green: #22c55e;
-    --red: #ef4444;
-    --blue: #38bdf8;
-    --purple: #a78bfa;
-    --orange: #fb923c;
-    --pink: #f472b6;
-    --teal: #2dd4bf;
-    --radius: 12px;
-    --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    min-height: 100vh;
-  }
+:root {
+  --bg:#05070f;--bg2:#090d1a;--bg3:#0e1425;--card:#0d1120;--card2:#111828;
+  --border:rgba(99,179,237,0.12);--border2:rgba(99,179,237,0.22);
+  --accent:#63b3ed;--accent2:#90cdf4;--neon:#00f5d4;--neon2:#00d4b1;
+  --warn:#f6ad55;--danger:#fc8181;--success:#68d391;--purple:#b794f4;--pink:#f687b3;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;--r:14px;--r2:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",sans-serif;font-size:13px;min-height:100vh;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(99,179,237,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(99,179,237,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 
-  /* ── HEADER ── */
-  .header {
-    background: linear-gradient(135deg, #1a1200 0%, #3a2800 40%, #1a1200 100%);
-    border-bottom: 2px solid var(--gold);
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 30px rgba(245,197,24,0.15);
-  }
-  .header h1 {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(245,197,24,0.4);
-  }
-  .header-right { display:flex; align-items:center; gap:10px; }
-  .refresh-btn {
-    background: var(--gold);
-    color: #000;
-    border: none;
-    padding: 7px 16px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .refresh-btn:hover { background: var(--gold-light); transform: scale(1.05); }
-  .last-updated { color: var(--muted); font-size: 11px; }
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:20px;}
+.loader-logo{font-family:"Syne",sans-serif;font-size:18px;font-weight:800;color:var(--accent);letter-spacing:4px;text-transform:uppercase;}
+.loader-bar-wrap{width:220px;height:3px;background:rgba(99,179,237,0.1);border-radius:2px;overflow:hidden;}
+.loader-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--neon),var(--accent));border-radius:2px;animation:loadBar 2.5s ease forwards;}
+.loader-msg{font-size:11px;color:var(--muted2);letter-spacing:1px;}
+@keyframes loadBar{to{width:100%;}}
 
-  /* ── FILTERS ── */
-  .filters {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 24px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .filter-group { display:flex; align-items:center; gap:6px; }
-  .filter-label { color: var(--gold); font-size: 11px; font-weight: 600; text-transform:uppercase; letter-spacing:.5px; }
-  select, .date-input {
-    background: var(--card2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    cursor: pointer;
-    outline: none;
-    transition: border-color .2s;
-    min-width: 130px;
-  }
-  select:focus, .date-input:focus { border-color: var(--gold); }
-  .filter-sep { color: var(--border); font-size: 18px; }
+/* HEADER */
+.header{position:sticky;top:0;z-index:100;background:rgba(5,7,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--neon),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(0,245,212,0.3);}
+.brand-title{font-family:"Syne",sans-serif;font-size:15px;font-weight:800;letter-spacing:.5px;}
+.brand-sub{font-size:10px;color:var(--muted2);letter-spacing:1px;margin-top:1px;}
+.hright{display:flex;align-items:center;gap:10px;}
+.live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--neon);font-family:"IBM Plex Mono",monospace;}
+.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--accent2);font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn:hover{background:rgba(99,179,237,0.1);}
+.btn-p{background:var(--neon);color:#000;border-color:var(--neon);}
+.btn-p:hover{background:var(--neon2);box-shadow:0 0 20px rgba(0,245,212,0.4);}
 
-  /* ── MAIN WRAPPER ── */
-  .main { padding: 20px 24px; display:flex; flex-direction:column; gap:20px; }
+/* FILTER */
+.filterbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 28px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.fc{display:flex;align-items:center;gap:6px;}
+.fc label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--neon);white-space:nowrap;}
+select,.di{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:8px;font-family:"IBM Plex Sans",sans-serif;font-size:11px;outline:none;cursor:pointer;min-width:120px;transition:border-color .2s;}
+select:focus,.di:focus{border-color:var(--accent);}
+.fdiv{width:1px;height:20px;background:var(--border);margin:0 2px;}
 
-  /* ── KPI CARDS ── */
-  .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 12px;
-  }
-  .kpi-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 14px 10px;
-    position: relative;
-    overflow: hidden;
-    transition: transform .2s, box-shadow .2s;
-  }
-  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(245,197,24,0.12); }
-  .kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-  }
-  .kpi-card.gold::before { background: var(--gold); }
-  .kpi-card.green::before { background: var(--green); }
-  .kpi-card.red::before { background: var(--red); }
-  .kpi-card.blue::before { background: var(--blue); }
-  .kpi-card.purple::before { background: var(--purple); }
-  .kpi-card.orange::before { background: var(--orange); }
-  .kpi-card.teal::before { background: var(--teal); }
+/* MAIN */
+#app{padding:24px 28px;display:flex;flex-direction:column;gap:20px;position:relative;z-index:1;opacity:0;transition:opacity .5s;}
+#app.show{opacity:1;}
 
-  .kpi-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom:6px; }
-  .kpi-value { font-family: 'Rajdhani', sans-serif; font-size: 30px; font-weight: 700; color: var(--text); line-height:1; }
-  .kpi-pct { font-size: 11px; font-weight: 600; margin-top: 4px; }
-  .kpi-pct.up { color: var(--green); }
-  .kpi-pct.down { color: var(--red); }
-  .kpi-pct.neutral { color: var(--muted); }
-  .kpi-bar-track { background: rgba(255,255,255,0.07); border-radius: 4px; height: 4px; margin-top: 8px; overflow:hidden; }
-  .kpi-bar-fill { height: 4px; border-radius: 4px; transition: width 1s ease; }
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:default;}
+.kpi:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4);}
+.kpi-glow{position:absolute;top:-30px;right:-30px;width:80px;height:80px;border-radius:50%;opacity:.12;filter:blur(20px);}
+.kpi-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted2);margin-bottom:6px;}
+.kpi-val{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;line-height:1;}
+.kpi-bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.06);margin-top:10px;overflow:hidden;}
+.kpi-bar-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.c-neon .kpi-glow,.c-neon .kpi-val{color:var(--neon);}
+.c-neon .kpi-glow{background:var(--neon);} .c-neon .kpi-bar-fill{background:var(--neon);}
+.c-success .kpi-val{color:var(--success);} .c-success .kpi-bar-fill{background:var(--success);}
+.c-danger .kpi-val{color:var(--danger);} .c-danger .kpi-bar-fill{background:var(--danger);}
 
-  /* ── TWO-COL ROW ── */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-
-  /* ── PANEL ── */
-  .panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-  .panel-header {
-    background: linear-gradient(90deg, rgba(245,197,24,0.12) 0%, transparent 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .panel-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--gold);
-    letter-spacing: .8px;
-    text-transform: uppercase;
-  }
-  .panel-body { padding: 14px 16px; }
-
-  /* ── CHART CONTAINER ── */
-  .chart-wrap { position: relative; }
-
-  /* ── TABLE ── */
-  .dash-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .dash-table th {
-    background: rgba(245,197,24,0.08);
-    color: var(--gold);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .6px;
-    padding: 8px 10px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  .dash-table td {
-    padding: 7px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: var(--text);
-    white-space: nowrap;
-  }
-  .dash-table tr:last-child td { border-bottom: none; }
-  .dash-table tr:hover td { background: rgba(245,197,24,0.05); }
-  .rank-badge {
-    display: inline-flex; align-items:center; justify-content:center;
-    width: 20px; height: 20px; border-radius: 50%;
-    font-size: 10px; font-weight: 700;
-    background: rgba(245,197,24,0.15); color: var(--gold);
-  }
-  .rank-badge.r1 { background: rgba(255,215,0,0.25); color: gold; }
-  .rank-badge.r2 { background: rgba(192,192,192,0.2); color: silver; }
-  .rank-badge.r3 { background: rgba(205,127,50,0.2); color: #cd7f32; }
-
-  .avg-bar-wrap { display:flex; align-items:center; gap:6px; }
-  .avg-bar { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
-
-  /* ── STATUS PILLS ── */
-  .pill {
-    display: inline-block;
-    padding: 2px 8px; border-radius: 20px;
-    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
-  }
-  .pill-done { background: rgba(34,197,94,0.15); color: var(--green); }
-  .pill-close { background: rgba(239,68,68,0.15); color: var(--red); }
-  .pill-virtual { background: rgba(56,189,248,0.15); color: var(--blue); }
-  .pill-physical { background: rgba(245,197,24,0.15); color: var(--gold); }
-
-  /* ── HORIZONTAL BAR ── */
-  .hbar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-  .hbar-label { width: 160px; font-size: 11px; color: var(--muted); flex-shrink:0; text-align:right; }
-  .hbar-track { flex: 1; height: 10px; background: rgba(255,255,255,0.06); border-radius:5px; overflow:hidden; }
-  .hbar-fill { height: 100%; border-radius: 5px; transition: width 1s ease; }
-  .hbar-val { width: 36px; text-align: right; font-size: 11px; font-weight: 600; color: var(--text); flex-shrink:0; }
-
-  /* ── TICKET STATUS ── */
-  .ticket-list { display:flex; flex-direction:column; gap:8px; }
-  .ticket-item { display:flex; align-items:center; justify-content:space-between; }
-  .ticket-item-label { font-size: 12px; color: var(--muted); }
-  .ticket-item-val {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 18px; font-weight: 700;
-  }
-
-  /* ── LANGUAGE TABLE ── */
-  .lang-table { width:100%; font-size:12px; border-collapse:collapse; }
-  .lang-table th { color: var(--gold); font-size:10px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border); text-align:left; }
-  .lang-table td { padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.04); }
-  .lang-table tr:last-child td { font-weight:700; color: var(--gold); }
-
-  /* ── LOADING ── */
-  #loading-overlay {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex; flex-direction:column; align-items:center; justify-content:center;
-    z-index: 1000;
-    gap: 16px;
-  }
-  .loader-ring {
-    width: 48px; height: 48px;
-    border: 3px solid rgba(245,197,24,0.15);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #loading-overlay p { color: var(--muted); font-size: 13px; }
-
-  /* ── ERROR ── */
-  .error-banner {
-    background: rgba(239,68,68,0.1);
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    color: var(--red);
-    font-size: 13px;
-    margin-bottom: 16px;
-  }
-  .info-banner {
-    background: rgba(56,189,248,0.08);
-    border: 1px solid rgba(56,189,248,0.25);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    color: var(--blue);
-    font-size: 12px;
-    margin-bottom: 12px;
-    line-height: 1.6;
-  }
-
-  /* ── CITY BAR CHART ── */
-  .city-chart-wrap { overflow-x: auto; }
-  .city-bars { display: flex; gap: 6px; align-items: flex-end; min-height: 100px; padding: 8px 4px 0; min-width: max-content; }
-  .city-bar-col { display: flex; flex-direction:column; align-items:center; gap: 4px; }
-  .city-bar { width: 28px; border-radius: 4px 4px 0 0; transition: height .8s ease; cursor: default; position:relative; }
-  .city-bar:hover::after {
-    content: attr(data-val);
-    position: absolute; bottom: 100%; left:50%; transform: translateX(-50%);
-    background: var(--bg3); color: var(--gold); font-size: 10px; font-weight:700;
-    padding: 2px 6px; border-radius: 4px; white-space:nowrap; margin-bottom:2px;
-    border: 1px solid var(--border);
-  }
-  .city-bar-name { font-size: 9px; color: var(--muted); transform: rotate(-40deg); transform-origin: top center; white-space: nowrap; margin-top: 6px; }
-
-  /* RESPONSIVE */
-  @media (max-width: 1200px) {
-    .kpi-row { grid-template-columns: repeat(4,1fr); }
-    .three-col { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 768px) {
-    .kpi-row { grid-template-columns: repeat(2,1fr); }
-    .two-col, .three-col { grid-template-columns: 1fr; }
-    .main { padding: 14px; }
-    .filters { flex-direction: column; align-items: flex-start; }
-  }
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{padding:9px 12px;text-align:left;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted2);border-bottom:1px solid var(--border);white-space:nowrap;background:rgba(255,255,255,0.02);}
+.tbl td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.03);white-space:nowrap;}
+.tbl tbody tr:hover td{background:rgba(99,179,237,0.04);}
 </style>
 </head>
 <body>
 
-<div id="loading-overlay">
-  <div class="loader-ring"></div>
-  <p>Loading dashboard data…</p>
+<div id="loader">
+  <div class="loader-logo">Trainer Dashboard</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-msg">Connecting to Google Sheet...</div>
 </div>
 
-<!-- HEADER -->
-<div class="header">
-  <h1>🏷️ Inventory Team On-Site Trainer Dashboard</h1>
-  <div class="header-right">
-    <span class="last-updated" id="last-updated">–</span>
-    <button class="refresh-btn" onclick="loadData()">⟳ Refresh</button>
+<header class="header">
+  <div class="brand">
+    <div class="brand-icon">📋</div>
+    <div>
+      <div class="brand-title">Inventory On-Site Trainer</div>
+      <div class="brand-sub">LIVE PERFORMANCE DASHBOARD</div>
+    </div>
   </div>
+  <div class="hright">
+    <div class="live" id="lstatus">CONNECTING</div>
+    <button class="btn" onclick="loadData()">↻ Refresh</button>
+  </div>
+</header>
+
+<div class="filterbar">
+  <div class="fc"><label>Trainer</label><select id="ft"><option value="">All</option></select></div>
+  <div class="fc"><label>City</label><select id="fc"><option value="">All</option></select></div>
+  <div class="fc"><label>Status</label><select id="fs"><option value="">All</option></select></div>
+  <div class="fc"><label>Mode</label><select id="fm"><option value="">All</option></select></div>
+  <div class="fc"><label>From</label><input type="date" id="ff" class="di"/></div>
+  <div class="fc"><label>To</label><input type="date" id="ft2" class="di"/></div>
+  <button class="btn btn-p" onclick="applyFilters()">Apply</button>
+  <button class="btn" onclick="resetFilters()">Reset</button>
 </div>
 
-<!-- FILTERS -->
-<div class="filters">
-  <div class="filter-group">
-    <span class="filter-label">Trainer</span>
-    <select id="f-trainer"><option value="">All Trainers</option></select>
+<div id="app">
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="panel">
+    <table class="tbl"><thead><tr><th>Trainer</th><th>Total</th><th>Done Count</th></tr></thead><tbody id="trb"></tbody></table>
   </div>
-  <div class="filter-group">
-    <span class="filter-label">City</span>
-    <select id="f-city"><option value="">All Cities</option></select>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">Status</span>
-    <select id="f-status"><option value="">All Status</option></select>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">Training Mode</span>
-    <select id="f-mode"><option value="">All Modes</option></select>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">From</span>
-    <input type="date" id="f-from" class="date-input"/>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">To</span>
-    <input type="date" id="f-to" class="date-input"/>
-  </div>
-  <button class="refresh-btn" onclick="applyFilters()">Apply</button>
-  <button class="refresh-btn" style="background:var(--bg3);color:var(--gold);border:1px solid var(--gold);" onclick="resetFilters()">Reset</button>
 </div>
-
-<div class="main" id="main-content" style="display:none;">
-
-  <!-- INFO BANNER -->
-  <div class="info-banner" id="info-banner" style="display:none;"></div>
-
-  <!-- KPI CARDS -->
-  <div class="kpi-row" id="kpi-row"></div>
-
-  <!-- ROW 2: Daily Call Chart + Trainer Table -->
-  <div class="two-col">
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">📞 Daily Call / Status Trend</span></div>
-      <div class="panel-body chart-wrap" style="height:220px;">
-        <canvas id="dailyChart"></canvas>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">🏆 Trainer Leaderboard</span>
-        <span style="font-size:11px;color:var(--muted);" id="trainer-count"></span>
-      </div>
-      <div class="panel-body" style="padding:0; max-height:220px; overflow-y:auto;">
-        <table class="dash-table" id="trainer-table">
-          <thead><tr><th>#</th><th>Trainer Name</th><th>Present</th><th>Training Done</th><th>Avg / Day</th></tr></thead>
-          <tbody id="trainer-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROW 3: Date-wise line chart -->
-  <div class="panel">
-    <div class="panel-header"><span class="panel-title">📅 Date-Wise Ticket Trend</span></div>
-    <div class="panel-body chart-wrap" style="height:240px;">
-      <canvas id="dateChart"></canvas>
-    </div>
-  </div>
-
-  <!-- ROW 4: Training Mode + Ticket Status + Virtual Language -->
-  <div class="three-col">
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">🎯 Training Mode</span></div>
-      <div class="panel-body" id="training-mode-body"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">🎫 Ticket Status</span></div>
-      <div class="panel-body" id="ticket-status-body"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">🌐 Virtual Training Language</span></div>
-      <div class="panel-body" style="padding:0; max-height:260px; overflow-y:auto;">
-        <table class="lang-table" id="lang-table">
-          <thead><tr><th>Language</th><th>Training</th></tr></thead>
-          <tbody id="lang-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROW 5: City Bar Chart -->
-  <div class="panel">
-    <div class="panel-header"><span class="panel-title">🏙️ Training Mode by City</span></div>
-    <div class="panel-body city-chart-wrap" style="padding:16px 16px 8px;">
-      <div id="city-bars-container" class="city-bars"></div>
-    </div>
-  </div>
-
-  <!-- ROW 6: Trainer-wise Training Done Table -->
-  <div class="panel">
-    <div class="panel-header"><span class="panel-title">📋 Trainer-Wise Training Done</span></div>
-    <div class="panel-body" style="padding:0; overflow-x:auto;">
-      <table class="dash-table" id="trainer-detail-table">
-        <thead>
-          <tr>
-            <th>Trainer Name</th>
-            <th>Physical Visit</th>
-            <th>Physical Re-training</th>
-            <th>Out of Station Visit</th>
-            <th>OFS (On-Field Support)</th>
-            <th>Virtual</th>
-            <th>Incomplete Physical Visit</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody id="trainer-detail-tbody"></tbody>
-        <tfoot id="trainer-detail-tfoot"></tfoot>
-      </table>
-    </div>
-  </div>
-
-</div><!-- /main -->
 
 <script>
-// ─────────────────────────────────────────────────────────────────
-// CONFIG — Live Google Apps Script endpoint
-// ─────────────────────────────────────────────────────────────────
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJSWqkwB7Z8vkGIfGBwfoSzMrd-YbJBenn5FNzro7pQDM_sjchNOR6QqQ5n9q8izebzw/exec';
 let allRows = [];
-let filteredRows = [];
-let charts = {};
-
-const TRAINING_MODES = [
-  'Virtual', 'Physical Visit', 'Physical Re-training', 'Feedback Visit',
-  'Out of Station Visit', 'Incomplete Physical Visit', 'OFS (On-Field Support)'
-];
-const MODE_COLORS = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6','#2dd4bf'];
-
 async function loadData() {
-  const overlay = document.getElementById('loading-overlay');
-  const overlayMsg = overlay.querySelector('p');
-  overlay.style.display = 'flex';
-  overlayMsg.textContent = 'Fetching live data from Google Sheet…';
-
   try {
-    const resp = await fetch(APPS_SCRIPT_URL);
-    if (!resp.ok) throw new Error('Network error: ' + resp.status);
-    const json = await resp.json();
-    if (json.status === 'error') throw new Error(json.message);
-    if (!json.data || json.data.length === 0) throw new Error('Sheet returned no rows');
-    allRows = normalizeRows(json.data);
-    document.getElementById('info-banner').style.display = 'none';
-    console.log(`✅ Loaded ${allRows.length} live rows`);
+    const res = await fetch(APPS_SCRIPT_URL);
+    const json = await res.json();
+    allRows = json.data.map(r => ({
+      date: String(r['Date'] || r['Timestamp'] || '').split(' ')[0],
+      trainer: String(r['Agent Name'] || r['Trainer Name'] || '').trim().toUpperCase(),
+      status: String(r['Status1'] || r['Status'] || '').trim(),
+      mode: String(r['Category'] || r['Training Mode'] || '').trim()
+    }));
+    render();
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    document.getElementById('lstatus').textContent = 'LIVE';
   } catch (e) {
-    console.error('⚠️ Live fetch failed:', e.message);
-    const banner = document.getElementById('info-banner');
-    banner.innerHTML = `⚠️ <strong>Connection Error</strong> — ${e.message}.<br>
-      Please ensure the Apps Script is deployed as 'Anyone' and your sheet contains valid data.`;
-    banner.style.background = 'rgba(239,68,68,0.08)';
-    banner.style.borderColor = 'rgba(239,68,68,0.3)';
-    banner.style.color = 'var(--red)';
-    banner.style.display = 'block';
+    console.error(e);
   }
-
-  populateFilters();
-  applyFilters();
-  overlay.style.display = 'none';
-  document.getElementById('main-content').style.display = 'flex';
-  document.getElementById('last-updated').textContent = '🟢 Live · ' + new Date().toLocaleTimeString();
-}
-
-function normalizeRows(raw) {
-  return raw.map(r => {
-    const get = (...names) => {
-      for (const n of names) {
-        if (r[n] !== undefined) {
-          const val = String(r[n]).trim();
-          if (val !== '' && val.toLowerCase() !== 'null') return val;
-        }
-      }
-      return '';
-    };
-
-    let rawDate = get('date', 'Date', 'DATE', 'Timestamp');
-    const mdyMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-    if (mdyMatch) {
-      const mm = mdyMatch[1].padStart(2, '0');
-      const dd = mdyMatch[2].padStart(2, '0');
-      const yyyy = mdyMatch[3];
-      rawDate = `${yyyy}-${mm}-${dd}`;
-    } else {
-      const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-      const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
-      if (sheetMatch) {
-        const dd = sheetMatch[1].padStart(2, '0');
-        const mm = monthMap[sheetMatch[2]] || '01';
-        const yy = '20' + sheetMatch[3];
-        rawDate = `${yy}-${mm}-${dd}`;
-      }
-    }
-
-    const slashMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (slashMatch) rawDate = `${slashMatch[3]}-${slashMatch[1].padStart(2,'0')}-${slashMatch[2].padStart(2,'0')}`;
-    const dashMatch = rawDate.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-    if (dashMatch) rawDate = `${dashMatch[3]}-${dashMatch[2].padStart(2,'0')}-${dashMatch[1].padStart(2,'0')}`;
-
-    return {
-      date:         rawDate,
-      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer', 'Agent Name').trim().toUpperCase(),
-      cityName:     get('City Name', 'CityName', 'City', 'Restaurantname'),
-      status:       get('Status', 'status').trim(),
-      trainingMode: get('Training Mode', 'TrainingMode', 'Mode', 'Category'),
-      language:     get('Languages', 'Language', 'Virtual Language'),
-    };
-  }).filter(r => r.trainerName && r.date);
-}
-
-function populateFilters() {
-  fillSelect('f-trainer', [...new Set(allRows.map(r=>r.trainerName).filter(Boolean))].sort());
-  fillSelect('f-city', [...new Set(allRows.map(r=>r.cityName).filter(Boolean))].sort());
-  fillSelect('f-status', [...new Set(allRows.map(r=>r.status).filter(Boolean))].sort());
-  fillSelect('f-mode', [...new Set(allRows.map(r=>r.trainingMode).filter(Boolean))].sort());
-  
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  document.getElementById('f-from').value = `${y}-${m}-01`;
-  document.getElementById('f-to').value = `${y}-${m}-${d}`;
-}
-
-function fillSelect(id, vals) {
-  const el = document.getElementById(id);
-  const first = el.options[0];
-  el.innerHTML = '';
-  el.appendChild(first);
-  vals.forEach(v => { const o = new Option(v,v); el.appendChild(o); });
-}
-
-function applyFilters() {
-  const trainer = document.getElementById('f-trainer').value;
-  const city = document.getElementById('f-city').value;
-  const status = document.getElementById('f-status').value;
-  const mode = document.getElementById('f-mode').value;
-  const from = document.getElementById('f-from').value;
-  const to = document.getElementById('f-to').value;
-  filteredRows = allRows.filter(r => {
-    if(trainer && r.trainerName !== trainer) return false;
-    if(city && r.cityName !== city) return false;
-    if(status && r.status !== status) return false;
-    if(mode && r.trainingMode !== mode) return false;
-    if(from && r.date < from) return false;
-    if(to && r.date > to) return false;
-    return true;
-  });
-  render();
-}
-
-function resetFilters() {
-  document.getElementById('f-trainer').value = '';
-  document.getElementById('f-city').value = '';
-  document.getElementById('f-status').value = '';
-  document.getElementById('f-mode').value = '';
-  populateFilters();
-  applyFilters();
 }
 
 function render() {
-  renderKPIs();
-  renderTrainerTable();
-  renderDailyChart();
-  renderDateChart();
-  renderTrainingMode();
-  renderTicketStatus();
-  renderLanguageTable();
-  renderCityBars();
-  renderTrainerDetailTable();
-}
-
-function renderKPIs() {
-  const total = filteredRows.length;
-  const done = filteredRows.filter(r=>r.status === 'Done').length;
-  const close = filteredRows.filter(r=>r.status === 'Close').length;
-  const notRel = filteredRows.filter(r=>r.status === 'Not related to inventory/Done by someone').length;
-  const reVisit = filteredRows.filter(r=>r.trainingMode === 'Physical Re-training').length;
-  const virtual = filteredRows.filter(r=>r.trainingMode === 'Virtual').length;
-  const physical = filteredRows.filter(r=>r.trainingMode === 'Physical Visit').length;
-  const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
-
-  const kpis = [
-    { label:'Total Ticket', val:total, pct:'100%', pctType:'neutral', color:'gold', bar:100, barColor:'var(--gold)' },
-    { label:'Done Count', val:done, pct:(total?(done/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'green', bar:total?done/total*100:0, barColor:'var(--green)' },
-    { label:'No Training Count', val:close, pct:(total?(close/total*100).toFixed(1)+'%':'–'), pctType:'down', color:'red', bar:total?close/total*100:0, barColor:'var(--red)' },
-    { label:'Re-Visit Count', val:reVisit, pct:(total?(reVisit/total*100).toFixed(1)+'%':'–'), pctType:'neutral', color:'blue', bar:total?reVisit/total*100:0, barColor:'var(--blue)' },
-    { label:'Virtual Done', val:virtual, pct:(total?(virtual/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'purple', bar:total?virtual/total*100:0, barColor:'var(--purple)' },
-    { label:'Physical Visit', val:physical, pct:(total?(physical/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'orange', bar:total?physical/total*100:0, barColor:'var(--orange)' },
-    { label:'Trainers', val:trainers, pct:'Active', pctType:'neutral', color:'teal', bar:100, barColor:'var(--teal)' },
-  ];
-
-  const row = document.getElementById('kpi-row');
-  row.innerHTML = kpis.map(k => `
-    <div class="kpi-card ${k.color}">
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-value">${k.val.toLocaleString()}</div>
-      <div class="kpi-pct ${k.pctType}">${k.pct}</div>
-      <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${k.bar}%;background:${k.barColor};"></div></div>
+  const done = allRows.filter(r => r.status === 'Done').length;
+  const kpiGrid = document.getElementById('kpi-grid');
+  kpiGrid.innerHTML = `
+    <div class="kpi c-neon">
+      <div class="kpi-label">Total Tickets</div>
+      <div class="kpi-val">${allRows.length}</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:100%"></div></div>
     </div>
-  `).join('');
+    <div class="kpi c-success">
+      <div class="kpi-label">Done Count</div>
+      <div class="kpi-val">${done}</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${(done/allRows.length)*100}%"></div></div>
+    </div>
+  `;
 }
 
-function renderTrainerTable() {
-  const trainerMap = {};
-  filteredRows.forEach(r => {
-    if(!r.trainerName) return;
-    if(!trainerMap[r.trainerName]) trainerMap[r.trainerName] = { present: 0, done: 0 };
-    trainerMap[r.trainerName].present++;
-    if(r.status === 'Done') trainerMap[r.trainerName].done++;
-  });
-  const arr = Object.entries(trainerMap).map(([name,d])=>({name,...d,avg:(d.done/Math.max(1,d.present)).toFixed(2)}));
-  arr.sort((a,b)=>b.done-a.done);
-  const maxDone = arr[0]?.done || 1;
-  document.getElementById('trainer-count').textContent = `${arr.length} trainers`;
-  document.getElementById('trainer-tbody').innerHTML = arr.slice(0,15).map((t,i)=>`
-    <tr>
-      <td><span class="rank-badge ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</span></td>
-      <td style="font-weight:500;">${t.name}</td>
-      <td>${t.present}</td>
-      <td>${t.done}</td>
-      <td>
-        <div class="avg-bar-wrap">
-          <div class="avg-bar" style="width:${Math.round(t.done/maxDone*80)+10}px;"></div>
-          <span style="font-size:11px;color:var(--gold);">${t.avg}</span>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function renderDailyChart() {
-  const byDate = {};
-  filteredRows.forEach(r => {
-    if(!r.date) return;
-    const d = r.date.slice(5);
-    if(!byDate[d]) byDate[d] = 0;
-    byDate[d]++;
-  });
-  const labels = Object.keys(byDate).sort();
-  const vals = labels.map(l=>byDate[l]);
-
-  if(charts.daily) charts.daily.destroy();
-  const ctx = document.getElementById('dailyChart').getContext('2d');
-  charts.daily = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Tickets',
-        data: vals,
-        backgroundColor: 'rgba(245,197,24,0.5)',
-        borderColor: 'var(--gold)',
-        borderWidth: 1,
-        borderRadius: 4,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } },
-        y: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } }
-      }
-    }
-  });
-}
-
-function renderDateChart() {
-  const modeByDate = {};
-  const datesSet = new Set();
-  filteredRows.forEach(r => {
-    if(!r.date) return;
-    datesSet.add(r.date);
-    if(!modeByDate[r.trainingMode]) modeByDate[r.trainingMode] = {};
-    modeByDate[r.trainingMode][r.date] = (modeByDate[r.trainingMode][r.date]||0)+1;
-  });
-  const dates = [...datesSet].sort();
-
-  const topModes = TRAINING_MODES.filter(m => filteredRows.some(r=>r.trainingMode===m));
-  const datasets = topModes.map((mode,i) => ({
-    label: mode,
-    data: dates.map(d => modeByDate[mode]?.[d] || 0),
-    borderColor: MODE_COLORS[i],
-    backgroundColor: MODE_COLORS[i]+'22',
-    borderWidth: 2,
-    pointRadius: 3,
-    tension: 0.3,
-    fill: false
-  }));
-
-  if(charts.date) charts.date.destroy();
-  const ctx = document.getElementById('dateChart').getContext('2d');
-  charts.date = new Chart(ctx, {
-    type: 'line',
-    data: { labels: dates.map(d=>d.slice(5)), datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: { color: '#8892a4', font:{size:10}, boxWidth:12, padding:12 }
-        }
-      },
-      scales: {
-        x: { ticks: { color: '#8892a4', font:{size:9}, maxTicksLimit:20 }, grid: { color: 'rgba(255,255,255,0.04)' } },
-        y: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } }
-      }
-    }
-  });
-}
-
-function renderTrainingMode() {
-  const counts = {};
-  filteredRows.forEach(r => { if(r.trainingMode) counts[r.trainingMode] = (counts[r.trainingMode]||0)+1; });
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const max = sorted[0]?.[1] || 1;
-  const body = document.getElementById('training-mode-body');
-  body.innerHTML = sorted.map(([mode,cnt],i) => `
-    <div class="hbar-row">
-      <div class="hbar-label">${mode}</div>
+window.onload = loadData;
+</script>
+</body>
+</html>div class="hbar-label">${mode}</div>
       <div class="hbar-track">
         <div class="hbar-fill" style="width:${cnt/max*100}%;background:${MODE_COLORS[i%MODE_COLORS.length]};"></div>
       </div>
       <div class="hbar-val">${cnt}</div>
+    <div class="kpi c-success">
+      <div class="kpi-label">Done Count</div>
+      <div class="kpi-val">${done}</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${(done/allRows.length)*100}%"></div></div>
     </div>
   `).join('');
 }
@@ -861,6 +268,7 @@ function renderTrainerDetailTable() {
 }
 
 window.addEventListener('DOMContentLoaded', loadData);
+window.onload = loadData;
 </script>
 </body>
 </html>
