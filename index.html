@@ -330,32 +330,34 @@ function render() {
 
 function renderKPIs() {
   const total = filteredData.length;
-  const done = filteredData.filter(r => r.status === 'Done').length;
+  const donePhysical = filteredData.filter(r => r.status === 'Done' && r.mode !== 'Virtual').length;
+  const doneVirtual = filteredData.filter(r => r.status === 'Done' && r.mode === 'Virtual').length;
+  
+  // Total Done is the sum of Physical Done and Virtual Done
+  const totalDone = donePhysical + doneVirtual;
+  
   const close = filteredData.filter(r => r.status === 'Close').length;
-  const revisit = filteredData.filter(r => r.mode === 'Physical Re-training').length;
-  const virtual = filteredData.filter(r => r.mode === 'Virtual').length;
-  const physical = filteredData.filter(r => r.mode === 'Physical Visit').length;
+  const notRelated = filteredData.filter(r => r.status.includes('Not related')).length;
   const trainers = new Set(filteredData.map(r => r.trainer)).size;
 
   const kpis = [
-    { label: 'Total Tickets', val: total, color: '' },
-    { label: 'Done Count', val: done, color: 'neon' },
-    { label: 'No Training Count', val: close, color: 'danger' },
-    { label: 'Re-Visit Count', val: revisit, color: 'warn' },
-    { label: 'Virtual Done', val: virtual, color: '' },
-    { label: 'Physical Visit', val: physical, color: '' },
-    { label: 'Active Trainers', val: trainers, color: 'neon' }
+    { label: 'Total Ticket', val: total, sub: 'Total Records', color: '' },
+    { label: 'Done', val: totalDone, sub: 'Combined Done', color: 'neon' },
+    { label: 'Close', val: close, sub: 'Status: Close', color: 'danger' },
+    { label: 'Not Related', val: notRelated, sub: 'Other Status', color: 'warn' },
+    { label: 'Virtual Done', val: doneVirtual, sub: 'Virtual Mode', color: '' },
+    { label: 'Physical Visit', val: donePhysical, sub: 'Physical Mode', color: '' },
+    { label: 'Trainer', val: trainers, sub: 'Unique Agents', color: 'neon' }
   ];
 
   document.getElementById('kpi-row').innerHTML = kpis.map(k => `
     <div class="kpi ${k.color}">
       <div class="kpi-label">${k.label}</div>
       <div class="kpi-val">${k.val.toLocaleString()}</div>
-      <div class="kpi-sub">${total ? (k.val / total * 100).toFixed(1) : 0}% of Total</div>
+      <div class="kpi-sub">${total > 0 ? (k.val / total * 100).toFixed(1) : 0}%</div>
     </div>
   `).join('');
 }
-
 function renderMainChart() {
   const days = {};
   filteredData.forEach(r => { days[r.date] = (days[r.date] || 0) + 1; });
