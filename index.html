@@ -230,7 +230,6 @@ async function init() {
 function normalize(raw) {
   if (!raw || raw.length === 0) return [];
   
-  // Get all header keys and normalize them (lowercase, no spaces) to find columns accurately
   const headers = Object.keys(raw[0]);
   const headerMap = {};
   headers.forEach(h => {
@@ -242,31 +241,34 @@ function normalize(raw) {
       for (let v of variants) {
         const normV = v.toLowerCase().replace(/\s+/g, '');
         const actualKey = headerMap[normV];
-        if (actualKey && r[actualKey] !== undefined && String(r[actualKey]).trim() !== '') {
+        if (actualKey && r[actualKey] !== undefined) {
           return String(r[actualKey]).trim();
         }
       }
       return '';
     };
 
-    // Date Extraction Logic
+    // Date handling
     let rawDate = get('date', 'Timestamp', 'dateValue');
     let dateObj = null;
-
     if (rawDate) {
-      // Handle M/D/YYYY HH:mm:ss or M/D/YYYY
       const mdy = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-      if (mdy) {
-        dateObj = `${mdy[3]}-${mdy[1].padStart(2, '0')}-${mdy[2].padStart(2, '0')}`;
-      } else {
-        // Handle 21/Mar/26
-        const monthMap = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
-        const dmy = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
-        if (dmy) dateObj = `20${dmy[3]}-${monthMap[dmy[2]] || '01'}-${dmy[1].padStart(2, '0')}`;
-        else if (rawDate.includes('-')) dateObj = rawDate.split('T')[0];
-      }
+      if (mdy) dateObj = `${mdy[3]}-${mdy[1].padStart(2, '0')}-${mdy[2].padStart(2, '0')}`;
+      else if (rawDate.includes('-')) dateObj = rawDate.split('T')[0];
     }
 
+    return {
+      date: dateObj,
+      // Convert to UpperCase to match your trainer list exactly
+      trainer: get('agentname', 'trainername', 'trainer').toUpperCase(),
+      city: get('restaurantname', 'cityname', 'city'),
+      // Keep status and mode cleaned for easier matching
+      status: get('status1', 'status').toUpperCase(),
+      mode: get('category', 'trainingmode', 'mode').toUpperCase(),
+      lang: get('Languages', 'Language', 'Virtual Language')
+    };
+  }).filter(r => r.trainer && r.date); 
+}
     return {
       date: dateObj,
       trainer: get('agentname', 'trainername', 'trainer').toUpperCase(),
@@ -329,30 +331,47 @@ function render() {
 }
 
 function renderKPIs() {
-  const total = filteredData.length; // Will show 1,215 once connected [cite: 1]
+  const total = filteredData.length; // Total Ticket (1,215) [cite: 7, 114]
   
-  // Matches "Total Done" from Looker Studio [cite: 1]
-  const doneCount = filteredData.filter(r => r.status === 'Done').length; 
+  // 1. Done Count (1,154) [cite: 10, 116]
+  const doneCount = filteredData.filter(r => r.status === 'DONE').length;
   
-  // Matches "Virtual Done" [cite: 1]
+  // 2. Close Count (51) [cite: 11, 116]
+  const closeCount = filteredData.filter(r => r.status === 'CLOSE').length;
+
+  // 3. Not Related (3) [cite: 13, 116]
+  const notRelated = filteredData.filter(r => 
+    r.status.includes('NOT RELATED') || r.status.includes('DONE BY SOMEONE')
+  ).length;
+
+  // 4. Virtual Done (37) [cite: 14, 114]
   const virtualDone = filteredData.filter(r => 
-    r.status === 'Done' && r.mode === 'Virtual'
+    r.status === 'DONE' && r.mode.includes('VIRTUAL')
   ).length;
 
-  // Matches "Physical Visit" (1,116) [cite: 1]
+  // 5. Physical Visit (1,116)  
+  // Includes Physical Visit, Re-training, OFS, and Out of Station 
   const physicalVisit = filteredData.filter(r => 
-    r.status === 'Done' && (r.mode === 'Physical Visit' || r.mode === 'Physical Re-training')
+    r.status === 'DONE' && 
+    (r.mode.includes('PHYSICAL') || r.mode.includes('OFS') || r.mode.includes('STATION'))
   ).length;
 
-  const trainers = new Set(filteredData.map(r => r.trainer)).size; // Should be 35 [cite: 1]
+  // 6. Incomplete Visit (7) 
+  const incompleteVisit = filteredData.filter(r => 
+    r.mode.includes('INCOMPLETE')
+  ).length;
+
+  // 7. Active Trainers (35) [cite: 18]
+  const trainers = new Set(filteredData.map(r => r.trainer)).size;
 
   const kpis = [
     { label: 'Total Ticket', val: total, color: '' },
     { label: 'Done', val: doneCount, color: 'neon' },
-    { label: 'Close', val: filteredData.filter(r => r.status === 'Close').length, color: 'danger' },
-    { label: 'Not Related', val: filteredData.filter(r => r.status.includes('Not related')).length, color: 'warn' },
+    { label: 'Close', val: closeCount, color: 'danger' },
+    { label: 'Not Related', val: notRelated, color: 'warn' },
     { label: 'Virtual Done', val: virtualDone, color: '' },
     { label: 'Physical Visit', val: physicalVisit, color: '' },
+    { label: 'Incomplete', val: incompleteVisit, color: 'warn' },
     { label: 'Trainer', val: trainers, color: 'neon' }
   ];
 
