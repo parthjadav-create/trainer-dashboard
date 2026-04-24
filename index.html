@@ -1,908 +1,1026 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Inventory Team On-Site Trainer Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<style>
-  :root {
-    --gold: #f5c518;
-    --gold-light: #fde87c;
-    --gold-dark: #c9a000;
-    --bg: #0f1117;
-    --bg2: #181c28;
-    --bg3: #1e2336;
-    --card: #1a1f30;
-    --card2: #222840;
-    --border: rgba(245,197,24,0.18);
-    --text: #e8eaf0;
-    --muted: #8892a4;
-    --green: #22c55e;
-    --red: #ef4444;
-    --blue: #38bdf8;
-    --purple: #a78bfa;
-    --orange: #fb923c;
-    --pink: #f472b6;
-    --teal: #2dd4bf;
-    --radius: 12px;
-    --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    min-height: 100vh;
-  }
+import os
+import shutil
+import psutil
+import time
+import hashlib
+from pathlib import Path
+from datetime import datetime, timedelta, date
+import argparse
+import pandas as pd
+import gspread
+from gspread.utils import a1_to_rowcol
+from oauth2client.service_account import ServiceAccountCredentials
+import base64
+import requests
+from bs4 import BeautifulSoup
 
-  /* ── HEADER ── */
-  .header {
-    background: linear-gradient(135deg, #1a1200 0%, #3a2800 40%, #1a1200 100%);
-    border-bottom: 2px solid var(--gold);
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 30px rgba(245,197,24,0.15);
-  }
-  .header h1 {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(245,197,24,0.4);
-  }
-  .header-right { display:flex; align-items:center; gap:10px; }
-  .refresh-btn {
-    background: var(--gold);
-    color: #000;
-    border: none;
-    padding: 7px 16px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .refresh-btn:hover { background: var(--gold-light); transform: scale(1.05); }
-  .last-updated { color: var(--muted); font-size: 11px; }
+# ========== CONFIGURATION ==========
 
-  /* ── FILTERS ── */
-  .filters {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 24px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .filter-group { display:flex; align-items:center; gap:6px; }
-  .filter-label { color: var(--gold); font-size: 11px; font-weight: 600; text-transform:uppercase; letter-spacing:.5px; }
-  select, .date-input {
-    background: var(--card2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    cursor: pointer;
-    outline: none;
-    transition: border-color .2s;
-    min-width: 130px;
-  }
-  select:focus, .date-input:focus { border-color: var(--gold); }
-  .filter-sep { color: var(--border); font-size: 18px; }
+# --- SCRIPT IDENTITY (IMPORTANT!) ---
+# SET A UNIQUE IDENTIFIER FOR EACH PC RUNNING THIS SCRIPT.
+# Example for PC-1 (manual): PC_IDENTIFIER = "PC1_MANUAL"
+# Example for PC-2 (scheduled): PC_IDENTIFIER = "PC2_SCHEDULER"
+# PC_IDENTIFIER = "PC-1 Manual" # This will now be set dynamically
 
-  /* ── MAIN WRAPPER ── */
-  .main { padding: 20px 24px; display:flex; flex-direction:column; gap:20px; }
+# --- LOCKING MECHANISM ---
+LOCK_CELL = "J1"  # A cell in the log sheet used for locking to prevent parallel runs.
+LOCK_TIMEOUT_MINUTES = 30  # Time in minutes after which a lock is considered stale.
 
-  /* ── KPI CARDS ── */
-  .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 12px;
-  }
-  .kpi-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 14px 10px;
-    position: relative;
-    overflow: hidden;
-    transition: transform .2s, box-shadow .2s;
-  }
-  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(245,197,24,0.12); }
-  .kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-  }
-  .kpi-card.gold::before { background: var(--gold); }
-  .kpi-card.green::before { background: var(--green); }
-  .kpi-card.red::before { background: var(--red); }
-  .kpi-card.blue::before { background: var(--blue); }
-  .kpi-card.purple::before { background: var(--purple); }
-  .kpi-card.orange::before { background: var(--orange); }
-  .kpi-card.teal::before { background: var(--teal); }
+# --- API RATE LIMITING ---
+INTERVAL_DELAY_SECONDS = 5  # Delay in seconds between processing intervals to avoid API rate limits
+# Google Sheets API limits: ~300 write requests per 300 seconds per user
 
-  .kpi-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom:6px; }
-  .kpi-value { font-family: 'Rajdhani', sans-serif; font-size: 30px; font-weight: 700; color: var(--text); line-height:1; }
-  .kpi-pct { font-size: 11px; font-weight: 600; margin-top: 4px; }
-  .kpi-pct.up { color: var(--green); }
-  .kpi-pct.down { color: var(--red); }
-  .kpi-pct.neutral { color: var(--muted); }
-  .kpi-bar-track { background: rgba(255,255,255,0.07); border-radius: 4px; height: 4px; margin-top: 8px; overflow:hidden; }
-  .kpi-bar-fill { height: 4px; border-radius: 4px; transition: width 1s ease; }
 
-  /* ── TWO-COL ROW ── */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-
-  /* ── PANEL ── */
-  .panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-  .panel-header {
-    background: linear-gradient(90deg, rgba(245,197,24,0.12) 0%, transparent 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .panel-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--gold);
-    letter-spacing: .8px;
-    text-transform: uppercase;
-  }
-  .panel-body { padding: 14px 16px; }
-
-  /* ── CHART CONTAINER ── */
-  .chart-wrap { position: relative; }
-
-  /* ── TABLE ── */
-  .dash-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .dash-table th {
-    background: rgba(245,197,24,0.08);
-    color: var(--gold);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .6px;
-    padding: 8px 10px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  .dash-table td {
-    padding: 7px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: var(--text);
-    white-space: nowrap;
-  }
-  .dash-table tr:last-child td { border-bottom: none; }
-  .dash-table tr:hover td { background: rgba(245,197,24,0.05); }
-  .rank-badge {
-    display: inline-flex; align-items:center; justify-content:center;
-    width: 20px; height: 20px; border-radius: 50%;
-    font-size: 10px; font-weight: 700;
-    background: rgba(245,197,24,0.15); color: var(--gold);
-  }
-  .rank-badge.r1 { background: rgba(255,215,0,0.25); color: gold; }
-  .rank-badge.r2 { background: rgba(192,192,192,0.2); color: silver; }
-  .rank-badge.r3 { background: rgba(205,127,50,0.2); color: #cd7f32; }
-
-  .avg-bar-wrap { display:flex; align-items:center; gap:6px; }
-  .avg-bar { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
-
-  /* ── STATUS PILLS ── */
-  .pill {
-    display: inline-block;
-    padding: 2px 8px; border-radius: 20px;
-    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
-  }
-  .pill-done { background: rgba(34,197,94,0.15); color: var(--green); }
-  .pill-close { background: rgba(239,68,68,0.15); color: var(--red); }
-  .pill-virtual { background: rgba(56,189,248,0.15); color: var(--blue); }
-  .pill-physical { background: rgba(245,197,24,0.15); color: var(--gold); }
-
-  /* ── HORIZONTAL BAR ── */
-  .hbar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-  .hbar-label { width: 160px; font-size: 11px; color: var(--muted); flex-shrink:0; text-align:right; }
-  .hbar-track { flex: 1; height: 10px; background: rgba(255,255,255,0.06); border-radius:5px; overflow:hidden; }
-  .hbar-fill { height: 100%; border-radius: 5px; transition: width 1s ease; }
-  .hbar-val { width: 36px; text-align: right; font-size: 11px; font-weight: 600; color: var(--text); flex-shrink:0; }
-
-  /* ── TICKET STATUS ── */
-  .ticket-list { display:flex; flex-direction:column; gap:8px; }
-  .ticket-item { display:flex; align-items:center; justify-content:space-between; }
-  .ticket-item-label { font-size: 12px; color: var(--muted); }
-  .ticket-item-val {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 18px; font-weight: 700;
-  }
-
-  /* ── LANGUAGE TABLE ── */
-  .lang-table { width:100%; font-size:12px; border-collapse:collapse; }
-  .lang-table th { color: var(--gold); font-size:10px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border); text-align:left; }
-  .lang-table td { padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.04); }
-  .lang-table tr:last-child td { font-weight:700; color: var(--gold); }
-
-  /* ── LOADING ── */
-  #loading-overlay {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex; flex-direction:column; align-items:center; justify-content:center;
-    z-index: 1000;
-    gap: 16px;
-  }
-  .loader-ring {
-    width: 48px; height: 48px;
-    border: 3px solid rgba(245,197,24,0.15);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #loading-overlay p { color: var(--muted); font-size: 13px; }
-
-  /* ── ERROR ── */
-  .error-banner {
-    background: rgba(239,68,68,0.1);
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    color: var(--red);
-    font-size: 13px;
-    margin-bottom: 16px;
-  }
-  .info-banner {
-    background: rgba(56,189,248,0.08);
-    border: 1px solid rgba(56,189,248,0.25);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    color: var(--blue);
-    font-size: 12px;
-    margin-bottom: 12px;
-    line-height: 1.6;
-  }
-
-  /* ── CITY BAR CHART ── */
-  .city-chart-wrap { overflow-x: auto; }
-  .city-bars { display: flex; gap: 6px; align-items: flex-end; min-height: 100px; padding: 8px 4px 0; min-width: max-content; }
-  .city-bar-col { display: flex; flex-direction:column; align-items:center; gap: 4px; }
-  .city-bar { width: 28px; border-radius: 4px 4px 0 0; transition: height .8s ease; cursor: default; position:relative; }
-  .city-bar:hover::after {
-    content: attr(data-val);
-    position: absolute; bottom: 100%; left:50%; transform: translateX(-50%);
-    background: var(--bg3); color: var(--gold); font-size: 10px; font-weight:700;
-    padding: 2px 6px; border-radius: 4px; white-space:nowrap; margin-bottom:2px;
-    border: 1px solid var(--border);
-  }
-  .city-bar-name { font-size: 9px; color: var(--muted); transform: rotate(-40deg); transform-origin: top center; white-space: nowrap; margin-top: 6px; }
-
-  /* RESPONSIVE */
-  @media (max-width: 1200px) {
-    .kpi-row { grid-template-columns: repeat(4,1fr); }
-    .three-col { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 768px) {
-    .kpi-row { grid-template-columns: repeat(2,1fr); }
-    .two-col, .three-col { grid-template-columns: 1fr; }
-    .main { padding: 14px; }
-    .filters { flex-direction: column; align-items: flex-start; }
-  }
-</style>
-</head>
-<body>
-
-<div id="loading-overlay">
-  <div class="loader-ring"></div>
-  <p>Loading dashboard data…</p>
-</div>
-
-<!-- HEADER -->
-<div class="header">
-  <h1>🏷️ Inventory Team On-Site Trainer Dashboard</h1>
-  <div class="header-right">
-    <span class="last-updated" id="last-updated">–</span>
-    <button class="refresh-btn" onclick="loadData()">⟳ Refresh</button>
-  </div>
-</div>
-
-<!-- FILTERS -->
-<div class="filters">
-  <div class="filter-group">
-    <span class="filter-label">Trainer</span>
-    <select id="f-trainer"><option value="">All Trainers</option></select>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">City</span>
-    <select id="f-city"><option value="">All Cities</option></select>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">Status</span>
-    <select id="f-status"><option value="">All Status</option></select>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">Training Mode</span>
-    <select id="f-mode"><option value="">All Modes</option></select>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">From</span>
-    <input type="date" id="f-from" class="date-input"/>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">To</span>
-    <input type="date" id="f-to" class="date-input"/>
-  </div>
-  <button class="refresh-btn" onclick="applyFilters()">Apply</button>
-  <button class="refresh-btn" style="background:var(--bg3);color:var(--gold);border:1px solid var(--gold);" onclick="resetFilters()">Reset</button>
-</div>
-
-<div class="main" id="main-content" style="display:none;">
-
-  <!-- INFO BANNER -->
-  <div class="info-banner" id="info-banner" style="display:none;"></div>
-
-  <!-- KPI CARDS -->
-  <div class="kpi-row" id="kpi-row"></div>
-
-  <!-- ROW 2: Daily Call Chart + Trainer Table -->
-  <div class="two-col">
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">📞 Daily Call / Status Trend</span></div>
-      <div class="panel-body chart-wrap" style="height:220px;">
-        <canvas id="dailyChart"></canvas>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">🏆 Trainer Leaderboard</span>
-        <span style="font-size:11px;color:var(--muted);" id="trainer-count"></span>
-      </div>
-      <div class="panel-body" style="padding:0; max-height:220px; overflow-y:auto;">
-        <table class="dash-table" id="trainer-table">
-          <thead><tr><th>#</th><th>Trainer Name</th><th>Present</th><th>Training Done</th><th>Avg / Day</th></tr></thead>
-          <tbody id="trainer-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROW 3: Date-wise line chart -->
-  <div class="panel">
-    <div class="panel-header"><span class="panel-title">📅 Date-Wise Ticket Trend</span></div>
-    <div class="panel-body chart-wrap" style="height:240px;">
-      <canvas id="dateChart"></canvas>
-    </div>
-  </div>
-
-  <!-- ROW 4: Training Mode + Ticket Status + Virtual Language -->
-  <div class="three-col">
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">🎯 Training Mode</span></div>
-      <div class="panel-body" id="training-mode-body"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">🎫 Ticket Status</span></div>
-      <div class="panel-body" id="ticket-status-body"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">🌐 Virtual Training Language</span></div>
-      <div class="panel-body" style="padding:0; max-height:260px; overflow-y:auto;">
-        <table class="lang-table" id="lang-table">
-          <thead><tr><th>Language</th><th>Training</th></tr></thead>
-          <tbody id="lang-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROW 5: City Bar Chart -->
-  <div class="panel">
-    <div class="panel-header"><span class="panel-title">🏙️ Training Mode by City</span></div>
-    <div class="panel-body city-chart-wrap" style="padding:16px 16px 8px;">
-      <div id="city-bars-container" class="city-bars"></div>
-    </div>
-  </div>
-
-  <!-- ROW 6: Trainer-wise Training Done Table -->
-  <div class="panel">
-    <div class="panel-header"><span class="panel-title">📋 Trainer-Wise Training Done</span></div>
-    <div class="panel-body" style="padding:0; overflow-x:auto;">
-      <table class="dash-table" id="trainer-detail-table">
-        <thead>
-          <tr>
-            <th>Trainer Name</th>
-            <th>Physical Visit</th>
-            <th>Physical Re-training</th>
-            <th>Out of Station Visit</th>
-            <th>OFS (On-Field Support)</th>
-            <th>Virtual</th>
-            <th>Incomplete Physical Visit</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody id="trainer-detail-tbody"></tbody>
-        <tfoot id="trainer-detail-tfoot"></tfoot>
-      </table>
-    </div>
-  </div>
-
-</div><!-- /main -->
-
-<script>
-// ─────────────────────────────────────────────────────────────────
-// CONFIG — Live Google Apps Script endpoint
-// ─────────────────────────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJSWqkwB7Z8vkGIfGBwfoSzMrd-YbJBenn5FNzro7pQDM_sjchNOR6QqQ5n9q8izebzw/exec';
-let allRows = [];
-let filteredRows = [];
-let charts = {};
-
-const TRAINING_MODES = [
-  'Physical Visit','Physical Re-training','Out of Station Visit',
-  'OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'
-  'Virtual', 'Physical Visit', 'Physical Re-training', 'Feedback Visit',
-  'Out of Station Visit', 'Incomplete Physical Visit', 'OFS (On-Field Support)'
-];
-const MODE_COLORS = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6','#2dd4bf'];
-
-// ─────────────────────────────────────────────────────────────────
-// LOAD DATA — fetches from Google Apps Script Web App
-// ─────────────────────────────────────────────────────────────────
-async function loadData() {
-  const overlay = document.getElementById('loading-overlay');
-  const overlayMsg = overlay.querySelector('p');
-  overlay.style.display = 'flex';
-  overlayMsg.textContent = 'Fetching live data from Google Sheet…';
-
-  try {
-    const resp = await fetch(APPS_SCRIPT_URL);
-    if (!resp.ok) throw new Error('Network error: ' + resp.status);
-    const json = await resp.json();
-    if (json.status === 'error') throw new Error(json.message);
-    if (!json.data || json.data.length === 0) throw new Error('Sheet returned no rows');
-    allRows = normalizeRows(json.data);
-    document.getElementById('info-banner').style.display = 'none';
-    console.log(`✅ Loaded ${allRows.length} live rows`);
-  } catch (e) {
-    console.error('⚠️ Live fetch failed:', e.message);
-    const banner = document.getElementById('info-banner');
-    banner.innerHTML = `⚠️ <strong>Connection Error</strong> — ${e.message}.<br>
-      Please ensure the Apps Script is deployed as 'Anyone' and your sheet contains valid data.`;
-    banner.style.background = 'rgba(239,68,68,0.08)';
-    banner.style.borderColor = 'rgba(239,68,68,0.3)';
-    banner.style.color = 'var(--red)';
-    banner.style.display = 'block';
-  }
-
-  populateFilters();
-  applyFilters();
-  overlay.style.display = 'none';
-  document.getElementById('main-content').style.display = 'flex';
-  document.getElementById('last-updated').textContent = '🟢 Live · ' + new Date().toLocaleTimeString();
+SCRIPT_DIR = Path(__file__).resolve().parent
+MAIN_FOLDER = str(SCRIPT_DIR)
+UPLOADED_FOLDER = str(SCRIPT_DIR / "Uploaded_Files")
+GOOGLE_SHEET_ID = "1zJLCgZu53yed1j_GdcZ5CwAYxA6vc9W0zmixGXTG2aY"
+TARGET_SHEET_NAME = "Response"
+LOG_SHEET_NAME = "ProcessedIntervals" # This should match your new logging sheet
+CREDENTIALS_FILE = str(SCRIPT_DIR / "credentials.json")
+LOGIN_PAGE_URL  = "https://dialer.petpooja.com/login"
+REPORT_PAGE_URL = "https://dialer.petpooja.com/report/custom-export-call-report-freezing"
+DOWNLOAD_URL    = "https://dialer.petpooja.com/report/custom-export-call-report-download-freezing"   # ← Replace this
+LOGIN_EMAIL    = "6666"   # ← Your plain text email or username
+LOGIN_PASSWORD = "Dipesh123"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+                                    # ↑ Replace with your exact User-Agent string
+                                    #   from the Request Headers tab
 }
 
-function normalizeRows(raw) {
-  // Log first row keys to console for debugging
-  if (raw.length > 0) {
-    console.log('📋 Sheet column keys:', Object.keys(raw[0]));
-    console.log('📋 First row sample:', raw[0]);
-  }
+# --- CSV Structure Enforcement ---
+REQUIRED_COLUMNS = [
+    "Date",
+    "Hour",
+    "Start Ts",
+    "End Ts",
+    "Interaction Type",
+    "Lead ID",
+    "Customer Number",
+    "User",
+    "Agent Name",
+    "Customer Talk Duration",
+    "Dead",
+    "Dispo",
+    "Length in sec",
+    "Ring Time",
+    "Queue time",
+    "Customer Hold Duration",
+    "Customer Hold Count",
+    "Transfer Queue",
+    "Feedback Response",
+    "Hangup Reason",
+    "disposition Code",
+    "Telco Status",
+    "Disposition Category",
+    "Queue Name",
+    "Campaign Name",
+    "User Group",
+    "Recording Filename",
+    "Recording Location",
+    "DID Date Time",
+    "DID Number",
+    "Comments",
+    "Call Notes",
+    "Attempt",
+    "List ID",
+    "List Name",
+    "Security Phase",
+    "CallRealatedTo",
+    "Category",
+    "Comments1",
+    "Hyperpure_Lead",
+    "MobileNo",
+    "Purchase_by_Petpooja",
+    "RestaurantId",
+    "Restaurantname",
+    "Status1"
+]
 
-  return raw.map(r => {
-    const get = (...names) => {
-      for (const n of names) {
-        if (r[n] !== undefined) {
-          const val = String(r[n]).trim();
-          if (val !== '' && val.toLowerCase() !== 'null') return val;
+INTERVALS = [
+    ("0:00", "0:15"),
+    ("0:15", "0:30"),
+    ("0:30", "0:45"),
+    ("0:45", "1:00"),
+    ("1:00", "1:15"),
+    ("1:15", "1:30"),
+    ("1:30", "1:45"),
+    ("1:45", "2:00"),
+    ("2:00", "2:15"),
+    ("2:15", "2:30"),
+    ("2:30", "2:45"),
+    ("2:45", "3:00"),
+    ("3:00", "3:15"),
+    ("3:15", "3:30"),
+    ("3:30", "3:45"),
+    ("3:45", "4:00"),
+    ("4:00", "4:15"),
+    ("4:15", "4:30"),
+    ("4:30", "4:45"),
+    ("4:45", "5:00"),
+    ("5:00", "5:15"),
+    ("5:15", "5:30"),
+    ("5:30", "5:45"),
+    ("5:45", "6:00"),
+    ("6:00", "6:15"),
+    ("6:15", "6:30"),
+    ("6:30", "6:45"),
+    ("6:45", "7:00"),
+    ("7:00", "7:15"),
+    ("7:15", "7:30"),
+    ("7:30", "7:45"),
+    ("7:45", "8:00"),
+    ("8:00", "8:15"),
+    ("8:15", "8:30"),
+    ("8:30", "8:45"),
+    ("8:45", "9:00"),
+    ("9:00", "9:15"),
+    ("9:15", "9:30"),
+    ("9:30", "9:45"),
+    ("9:45", "10:00"),
+    ("10:00", "10:15"),
+    ("10:15", "10:30"),
+    ("10:30", "10:45"),
+    ("10:45", "11:00"),
+    ("11:00", "11:15"),
+    ("11:15", "11:30"),
+    ("11:30", "11:45"),
+    ("11:45", "11:59"),
+    ("12:00", "13:00"),
+    ("13:00", "13:15"),
+    ("13:15", "13:30"),
+    ("13:30", "13:45"),
+    ("13:45", "14:00"),
+    ("14:00", "14:15"),
+    ("14:15", "14:30"),
+    ("14:30", "14:45"),
+    ("14:45", "15:00"),
+    ("15:00", "15:15"),
+    ("15:15", "15:30"),
+    ("15:30", "15:45"),
+    ("15:45", "16:00"),
+    ("16:00", "16:15"),
+    ("16:15", "16:30"),
+    ("16:30", "16:45"),
+    ("16:45", "17:00"),
+    ("17:00", "17:15"),
+    ("17:15", "17:30"),
+    ("17:30", "17:45"),
+    ("17:45", "18:00"),
+    ("18:00", "18:15"),
+    ("18:15", "18:30"),
+    ("18:30", "18:45"),
+    ("18:45", "19:00"),
+    ("19:00", "19:15"),
+    ("19:15", "19:30"),
+    ("19:30", "19:45"),
+    ("19:45", "20:00"),
+    ("20:00", "20:15"),
+    ("20:15", "20:30"),
+    ("20:30", "20:45"),
+    ("20:45", "21:00"),
+    ("21:00", "21:15"),
+    ("21:15", "21:30"),
+    ("21:30", "21:45"),
+    ("21:45", "22:00"),
+    ("22:00", "22:15"),
+    ("22:15", "22:30"),
+    ("22:30", "22:45"),
+    ("22:45", "23:00"),
+    ("23:00", "23:15"),
+    ("23:15", "23:30"),
+    ("23:30", "23:45"),
+    ("23:45", "23:59")
+]
+
+def _parse_time(tstr, target_date):
+    """Parse a time string like '00:15' (24-hour format) into a datetime for the given date."""
+    return datetime.strptime(f"{target_date.strftime('%Y-%m-%d')} {tstr}", "%Y-%m-%d %H:%M")
+
+
+
+# ========== GOOGLE SHEETS AUTH ==========
+_scope = [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive",
+]
+_creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, _scope) # pyright: ignore[reportArgumentType]
+_gs_client = gspread.authorize(_creds) # pyright: ignore[reportArgumentType]
+
+
+# ========== HELPERS (SHEETS / FILE) ==========
+
+def build_dialer_session() -> tuple:
+    """
+    Logs into the dialer using HTTP requests and extracts the full user list.
+    Returns a tuple of (authenticated session, list of user IDs, csrf_token).
+    Replaces the entire Playwright login and navigation flow.
+    """
+    session = requests.Session()
+    session.headers.update(HEADERS)
+
+    # Step 0: Fetch login page and extract _token
+    print("Fetching login page to extract _token...")
+    login_page = session.get(LOGIN_PAGE_URL)
+    soup = BeautifulSoup(login_page.text, "html.parser")
+    token_input = soup.find("input", {"name": "_token"})
+    if not token_input:
+        raise RuntimeError("Could not find _token on login page.")
+    csrf_token = token_input["value"]
+    print(f"_token extracted: {csrf_token[:20]}...")
+
+    # Step 1: Login with Base64 encoded password
+    print("Logging in...")
+    encoded_password = base64.b64encode(LOGIN_PASSWORD.encode()).decode()
+    login_payload = {
+        "_token":   csrf_token,
+        "user":     LOGIN_EMAIL,
+        "password": encoded_password,
+    }
+    login_response = session.post(LOGIN_PAGE_URL, data=login_payload)
+    if "dashboard" not in login_response.url:
+        raise RuntimeError(f"Login failed. Landed on: {login_response.url}")
+    print("Login successful.")
+
+    # Step 2: Fetch report page and extract user list dynamically
+    print("Fetching report page to extract user list...")
+    report_page = session.get(REPORT_PAGE_URL)
+    report_soup = BeautifulSoup(report_page.text, "html.parser")
+    user_select = report_soup.find("select", {"id": "user"})
+    if not user_select:
+        raise RuntimeError("Could not find user dropdown on report page.")
+    user_values = [opt["value"] for opt in user_select.find_all("option")]
+    print(f"Extracted {len(user_values)} users.")
+
+    return session, user_values, csrf_token
+
+def acquire_lock(pc_id: str) -> gspread.Worksheet | None:
+    """
+    Tries to acquire a lock using a cell in Google Sheets.
+    Returns the worksheet object if lock is acquired, otherwise returns None.
+    """
+    print(f"[{pc_id}] Attempting to acquire lock...")
+    try:
+        sheet = _gs_client.open_by_key(GOOGLE_SHEET_ID).worksheet(LOG_SHEET_NAME)
+        lock_value = sheet.acell(LOCK_CELL, value_render_option='FORMATTED_VALUE').value
+
+        if lock_value and lock_value.startswith("LOCKED_BY"):
+            print(f"Lock cell value: {lock_value}")
+            parts = lock_value.split("::")
+            if len(parts) == 4 and parts[0] == 'LOCKED_BY' and parts[2] == 'AT':
+                locked_by_id = parts[1]
+                lock_time_str = parts[3]
+                lock_time = datetime.fromisoformat(lock_time_str)
+
+                if datetime.now() - lock_time > timedelta(minutes=LOCK_TIMEOUT_MINUTES):
+                    print(f"Found stale lock from '{locked_by_id}' (older than {LOCK_TIMEOUT_MINUTES} mins). Breaking lock.")
+                else:
+                    # If the lock is not stale, abort regardless of who owns it.
+                    print(f"Lock is currently held by '{locked_by_id}'. Aborting.")
+                    return None
+
+        # Attempt to take/update the lock
+        new_lock_value = f"LOCKED_BY::{pc_id}::AT::{datetime.now().isoformat()}"
+        row, col = a1_to_rowcol(LOCK_CELL)
+        sheet.update_cell(row, col, new_lock_value)
+
+        # Verify we got the lock to prevent race conditions
+        time.sleep(3)  # Give sheets API a moment to propagate
+        current_lock_value = sheet.acell(LOCK_CELL, value_render_option='FORMATTED_VALUE').value
+        if current_lock_value == new_lock_value:
+            print(f"[{pc_id}] Lock acquired successfully.")
+            log_memory("After lock acquisition")
+            return sheet
+        else:
+            print(f"[{pc_id}] Failed to acquire lock (race condition). Another process won. Current value: {current_lock_value}")
+            return None
+
+    except Exception as e:
+        print(f"CRITICAL: Error acquiring lock: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+
+
+def release_lock(sheet: gspread.Worksheet, pc_id: str):
+    """Releases the lock if this process owns it."""
+    if not sheet:
+        return
+    print(f"[{pc_id}] Releasing lock...")
+    try:
+        # Check if we still own the lock before releasing to avoid race conditions
+        lock_value = sheet.acell(LOCK_CELL, value_render_option='FORMATTED_VALUE').value
+        if lock_value and lock_value.startswith(f"LOCKED_BY::{pc_id}::AT::"):
+            row, col = a1_to_rowcol(LOCK_CELL)
+            sheet.update_cell(row, col, "")
+            print(f"[{pc_id}] Lock released.")
+        else:
+            print(f"[{pc_id}] Did not own the lock, not releasing. Current value: {lock_value}")
+    except Exception as e:
+        print(f"CRITICAL: Error releasing lock: {e}")
+        import traceback
+        traceback.print_exc()
+
+def get_file_hash(file_path: str) -> str:
+    with open(file_path, "rb") as f:
+        file_data = f.read()
+    return hashlib.sha256(file_data).hexdigest()
+
+
+def process_and_upload(file_path: str) -> dict:
+    file_name = os.path.basename(file_path)
+    start_time = time.time()
+    print(f"Starting process_and_upload for file: {file_name}")
+
+    log_data = {
+        "row_count": 0,
+        "status": "Failed",
+        "error_msg": "",
+        "file_hash": "",
+        "sheet_start_row": 0
+    }
+
+    try:
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"File not found at path: {file_path}")
+
+        file_hash = get_file_hash(file_path)
+        log_data["file_hash"] = file_hash
+        print(f"File hash: {file_hash}")
+
+        print(f"Reading CSV file: {file_path}")
+        df = pd.read_csv(file_path, index_col=False, keep_default_na=False)
+        initial_row_count = len(df)
+        print(f"CSV loaded with {initial_row_count} initial rows.")
+
+        # --- Row Filtering for System Calls ---
+        # Remove rows where column H matches specified values.
+        if df.shape[1] > 7:  # Check if column H (index 7) exists
+            col_h_name = df.columns[7] # Assuming 'Call Type' or similar is at index 7
+            values_to_remove = ['VDAD', 'Outbound Auto Dial', '6666','2605','2416','1027','1028','Test4','Test5','7777']
+            print(f"Filtering out rows where '{col_h_name}' is in {values_to_remove}...")
+
+            # Keep rows that DO NOT meet the removal condition
+            df = df[~df[col_h_name].isin(values_to_remove)].copy()
+
+            rows_removed = initial_row_count - len(df)
+            print(f"Removed {rows_removed} system-generated call rows. {len(df)} rows remain for processing.")
+        else:
+            print("WARNING: CSV has fewer than 8 columns. Skipping row filtering for system-generated calls.")
+        # --- End Row Filtering ---
+
+        row_count = len(df)  # Update row_count to reflect filtered data
+        log_data["row_count"] = row_count
+
+        if row_count > 0:
+            # Agent Name cleaning``
+            name_map = {
+                "Deraiya Sahista": "Sahista Deraiya",
+                "Yash Sajan Barke": "Yash Barke",
+                "Rajpurohit Vikas": "Vikas Rajpurohit1",
+                "Shah Hardik": "Hardik Shah",
+                "Parth Shah": "Parth Shah1",
+                
+            }
+            agent_col = "Agent Name"
+            if agent_col in df.columns:
+                print("Cleaning agent names...")
+                df[agent_col] = df[agent_col].apply(lambda x: name_map.get(x, x))
+                print("Agent names cleaned successfully.")
+            else:
+                raise ValueError(f"'{agent_col}' column not found in CSV file.")
+            
+            # --- Enforce Column Structure (Strict Mode) ---
+            if REQUIRED_COLUMNS:
+                print(f"Enforcing strict column structure. Checking for {len(REQUIRED_COLUMNS)} columns.")
+                missing_cols = [col for col in REQUIRED_COLUMNS if col not in df.columns]
+                if missing_cols:
+                    raise ValueError(f"Strict Mode: Missing required columns in CSV: {missing_cols}")
+                
+                # Log extra columns that are about to be removed
+                extra_cols = [col for col in df.columns if col not in REQUIRED_COLUMNS]
+                if extra_cols:
+                    print(f"INFO: Detected and removed {len(extra_cols)} extra columns: {extra_cols}")
+
+                # Select only the required columns in the specified order (drops extras)
+                df = df[REQUIRED_COLUMNS]            
+
+            df = df.fillna("").astype(str)
+            data = df.values.tolist()
+
+            print(f"Uploading {len(data)} rows to Google Sheets...")
+            sheet = _gs_client.open_by_key(GOOGLE_SHEET_ID).worksheet(TARGET_SHEET_NAME)
+
+            response = sheet.append_rows(data, value_input_option="USER_ENTERED")
+            updated_range = response.get("updates", {}).get("updatedRange", "")
+            # updatedRange looks like "Response!A53105:AW53124" — extract the start row
+            next_row = int(updated_range.split("!")[1].split(":")[0][1:]) if updated_range else 0
+            log_data["sheet_start_row"] = next_row
+            print(f"Successfully uploaded data to Google Sheets starting at row {next_row}")
+            
+            # Add extra delay after large uploads to avoid API throttling
+            if len(data) > 100:
+                extra_delay = 3
+                print(f"Large upload ({len(data)} rows) - adding {extra_delay}s extra delay for API safety...")
+                time.sleep(extra_delay)
+
+        os.makedirs(UPLOADED_FOLDER, exist_ok=True)
+        shutil.move(file_path, os.path.join(UPLOADED_FOLDER, file_name))
+        print(f"Moved file to uploaded folder: {UPLOADED_FOLDER}")
+
+        upload_duration = time.time() - start_time
+        print(f"Upload completed in {upload_duration:.2f} seconds")
+        log_data["status"] = "Success" if row_count > 0 else "Success (No Data)"
+        print(f"Process_and_upload completed successfully for: {file_name}")
+        return log_data
+    except Exception as exc:
+        print(f"Error in process_and_upload: {exc}")
+        log_data["error_msg"] = str(exc)
+        print(f"Exception type: {type(exc).__name__}")
+        import traceback
+        traceback.print_exc()
+        return log_data
+
+
+# ========== NEW ROLLING BACKFILL HELPER ==========
+def _get_last_run_details(log_sheet: gspread.Worksheet, target_date: date) -> dict | None:
+    print("Inspecting log sheet for details of the last run...")
+    try:
+        # Step 1: Get header row only to find column indices
+        header = log_sheet.row_values(1)
+        try:
+            date_col        = header.index('Date')
+            start_time_col  = header.index('Start Time')
+            end_time_col    = header.index('End Time')
+            timestamp_col   = header.index('Timestamp')
+            sheet_start_row_col = header.index('Row where the data was pushed')
+            status_col      = header.index('Status')
+        except ValueError as e:
+            print(f"ERROR: Missing required column in '{LOG_SHEET_NAME}' header: {e}")
+            return None
+
+        # Step 2: Fetch only the date column to find today's row numbers
+        target_date_str = f"{target_date.month}/{target_date.day}/{target_date.year}"
+        print(f"Scanning log sheet for date: {target_date_str}")
+
+        all_dates = log_sheet.col_values(date_col + 1)[1:]  # col_values is 1-indexed, skip header
+        row_numbers = [i + 2 for i, d in enumerate(all_dates) if d == target_date_str]
+
+        if not row_numbers:
+            print(f"No log entries found for today ({target_date_str}).")
+            return None
+
+        # Step 3: Batch fetch only today's rows
+        ranges_to_get = [f'A{row_num}:I{row_num}' for row_num in row_numbers]
+        all_row_data = log_sheet.batch_get(ranges_to_get, value_render_option='FORMATTED_VALUE')
+
+        today_rows = []
+        for i, row_data_list in enumerate(all_row_data):
+            if not row_data_list:
+                continue
+            row = row_data_list[0]
+            if len(row) > timestamp_col and row[timestamp_col]:
+                today_rows.append({'data': row, 'log_sheet_row': row_numbers[i]})
+
+        if not today_rows:
+            print(f"No valid log entries found for today ({target_date_str}).")
+            return None
+
+        # Step 4: Identify last run block by timestamp — rest of logic unchanged
+        last_row_info = today_rows[-1]
+        try:
+            last_timestamp = datetime.strptime(last_row_info['data'][timestamp_col], "%Y-%m-%d %H:%M:%S")
+        except (ValueError, IndexError):
+            print(f"Could not parse timestamp in the last row for today. Cannot determine last run.")
+            return None
+
+        print(f"Last entry timestamp: {last_timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+        last_run_block_all_statuses = [last_row_info]
+
+        for i in range(len(today_rows) - 2, -1, -1):
+            current_row_info = today_rows[i]
+            try:
+                current_timestamp = datetime.strptime(current_row_info['data'][timestamp_col], "%Y-%m-%d %H:%M:%S")
+                if last_timestamp - current_timestamp <= timedelta(minutes=1):
+                    last_run_block_all_statuses.insert(0, current_row_info)
+                else:
+                    break
+            except (ValueError, IndexError):
+                continue
+
+        # Step 5: Filter for successful entries only
+        successful_entries = []
+        for entry in last_run_block_all_statuses:
+            if len(entry['data']) > status_col and entry['data'][status_col] in ["Success", "Success (No Data)"]:
+                if len(entry['data']) > sheet_start_row_col and entry['data'][sheet_start_row_col].isdigit() and int(entry['data'][sheet_start_row_col]) > 0:
+                    successful_entries.append(entry)
+
+        if not successful_entries:
+            print("Last run block found, but it contains no successful entries with valid data pointers. Skipping rolling backfill.")
+            return None
+
+        first_successful_entry = successful_entries[0]
+        last_successful_entry  = successful_entries[-1]
+
+        details = {
+            "first_interval": (first_successful_entry['data'][start_time_col], first_successful_entry['data'][end_time_col]),
+            "last_interval":  (last_successful_entry['data'][start_time_col],  last_successful_entry['data'][end_time_col]),
+            "sheet_start_row": int(first_successful_entry['data'][sheet_start_row_col]),
+            "successful_entries_details": successful_entries
         }
-      }
-      return '';
-    };
 
-    // Date: Column A logic (Handling M/D/YYYY HH:mm:ss)
-    let rawDate = get('date', 'Date', 'DATE', 'Timestamp');
+        print("\n--- Last Run Details (based on SUCCESSFUL entries) ---")
+        print(f"  First Successful Interval: {details['first_interval']}")
+        print(f"  Last Successful Interval:  {details['last_interval']}")
+        print(f"  Data Start Row in '{TARGET_SHEET_NAME}': {details['sheet_start_row']}")
+        print(f"  Log Rows to Update in '{LOG_SHEET_NAME}': {[e['log_sheet_row'] for e in details['successful_entries_details']]}")
+        print("--------------------------------------------------------\n")
+        return details
 
-    // Regex for M/D/YYYY or M/D/YYYY HH:mm:ss
-    const mdyMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-    if (mdyMatch) {
-      const mm = mdyMatch[1].padStart(2, '0');
-      const dd = mdyMatch[2].padStart(2, '0');
-      const yyyy = mdyMatch[3];
-      rawDate = `${yyyy}-${mm}-${dd}`;
-    } else {
-      // Handle DD/MMM/YY format (e.g., 21/Mar/26)
-      const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-      const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
-      if (sheetMatch) {
-        const dd = sheetMatch[1].padStart(2, '0');
-        const mm = monthMap[sheetMatch[2]] || '01';
-        const yy = '20' + sheetMatch[3];
-        rawDate = `${yy}-${mm}-${dd}`;
-      }
-    }
+    except Exception as e:
+        print(f"Error getting last run details: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
 
-    // Fallback for other formats
-    const slashMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (slashMatch) rawDate = `${slashMatch[3]}-${slashMatch[1].padStart(2,'0')}-${slashMatch[2].padStart(2,'0')}`;
-    const dashMatch = rawDate.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-    if (dashMatch) rawDate = `${dashMatch[3]}-${dashMatch[2].padStart(2,'0')}-${dashMatch[1].padStart(2,'0')}`;
+# ========== HELPERS (PLAYWRIGHT) ==========
+#updated for sheetbased intervals tracking
+def _read_processed_intervals(target_date: date) -> list:
+    """
+    Read processed intervals for a specific date from the 'ProcessedIntervals' Google Sheet.
+    This version is optimized to avoid downloading the entire sheet.
+    """
+    try:
+        sheet = _gs_client.open_by_key(GOOGLE_SHEET_ID).worksheet("ProcessedIntervals")
+        
+        target_date_str = f"{target_date.month}/{target_date.day}/{target_date.year}"
+        print(f"Querying Google Sheet for date: {target_date_str}")
 
-    return {
-      date:         rawDate,
-      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer', 'Agent Name').trim(),
-      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer', 'Agent Name').trim().toUpperCase(),
-      cityName:     get('City Name', 'CityName', 'City', 'Restaurantname'),
-      status:       get('Status', 'status').trim(),
-      trainingMode: get('Training Mode', 'TrainingMode', 'Mode', 'Category'),
-      language:     get('Languages', 'Language', 'Virtual Language'), // Col S
-    };
-  }).filter(r => r.trainerName || r.date);
-  }).filter(r => r.trainerName && r.date);
-}
+        # 1. Fetch only the first column (dates). This is much faster than getting all values.
+        all_dates = sheet.col_values(1, value_render_option='FORMATTED_VALUE')[1:] # Skip header
 
-// ─────────────────────────────────────────────────────────────────
-// FILTERS
-// ─────────────────────────────────────────────────────────────────
-function populateFilters() {
-  fillSelect('f-trainer', [...new Set(allRows.map(r=>r.trainerName).filter(Boolean))].sort());
-  fillSelect('f-city', [...new Set(allRows.map(r=>r.cityName).filter(Boolean))].sort());
-  fillSelect('f-status', [...new Set(allRows.map(r=>r.status).filter(Boolean))].sort());
-  fillSelect('f-mode', [...new Set(allRows.map(r=>r.trainingMode).filter(Boolean))].sort());
-  
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  document.getElementById('f-from').value = `${y}-${m}-01`;
-  document.getElementById('f-to').value = `${y}-${m}-${d}`;
-}
+        # 2. Find the row numbers for the target date.
+        # We add 2 because the list is 0-indexed and we skipped the sheet's header row.
+        row_numbers = [i + 2 for i, d in enumerate(all_dates) if d == target_date_str]
 
-function fillSelect(id, vals) {
-  const el = document.getElementById(id);
-  const first = el.options[0];
-  el.innerHTML = '';
-  el.appendChild(first);
-  vals.forEach(v => { const o = new Option(v,v); el.appendChild(o); });
-}
+        if not row_numbers:
+            print(f"No intervals found for {target_date_str}")
+            return []
 
-function applyFilters() {
-  const trainer = document.getElementById('f-trainer').value;
-  const city = document.getElementById('f-city').value;
-  const status = document.getElementById('f-status').value;
-  const mode = document.getElementById('f-mode').value;
-  const from = document.getElementById('f-from').value;
-  const to = document.getElementById('f-to').value;
-  filteredRows = allRows.filter(r => {
-    if(trainer && r.trainerName !== trainer) return false;
-    if(city && r.cityName !== city) return false;
-    if(status && r.status !== status) return false;
-    if(mode && r.trainingMode !== mode) return false;
-    if(from && r.date < from) return false;
-    if(to && r.date > to) return false;
-    return true;
-  });
-  render();
-}
+        # 3. Batch-fetch only the required rows (A:I for each matched row number).
+        # This is highly efficient.
+        ranges_to_get = [f'A{row_num}:I{row_num}' for row_num in row_numbers]
+        all_row_data = sheet.batch_get(ranges_to_get, value_render_option='FORMATTED_VALUE')
 
-function resetFilters() {
-  document.getElementById('f-trainer').value = '';
-  document.getElementById('f-city').value = '';
-  document.getElementById('f-status').value = '';
-  document.getElementById('f-mode').value = '';
-  populateFilters();
-  applyFilters();
-}
+        intervals = []
+        # The result is a list of value ranges, e.g., [[['row1-val1', 'row1-val2']], [['row2-val1', 'row2-val2']]]
+        for row_data_list in all_row_data:
+            if not row_data_list: continue # Skip if a range returned empty
+            row = row_data_list[0] # Get the actual row list from the value range
+            if len(row) >= 3:
+                intervals.append({
+                    "start": row[1],  # Start time
+                    "end": row[2],    # End time
+                    "timestamp": row[3] if len(row) > 3 else ""
+                })
 
-// ─────────────────────────────────────────────────────────────────
-// RENDER
-// ─────────────────────────────────────────────────────────────────
-function render() {
-  renderKPIs();
-  renderTrainerTable();
-  renderDailyChart();
-  renderDateChart();
-  renderTrainingMode();
-  renderTicketStatus();
-  renderLanguageTable();
-  renderCityBars();
-  renderTrainerDetailTable();
-}
+        print(f"Filtered intervals for {target_date_str}: {intervals}")
+        return intervals
+    except Exception as e:
+        print(f"Error reading intervals from Google Sheet: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
+    
+#updated to append intervals in sheet    
+def _append_processed_interval(target_date: date, start_time: datetime, end_time: datetime, row_count: int = 0, status: str = "", error_msg: str = "", file_hash: str = "", sheet_start_row: int = 0) -> None:
+    """Append processed interval to the 'ProcessedIntervals' Google Sheet."""
+    try:
+        # Open the 'ProcessedIntervals' sheet
+        sheet = _gs_client.open_by_key(GOOGLE_SHEET_ID).worksheet("ProcessedIntervals")
+        
+        # Format the data to append
+        date_str = f"{target_date.month}/{target_date.day}/{target_date.year}"  # Format as M/D/YYYY
+        start_str = start_time.strftime("%H:%M")
+        end_str = end_time.strftime("%H:%M")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Append the interval as a new row
+        row = [date_str, start_str, end_str, timestamp, row_count, status, error_msg, file_hash, sheet_start_row]
+        sheet.append_row(row, value_input_option="USER_ENTERED") # pyright: ignore[reportArgumentType]
+        print(f"Appended interval to Google Sheet: {row}")
+    except Exception as e:
+        print(f"Error appending interval to Google Sheet: {e}")
+        import traceback
+        traceback.print_exc()
 
-// ── KPIs ──
-function renderKPIs() {
-  const total = filteredRows.length;
-  const done = filteredRows.filter(r=>r.status === 'Done').length;
-  const close = filteredRows.filter(r=>r.status === 'Close').length;
-  const notRel = filteredRows.filter(r=>r.status === 'Not related to inventory/Done by someone').length;
-  const reVisit = filteredRows.filter(r=>r.trainingMode === 'Physical Re-training').length;
-  const virtual = filteredRows.filter(r=>r.trainingMode === 'Virtual').length;
-  const physical = filteredRows.filter(r=>r.trainingMode === 'Physical Visit').length;
-  const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
+def _update_processed_interval(log_sheet: gspread.Worksheet, row_number: int, target_date: date, start_time: datetime, end_time: datetime, row_count: int = 0, status: str = "", error_msg: str = "", file_hash: str = "", sheet_start_row: int = 0) -> None:
+    """Update an existing row in the 'ProcessedIntervals' Google Sheet."""
+    try:
+        date_str = f"{target_date.month}/{target_date.day}/{target_date.year}"
+        start_str = start_time.strftime("%H:%M")
+        end_str = end_time.strftime("%H:%M")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Construct the full row of data to update
+        row_values = [date_str, start_str, end_str, timestamp, row_count, status, error_msg, file_hash, sheet_start_row]
+        
+        # Update the specific row. The range covers columns A to I for that row.
+        log_sheet.update(range_name=f'A{row_number}:I{row_number}', values=[row_values], value_input_option="USER_ENTERED")
+        print(f"Updated log entry in Google Sheet at row {row_number}: {row_values}")
+    except Exception as e:
+        print(f"Error updating interval in Google Sheet at row {row_number}: {e}")
+        import traceback
+        traceback.print_exc()
 
-  const kpis = [
-    { label:'Total Ticket', val:total, pct:'100%', pctType:'neutral', color:'gold', bar:100, barColor:'var(--gold)' },
-    { label:'Done Count', val:done, pct:(total?(done/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'green', bar:total?done/total*100:0, barColor:'var(--green)' },
-    { label:'No Training Count', val:close, pct:(total?(close/total*100).toFixed(1)+'%':'–'), pctType:'down', color:'red', bar:total?close/total*100:0, barColor:'var(--red)' },
-    { label:'Re-Visit Count', val:reVisit, pct:(total?(reVisit/total*100).toFixed(1)+'%':'–'), pctType:'neutral', color:'blue', bar:total?reVisit/total*100:0, barColor:'var(--blue)' },
-    { label:'Virtual Done', val:virtual, pct:(total?(virtual/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'purple', bar:total?virtual/total*100:0, barColor:'var(--purple)' },
-    { label:'Physical Visit', val:physical, pct:(total?(physical/total*100).toFixed(1)+'%':'–'), pctType:'up', color:'orange', bar:total?physical/total*100:0, barColor:'var(--orange)' },
-    { label:'Trainers', val:trainers, pct:'Active', pctType:'neutral', color:'teal', bar:100, barColor:'var(--teal)' },
-  ];
 
-  const row = document.getElementById('kpi-row');
-  row.innerHTML = kpis.map(k => `
-    <div class="kpi-card ${k.color}">
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-value">${k.val.toLocaleString()}</div>
-      <div class="kpi-pct ${k.pctType}">${k.pct}</div>
-      <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${k.bar}%;background:${k.barColor};"></div></div>
-    </div>
-  `).join('');
-}
+def download_report(target_date: date, start_time: datetime, end_time: datetime,
+                    session: requests.Session, user_values: list, csrf_token: str) -> Path:
+    """
+    Downloads the dialer CSV for a given date and time range using HTTP requests.
+    Replaces the entire Playwright download flow.
+    Returns the path to the saved CSV file.
+    """
+    date_str  = target_date.strftime("%Y-%m-%d")
+    start_str = start_time.strftime("%I:%M %p").lstrip("0")
+    end_str   = end_time.strftime("%I:%M %p").lstrip("0")
+    daterange = f"{date_str} {start_str} - {date_str} {end_str}"
+    print(f"Downloading report: {daterange}...")
 
-// ── TRAINER TABLE ──
-function renderTrainerTable() {
-  const trainerMap = {};
-  filteredRows.forEach(r => {
-    if(!r.trainerName) return;
-    if(!trainerMap[r.trainerName]) trainerMap[r.trainerName] = { present: 0, done: 0 };
-    trainerMap[r.trainerName].present++;
-    if(r.status === 'Done') trainerMap[r.trainerName].done++;
-  });
-  const arr = Object.entries(trainerMap).map(([name,d])=>({name,...d,avg:(d.done/Math.max(1,d.present)).toFixed(2)}));
-  arr.sort((a,b)=>b.done-a.done);
-  const maxDone = arr[0]?.done || 1;
-  document.getElementById('trainer-count').textContent = `${arr.length} trainers`;
-  document.getElementById('trainer-tbody').innerHTML = arr.slice(0,15).map((t,i)=>`
-    <tr>
-      <td><span class="rank-badge ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</span></td>
-      <td style="font-weight:500;">${t.name}</td>
-      <td>${t.present}</td>
-      <td>${t.done}</td>
-      <td>
-        <div class="avg-bar-wrap">
-          <div class="avg-bar" style="width:${Math.round(t.done/maxDone*80)+10}px;"></div>
-          <span style="font-size:11px;color:var(--gold);">${t.avg}</span>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
+    payload = [
+        ("_token",      (None, csrf_token)),
+        ("file_formate",(None, "csv")),
+        ("daterange",   (None, daterange)),
+        ("campaigns[]", (None, "1360877")),
+        ("in_group[]",  (None, "AGENTDIRECT")),
+        ("in_group[]",  (None, "INVT_LIVE")),
+        ("in_group[]",  (None, "TRANSFER_INV")),
+        ("header_row",  (None, "YES")),
+        ("custom_fields",  (None, "YES")),
+        ("time_in_sec",  (None, "Y")),
 
-// ── DAILY CHART ──
-function renderDailyChart() {
-  const byDate = {};
-  filteredRows.forEach(r => {
-    if(!r.date) return;
-    const d = r.date.slice(5); // MM-DD
-    if(!byDate[d]) byDate[d] = 0;
-    byDate[d]++;
-  });
-  const labels = Object.keys(byDate).sort();
-  const vals = labels.map(l=>byDate[l]);
+    ]
+    for uid in user_values:
+        payload.append(("user[]", (None, uid)))
 
-  if(charts.daily) charts.daily.destroy();
-  const ctx = document.getElementById('dailyChart').getContext('2d');
-  charts.daily = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Tickets',
-        data: vals,
-        backgroundColor: 'rgba(245,197,24,0.5)',
-        borderColor: 'var(--gold)',
-        borderWidth: 1,
-        borderRadius: 4,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } },
-        y: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } }
-      }
-    }
-  });
-}
+    response = session.post(DOWNLOAD_URL, files=payload)
 
-// ── DATE-WISE LINE CHART ──
-function renderDateChart() {
-  const modeByDate = {};
-  const datesSet = new Set();
-  filteredRows.forEach(r => {
-    if(!r.date) return;
-    datesSet.add(r.date);
-    if(!modeByDate[r.trainingMode]) modeByDate[r.trainingMode] = {};
-    modeByDate[r.trainingMode][r.date] = (modeByDate[r.trainingMode][r.date]||0)+1;
-  });
-  const dates = [...datesSet].sort();
+    if response.status_code != 200:
+        raise RuntimeError(f"Download failed with status {response.status_code}")
+    if "," not in response.text[:200]:
+        raise RuntimeError(f"Response does not look like CSV. First 200 chars: {response.text[:200]}")
 
-  const topModes = TRAINING_MODES.filter(m => filteredRows.some(r=>r.trainingMode===m));
-  const datasets = topModes.map((mode,i) => ({
-    label: mode,
-    data: dates.map(d => modeByDate[mode]?.[d] || 0),
-    borderColor: MODE_COLORS[i],
-    backgroundColor: MODE_COLORS[i]+'22',
-    borderWidth: 2,
-    pointRadius: 3,
-    tension: 0.3,
-    fill: false
-  }));
+    # Save to script directory, overwriting any existing file
+    output_path = Path(MAIN_FOLDER) / "dialer_export.csv"
+    if output_path.exists():
+        output_path.unlink()
+    output_path.write_bytes(response.content)
+    print(f"CSV saved to {output_path}")
+    return output_path
 
-  if(charts.date) charts.date.destroy();
-  const ctx = document.getElementById('dateChart').getContext('2d');
-  charts.date = new Chart(ctx, {
-    type: 'line',
-    data: { labels: dates.map(d=>d.slice(5)), datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: { color: '#8892a4', font:{size:10}, boxWidth:12, padding:12 }
-        }
-      },
-      scales: {
-        x: { ticks: { color: '#8892a4', font:{size:9}, maxTicksLimit:20 }, grid: { color: 'rgba(255,255,255,0.04)' } },
-        y: { ticks: { color: '#8892a4', font:{size:9} }, grid: { color: 'rgba(255,255,255,0.04)' } }
-      }
-    }
-  });
-}
 
-// ── TRAINING MODE BARS ──
-function renderTrainingMode() {
-  const counts = {};
-  filteredRows.forEach(r => { if(r.trainingMode) counts[r.trainingMode] = (counts[r.trainingMode]||0)+1; });
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const max = sorted[0]?.[1] || 1;
-  const body = document.getElementById('training-mode-body');
-  body.innerHTML = sorted.map(([mode,cnt],i) => `
-    <div class="hbar-row">
-      <div class="hbar-label">${mode}</div>
-      <div class="hbar-track">
-        <div class="hbar-fill" style="width:${cnt/max*100}%;background:${MODE_COLORS[i%MODE_COLORS.length]};"></div>
-      </div>
-      <div class="hbar-val">${cnt}</div>
-    </div>
-  `).join('');
-}
+#updated to track processed intervals in Google Sheets.
+def get_processed_intervals(target_date: date) -> set:
+    """Return a set of processed intervals for a specific date from the 'ProcessedIntervals' Google Sheet."""
+    try:
+        # Read processed intervals for the target date
+        processed_intervals = _read_processed_intervals(target_date)
+        
+        # Debugging: Print the intervals read from the sheet
+        print(f"Processed intervals (raw) for {target_date}: {processed_intervals}")
+        
+        # Convert to a set of (start, end) tuples
+        processed_set = {(interval["start"], interval["end"]) for interval in processed_intervals}
+        
+        # Debugging: Print the converted set of tuples
+        print(f"Processed intervals (set) for {target_date}: {processed_set}")
+        
+        return processed_set
+    except Exception as e:
+        print(f"Error getting processed intervals: {e}")
+        return set()
 
-// ── TICKET STATUS ──
-function renderTicketStatus() {
-  const counts = {};
-  filteredRows.forEach(r => { if(r.status) counts[r.status] = (counts[r.status]||0)+1; });
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const statusColors = { 
-    'Done': 'var(--green)', 
-    'Close': 'var(--red)', 
-    'Re-schedule': 'var(--purple)', 
-    'Not related to inventory/Done by someone': 'var(--blue)', 
-    'Tech concern': 'var(--orange)',
-    'Need other languge / Physical visit': 'var(--teal)'
-  };
-  const body = document.getElementById('ticket-status-body');
-  body.innerHTML = `<div class="ticket-list">` + sorted.map(([s,cnt]) => `
-    <div class="ticket-item">
-      <span class="ticket-item-label" style="display:flex;align-items:center;gap:6px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:${statusColors[s]||'var(--muted)'};display:inline-block;"></span>
-        ${s}
-      </span>
-      <span class="ticket-item-val" style="color:${statusColors[s]||'var(--text)'};">${cnt.toLocaleString()}</span>
-    </div>
-  `).join('') + `</div>`;
-}
+#upddated to track missing intervals in Google Sheets.
+def get_missing_intervals(target_date: date) -> list:
+    """Return a list of missing intervals for a specific date."""
+    try:
+        # Get processed intervals from the Google Sheet
+        processed_intervals = get_processed_intervals(target_date)
 
-// ── LANGUAGE TABLE ──
-function renderLanguageTable() {
-  const counts = {};
-  filteredRows.filter(r=>r.language).forEach(r => { counts[r.language] = (counts[r.language]||0)+1; });
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const total = sorted.reduce((s,[,v])=>s+v,0);
-  const langColors = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6','#2dd4bf','#64748b'];
-  document.getElementById('lang-tbody').innerHTML = sorted.map(([lang,cnt],i) => `
-    <tr>
-      <td style="display:flex;align-items:center;gap:6px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:${langColors[i%langColors.length]};display:inline-block;flex-shrink:0;"></span>
-        ${lang}
-      </td>
-      <td style="font-weight:600;color:${langColors[i%langColors.length]};">${cnt}</td>
-    </tr>
-  `).join('') + `<tr><td style="color:var(--gold);font-weight:700;">Grand total</td><td style="font-weight:700;color:var(--gold);">${total}</td></tr>`;
-}
+        # Debugging: Print the processed intervals
+        print(f"Processed intervals for {target_date}: {processed_intervals}")
 
-// ── CITY BARS ──
-function renderCityBars() {
-  const counts = {};
-  filteredRows.forEach(r => { if(r.cityName) counts[r.cityName] = (counts[r.cityName]||0)+1; });
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,30);
-  const max = sorted[0]?.[1] || 1;
-  const container = document.getElementById('city-bars-container');
-  container.innerHTML = sorted.map(([city,cnt],i) => {
-    const h = Math.max(8, Math.round(cnt/max*90));
-    return `
-      <div class="city-bar-col">
-        <div style="font-size:10px;color:var(--text);font-weight:600;">${cnt}</div>
-        <div class="city-bar" style="height:${h}px;background:${MODE_COLORS[i%MODE_COLORS.length]};" data-val="${cnt}" title="${city}: ${cnt}"></div>
-        <div class="city-bar-name">${city}</div>
-      </div>
-    `;
-  }).join('');
-}
+        if not processed_intervals:
+            print("No valid processed intervals found. Returning all intervals for the day.")
+            return INTERVALS
 
-// ── TRAINER DETAIL TABLE ──
-function renderTrainerDetailTable() {
-  const trainerMap = {};
-  filteredRows.forEach(r => {
-    const key = r.trainerName || '(Unknown)';
-    if(!trainerMap[key]) {
-      trainerMap[key] = { 'Physical Visit':0,'Physical Re-training':0,'Out of Station Visit':0,'OFS (On-Field Support)':0,'Virtual':0,'Incomplete Physical Visit':0 };
-      trainerMap[key] = Object.fromEntries(TRAINING_MODES.map(mode => [mode, 0]));
-    }
-    if(TRAINING_MODES.includes(r.trainingMode)) {
-      trainerMap[key][r.trainingMode] = (trainerMap[key][r.trainingMode]||0)+1;
-    }
-  });
+        # Sort processed intervals based on their order in the master INTERVALS list.
+        # This will intentionally raise a ValueError if an interval from the sheet
+        # (e.g., a large, combined one from a previous bulk run) is not found.
+        sorted_intervals = sorted(
+            processed_intervals, key=lambda x: INTERVALS.index(x)
+        )
 
-  const modeKeys = ['Physical Visit','Physical Re-training','Out of Station Visit','OFS (On-Field Support)','Virtual','Incomplete Physical Visit'];
-  const modeKeys = TRAINING_MODES;
-  const totals = {};
-  modeKeys.forEach(m => totals[m] = 0);
-  let grandTotal = 0;
+        # Debugging: Print the sorted processed intervals
+        print(f"Sorted processed intervals: {sorted_intervals}")
 
-  const rows = Object.entries(trainerMap).sort((a,b) => {
-    const at = modeKeys.reduce((s,m)=>s+a[1][m],0);
-    const bt = modeKeys.reduce((s,m)=>s+b[1][m],0);
-    return bt-at;
-  });
+        # Get the last processed interval
+        last_processed_start, last_processed_end = sorted_intervals[-1]
 
-  document.getElementById('trainer-detail-tbody').innerHTML = rows.map(([name, data]) => {
-    const rowTotal = modeKeys.reduce((s,m)=>s+data[m],0);
-    grandTotal += rowTotal;
-    modeKeys.forEach(m => totals[m] += data[m]);
-    return `<tr>
-      <td style="font-weight:500;">${name}</td>
-      ${modeKeys.map(m => `<td style="text-align:center;">${data[m]||'–'}</td>`).join('')}
-      <td style="text-align:center;font-weight:700;color:var(--gold);">${rowTotal}</td>
-    </tr>`;
-  }).join('');
+        # Debugging: Print the last processed interval
+        print(f"Last processed interval: {last_processed_start} - {last_processed_end}")
 
-  document.getElementById('trainer-detail-tfoot').innerHTML = `
-    <tr style="background:rgba(245,197,24,0.08);font-weight:700;">
-      <td style="color:var(--gold);">Total</td>
-      ${modeKeys.map(m=>`<td style="text-align:center;color:var(--gold);">${totals[m]}</td>`).join('')}
-      <td style="text-align:center;color:var(--gold);">${grandTotal}</td>
-    </tr>
-  `;
-}
+        # Find the index of the last processed interval in INTERVALS
+        last_processed_index = INTERVALS.index((last_processed_start, last_processed_end))
 
-// ─────────────────────────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', loadData);
-</script>
-</body>
-</html>
+        # Return only the intervals after the last processed one
+        missing_intervals = INTERVALS[last_processed_index + 1:]
+
+        # Debugging: Print the missing intervals
+        print(f"Missing intervals: {missing_intervals}")
+
+        return missing_intervals
+    except ValueError as e:
+        # This is the expected behavior when a non-standard interval (e.g., from a bulk run) is found.
+        # It stops the script from re-processing yesterday's data by returning an empty list.
+        print(f"Stopping yesterday's run due to non-standard interval. Error: {e}")
+        return []
+    except Exception as e:
+        print(f"An unexpected error occurred in get_missing_intervals: {e}")
+        import traceback
+        traceback.print_exc()
+        return []  
+
+def log_memory(label: str = ""):
+    process = psutil.Process(os.getpid())
+    mem_mb = process.memory_info().rss / 1024 / 1024
+    print(f"[MEMORY] {label}: {mem_mb:.1f} MB")
+
+def run(pc_identifier: str) -> None:
+    lock_sheet = None
+    try:
+        # --- Lock Acquisition ---
+        if not pc_identifier or pc_identifier == "DEFAULT_PC":
+            print("CRITICAL: PC_IDENTIFIER is not set. Please set a unique name in the script's CONFIGURATION section. Aborting.")
+            return
+
+        lock_sheet = acquire_lock(pc_identifier)
+        if not lock_sheet:
+            print("Could not acquire lock. Another process may be running. Exiting.")
+            return  # Exit if lock not acquired
+
+
+        # --- Main Logic (now runs only if lock is acquired) ---
+        now = datetime.now()
+        today = now.date()
+        yesterday = today - timedelta(days=1)
+
+        # Get missing intervals for yesterday
+        missing_intervals_yesterday = get_missing_intervals(yesterday)
+
+        if missing_intervals_yesterday:
+            # Combine missed intervals into one range
+            first_start, _ = missing_intervals_yesterday[0]
+            _, last_end = missing_intervals_yesterday[-1]
+            start_time = _parse_time(first_start, yesterday)
+            end_time = _parse_time(last_end, yesterday)
+            print(f"Processing combined missed intervals for yesterday: {start_time} - {end_time}")
+            try:
+                # For a one-off download like this, we need to handle the full login/navigation
+                session, user_values, csrf_token = build_dialer_session()
+                log_memory("After dialer session built")
+                csv_path = download_report(yesterday, start_time, end_time, session, user_values, csrf_token)
+
+                log_data = process_and_upload(str(csv_path))
+                _append_processed_interval(
+                    target_date=yesterday,
+                    start_time=start_time,
+                    end_time=end_time,
+                    row_count=log_data["row_count"],
+                    status=log_data["status"],
+                    error_msg=log_data["error_msg"],
+                    file_hash=log_data["file_hash"],
+                    sheet_start_row=log_data["sheet_start_row"]
+                )
+                print(f"Successfully processed and logged combined interval for yesterday.")
+            except Exception as exc:
+                print(f"Processing failed for yesterday's combined interval: {exc}")
+                # Log the failure for the combined interval
+                _append_processed_interval(yesterday, start_time, end_time, status="Failed", error_msg=f"Download or processing failed: {exc}")
+                import traceback
+                traceback.print_exc()
+            
+            print(f"Yesterday's processing complete. Waiting {INTERVAL_DELAY_SECONDS} seconds before continuing...")
+            time.sleep(INTERVAL_DELAY_SECONDS)
+            return
+
+        # --- Today's Processing with Rolling Backfill ---
+        main_sheet = _gs_client.open_by_key(GOOGLE_SHEET_ID).worksheet(TARGET_SHEET_NAME)
+        
+        last_run_details = _get_last_run_details(lock_sheet, today)
+
+        log_row_map = {}
+        intervals_to_reprocess = []
+        next_interval_start_index = 0
+
+        if last_run_details:
+            print("Previous run found for today. Preparing for rolling backfill.")
+            
+            header = lock_sheet.row_values(1)
+            try:
+                start_time_col = header.index('Start Time')
+                end_time_col = header.index('End Time')
+                hash_col = header.index('hash value')
+            except ValueError as e:
+                print(f"CRITICAL: A required column (Start Time, End Time, or hash value) is missing in '{LOG_SHEET_NAME}' header: {e}. Aborting rolling backfill.")
+                last_run_details = None # This will cause the 'else' block to run for normal processing
+
+            if last_run_details:
+                # --- NEW: Clear hashes for re-processing ---
+                print("Clearing old hashes from log sheet to allow re-upload...")
+                cells_to_clear = []
+                hash_col_gspread = hash_col + 1  # gspread is 1-indexed
+                for entry in last_run_details['successful_entries_details']:
+                    log_sheet_row_num = entry['log_sheet_row']
+                    cells_to_clear.append(gspread.Cell(row=log_sheet_row_num, col=hash_col_gspread, value=""))
+                
+                if cells_to_clear:
+                    lock_sheet.update_cells(cells_to_clear, value_input_option='RAW')
+                    print(f"Cleared {len(cells_to_clear)} hash values to prepare for re-upload.")
+                # --- END NEW ---
+
+                # Create a map of (start_time, end_time) -> log_sheet_row for easy lookup
+                log_row_map = {
+                    (entry['data'][start_time_col], entry['data'][end_time_col]): entry['log_sheet_row']
+                    for entry in last_run_details['successful_entries_details']
+                }
+
+                start_row_to_delete = last_run_details['sheet_start_row']
+                last_row_in_sheet1 = len(main_sheet.col_values(1))
+                if start_row_to_delete <= last_row_in_sheet1:
+                    print(f"Deleting rows in '{TARGET_SHEET_NAME}' from {start_row_to_delete} to end ({last_row_in_sheet1}).")
+                    main_sheet.delete_rows(start_row_to_delete, last_row_in_sheet1)
+                    print("Old data deleted successfully.")
+
+                # 1. Get the specific intervals that were successful in the last run to re-process.
+                intervals_to_reprocess = [
+                    (entry['data'][start_time_col], entry['data'][end_time_col])
+                    for entry in last_run_details['successful_entries_details']
+                ]
+
+                # 2. Determine where the dynamic processing of new intervals should begin.
+                last_reprocess_idx = INTERVALS.index(last_run_details['last_interval'])
+                next_interval_start_index = last_reprocess_idx + 1
+        
+        else:
+            print("No previous run found for today. Determining start point for dynamic processing.")
+            processed_today = get_processed_intervals(today)
+            # Sort the processed intervals by their end time chronologically
+            processed_intervals_today_sorted = sorted(list(processed_today), key=lambda x: datetime.strptime(x[1], "%H:%M").time())
+            
+            last_interval_end = None
+            if processed_intervals_today_sorted:
+                last_interval_end = processed_intervals_today_sorted[-1][1]
+
+            if last_interval_end:
+                last_interval_end_dt = datetime.strptime(last_interval_end, "%H:%M")
+                for i, (start, end) in enumerate(INTERVALS):
+                    start_dt = datetime.strptime(start, "%H:%M")
+                    if start_dt >= last_interval_end_dt:
+                        next_interval_start_index = i
+                        break
+            else:
+                next_interval_start_index = 0 # Start from the beginning of the day
+        session, user_values, csrf_token = build_dialer_session()
+
+
+        # --- PHASE 1: Re-process known past intervals ---
+        if intervals_to_reprocess:
+            print(f"\n--- Starting Phase 1: Re-processing {len(intervals_to_reprocess)} known intervals ---")
+            print(f"Intervals to re-process: {intervals_to_reprocess}")
+        
+        for start_str, end_str in intervals_to_reprocess:
+            start_time = _parse_time(start_str, today)
+            end_time = _parse_time(end_str, today)
+
+            print(f"\n>>> Processing interval: {start_str} - {end_str}")
+            try:
+                csv_path = download_report(today, start_time, end_time, session, user_values, csrf_token)
+                
+                log_data = process_and_upload(str(csv_path))
+
+                # Decide whether to update an existing log row or append a new one
+                if (start_str, end_str) in log_row_map:
+                    row_to_update = log_row_map[(start_str, end_str)]
+                    _update_processed_interval(
+                        log_sheet=lock_sheet,
+                        row_number=row_to_update,
+                        target_date=today,
+                        start_time=start_time,
+                        end_time=end_time,
+                        row_count=log_data["row_count"],
+                        status=log_data["status"],
+                        error_msg=log_data["error_msg"],
+                        file_hash=log_data["file_hash"],
+                        sheet_start_row=log_data["sheet_start_row"]
+                    )
+                else:
+                    _append_processed_interval(
+                        target_date=today,
+                        start_time=start_time,
+                        end_time=end_time,
+                        row_count=log_data["row_count"],
+                        status=log_data["status"],
+                        error_msg=log_data["error_msg"],
+                        file_hash=log_data["file_hash"],
+                        sheet_start_row=log_data["sheet_start_row"]
+                    )
+
+            except Exception as exc:
+                print(f"Error processing interval {start_str} - {end_str}: {exc}")
+                # If this was an interval we were supposed to update, we still update it but with a "Failed" status
+                if (start_str, end_str) in log_row_map:
+                    row_to_update = log_row_map[(start_str, end_str)]
+                    _update_processed_interval(lock_sheet, row_to_update, today, start_time, end_time, status="Failed", error_msg=f"Critical error in interval loop: {exc}")
+                else:
+                    # Otherwise, append a new failed log
+                    _append_processed_interval(today, start_time, end_time, status="Failed", error_msg=f"Critical error in interval loop: {exc}")
+                continue
+            
+            # Add delay between intervals to avoid API rate limits
+            if intervals_to_reprocess.index((start_str, end_str)) < len(intervals_to_reprocess) - 1:
+                print(f"Waiting {INTERVAL_DELAY_SECONDS} seconds before next interval...")
+                time.sleep(INTERVAL_DELAY_SECONDS)
+
+        # --- PHASE 2: Dynamic catch-up for new intervals ---
+        print(f"\n--- Starting Phase 2: Dynamic catch-up for new intervals (starting from index {next_interval_start_index}) ---")
+        for i in range(next_interval_start_index, len(INTERVALS)):
+            start_str, end_str = INTERVALS[i]
+            start_time = _parse_time(start_str, today)
+            end_time = _parse_time(end_str, today)
+
+            # Check current time on EACH iteration to solve the time-gap problem
+            if end_time > datetime.now():
+                print(f"Reached current time. Next interval {start_str}-{end_str} has not passed. Stopping.")
+                break
+
+            print(f"\n>>> Processing interval: {start_str} - {end_str}")
+            try:
+                csv_path = download_report(today, start_time, end_time, session, user_values, csrf_token)
+                
+                log_data = process_and_upload(str(csv_path))
+                log_memory(f"After interval {start_str}-{end_str}")
+
+                # All intervals in this loop are new, so we always append.
+                _append_processed_interval(
+                    target_date=today, start_time=start_time, end_time=end_time,
+                    row_count=log_data["row_count"], status=log_data["status"],
+                    error_msg=log_data["error_msg"], file_hash=log_data["file_hash"],
+                    sheet_start_row=log_data["sheet_start_row"]
+                )
+            except Exception as exc:
+                print(f"Error processing interval {start_str} - {end_str}: {exc}")
+                _append_processed_interval(today, start_time, end_time, status="Failed", error_msg=f"Critical error in interval loop: {exc}")
+                continue
+            
+            # Add delay between intervals to avoid API rate limits
+            if i < len(INTERVALS) - 1:  # Don't delay after the last interval
+                print(f"Waiting {INTERVAL_DELAY_SECONDS} seconds before next interval...")
+                time.sleep(INTERVAL_DELAY_SECONDS)
+
+
+    except Exception as exc:
+        print(f"Critical error in run(): {exc}")
+        print(f"Exception type: {type(exc).__name__}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        # --- Lock Release ---
+        # This block will always run, ensuring the lock is released even if the script crashes.
+        if lock_sheet:
+            release_lock(lock_sheet, pc_identifier)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Automated Dialer Report Uploader with Rolling Backfill.")
+    parser.add_argument(
+        '--runner',
+        type=str,
+        choices=['manual', 'scheduler'],
+        default='manual',
+        help="Specifies the context the script is run in ('manual' or 'scheduler')."
+    )
+    args = parser.parse_args()
+
+    # Dynamically set PC_IDENTIFIER based on the runner
+    if args.runner == 'scheduler':
+        # You can customize this name
+        pc_identifier_for_run = "PC1_SCHEDULER"
+    else: # 'manual'
+        # You can customize this name
+        pc_identifier_for_run = "PC1_MANUAL"
+    
+    print(f"--- Running with Identifier: {pc_identifier_for_run} ---")
+
+    run(pc_identifier=pc_identifier_for_run)	
