@@ -462,51 +462,10 @@ let charts = {};
 const TRAINING_MODES = [
   'Physical Visit','Physical Re-training','Out of Station Visit',
   'OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'
+  'Virtual', 'Physical Visit', 'Physical Re-training', 'Feedback Visit',
+  'Out of Station Visit', 'Incomplete Physical Visit', 'OFS (On-Field Support)'
 ];
 const MODE_COLORS = ['#f5c518','#22c55e','#38bdf8','#a78bfa','#fb923c','#f472b6','#2dd4bf'];
-
-// ─────────────────────────────────────────────────────────────────
-// DEMO DATA (mirrors your sheet structure)
-// ─────────────────────────────────────────────────────────────────
-function generateDemoData() {
-  const trainers = [
-    'KUNAL ARSEKAR', 'KRUNAL MAHULKAR', 'KEYUR KADU', 'GLADSON ANTO', 
-    'GAUTAM M', 'DEVENDRA PRASAD', 'DEEPAK PATEL', 'DASTAGIR ALAM', 
-    'ARPIT DUBEY', 'ANTAREKSH KAKARIYA', 'ANKIT DAS', 'ANIKET SHIRFULE', 
-    'ABDUL REHMAN', 'AAKASH VAMJA', 'PRAKHAR TIWARI', 'PRABUDDHA GAIKWAD', 
-    'PRABHU V', 'NOMAN KHAN', 'NIHAL KA', 'NIBHUN T', 'NEERAJ KUMAR1', 
-    'MANOJ SINGH', 'LAXMISAI MUDUNURI'
-  ];
-  const cities = ['Delhi','Mumbai','Bangalore','Hyderabad','Pune','Chennai','Kolkata','Ahmedabad','Surat','Jaipur','Lucknow','Kanpur'];
-  const statuses = [
-    'Done', 'Close', 'Re-schedule', 
-    'Not related to inventory/Done by someone', 
-    'Tech concern', 'Need other languge / Physical visit'
-  ];
-  const modes = TRAINING_MODES;
-  const languages = ['Telugu','Kannada','Oriya','Hindi','Tamil','Marathi','Bengali','Gujarati'];
-  const rows = [];
-  const baseDate = new Date('2026-04-01');
-
-  for(let i=0;i<1071;i++){
-    const d = new Date(baseDate);
-    d.setDate(d.getDate() + Math.floor(Math.random()*22));
-    const trainer = trainers[Math.floor(Math.random()*trainers.length)];
-    const city = cities[Math.floor(Math.random()*cities.length)];
-    const status = statuses[Math.floor(Math.random()*(statuses.length))];
-    const mode = modes[Math.floor(Math.random()*modes.length)];
-    const lang = (mode==='Virtual') ? languages[Math.floor(Math.random()*languages.length)] : '';
-    rows.push({
-      date: d.toISOString().split('T')[0],
-      trainerName: trainer,
-      cityName: city,
-      status: status,
-      trainingMode: mode,
-      language: lang
-    });
-  }
-  return rows;
-}
 
 // ─────────────────────────────────────────────────────────────────
 // LOAD DATA — fetches from Google Apps Script Web App
@@ -527,11 +486,10 @@ async function loadData() {
     document.getElementById('info-banner').style.display = 'none';
     console.log(`✅ Loaded ${allRows.length} live rows`);
   } catch (e) {
-    console.warn('⚠️ Live fetch failed, using demo data:', e.message);
-    allRows = generateDemoData();
+    console.error('⚠️ Live fetch failed:', e.message);
     const banner = document.getElementById('info-banner');
-    banner.innerHTML = `⚠️ <strong>Could not load live data</strong> — ${e.message}.<br>
-      Make sure the Apps Script is deployed as <em>Anyone</em> access and redeploy as a <em>New Version</em> after any changes.`;
+    banner.innerHTML = `⚠️ <strong>Connection Error</strong> — ${e.message}.<br>
+      Please ensure the Apps Script is deployed as 'Anyone' and your sheet contains valid data.`;
     banner.style.background = 'rgba(239,68,68,0.08)';
     banner.style.borderColor = 'rgba(239,68,68,0.3)';
     banner.style.color = 'var(--red)';
@@ -563,17 +521,26 @@ function normalizeRows(raw) {
       return '';
     };
 
-    // Date: Col X — header "date"
-    let rawDate = get('date', 'Date', 'DATE');
+    // Date: Column A logic (Handling M/D/YYYY HH:mm:ss)
+    let rawDate = get('date', 'Date', 'DATE', 'Timestamp');
 
-    // Handle DD/MMM/YY format (e.g., 21/Mar/26)
-    const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
-    const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
-    if (sheetMatch) {
-      const dd = sheetMatch[1].padStart(2, '0');
-      const mm = monthMap[sheetMatch[2]] || '01';
-      const yy = '20' + sheetMatch[3];
-      rawDate = `${yy}-${mm}-${dd}`;
+    // Regex for M/D/YYYY or M/D/YYYY HH:mm:ss
+    const mdyMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (mdyMatch) {
+      const mm = mdyMatch[1].padStart(2, '0');
+      const dd = mdyMatch[2].padStart(2, '0');
+      const yyyy = mdyMatch[3];
+      rawDate = `${yyyy}-${mm}-${dd}`;
+    } else {
+      // Handle DD/MMM/YY format (e.g., 21/Mar/26)
+      const monthMap = { Jan:'01', Feb:'02', Mar:'03', Apr:'04', May:'05', Jun:'06', Jul:'07', Aug:'08', Sep:'09', Oct:'10', Nov:'11', Dec:'12' };
+      const sheetMatch = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
+      if (sheetMatch) {
+        const dd = sheetMatch[1].padStart(2, '0');
+        const mm = monthMap[sheetMatch[2]] || '01';
+        const yy = '20' + sheetMatch[3];
+        rawDate = `${yy}-${mm}-${dd}`;
+      }
     }
 
     // Fallback for other formats
@@ -584,13 +551,15 @@ function normalizeRows(raw) {
 
     return {
       date:         rawDate,
-      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer').trim(),
-      cityName:     get('City Name', 'CityName', 'City'),             // Col I
+      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer', 'Agent Name').trim(),
+      trainerName:  get('Trainer Name', 'TrainerName', 'Trainer', 'Agent Name').trim().toUpperCase(),
+      cityName:     get('City Name', 'CityName', 'City', 'Restaurantname'),
       status:       get('Status', 'status').trim(),
-      trainingMode: get('Training Mode', 'TrainingMode', 'Mode'),     // Col D
+      trainingMode: get('Training Mode', 'TrainingMode', 'Mode', 'Category'),
       language:     get('Languages', 'Language', 'Virtual Language'), // Col S
     };
   }).filter(r => r.trainerName || r.date);
+  }).filter(r => r.trainerName && r.date);
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -891,6 +860,7 @@ function renderTrainerDetailTable() {
     const key = r.trainerName || '(Unknown)';
     if(!trainerMap[key]) {
       trainerMap[key] = { 'Physical Visit':0,'Physical Re-training':0,'Out of Station Visit':0,'OFS (On-Field Support)':0,'Virtual':0,'Incomplete Physical Visit':0 };
+      trainerMap[key] = Object.fromEntries(TRAINING_MODES.map(mode => [mode, 0]));
     }
     if(TRAINING_MODES.includes(r.trainingMode)) {
       trainerMap[key][r.trainingMode] = (trainerMap[key][r.trainingMode]||0)+1;
@@ -898,6 +868,7 @@ function renderTrainerDetailTable() {
   });
 
   const modeKeys = ['Physical Visit','Physical Re-training','Out of Station Visit','OFS (On-Field Support)','Virtual','Incomplete Physical Visit'];
+  const modeKeys = TRAINING_MODES;
   const totals = {};
   modeKeys.forEach(m => totals[m] = 0);
   let grandTotal = 0;
