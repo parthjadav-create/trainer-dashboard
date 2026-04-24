@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root {
+:root {f
   --bg: #f8f9fa; /* Light background */
   --bg2: #e9ecef; /* Slightly darker light background for filter bar */
   --card: #ffffff; /* White cards */
@@ -330,24 +330,38 @@ function render() {
 
 function renderKPIs() {
   const total = filteredData.length;
-  const donePhysical = filteredData.filter(r => r.status === 'Done' && r.mode !== 'Virtual').length;
-  const doneVirtual = filteredData.filter(r => r.status === 'Done' && r.mode === 'Virtual').length;
   
-  // Total Done is the sum of Physical Done and Virtual Done
-  const totalDone = donePhysical + doneVirtual;
+  // 1. Total Done: Any ticket that has a 'Done' status
+  const totalDone = filteredData.filter(r => 
+    r.status && r.status.toLowerCase() === 'done'
+  ).length;
+
+  // 2. Virtual Done: Status is 'Done' AND Mode is 'Virtual'
+  const doneVirtual = filteredData.filter(r => 
+    r.status && r.status.toLowerCase() === 'done' && 
+    r.mode && r.mode.toLowerCase().includes('virtual')
+  ).length;
+
+  // 3. Physical Visit: Status is 'Done' AND Mode is 'Physical Visit'
+  const physicalVisit = filteredData.filter(r => 
+    r.status && r.status.toLowerCase() === 'done' && 
+    r.mode && r.mode.toLowerCase().includes('physical visit')
+  ).length;
+
+  // 4. Close/Not Related: Adjusting these based on typical sheet values
+  const close = filteredData.filter(r => r.status && r.status.toLowerCase() === 'close').length;
+  const notRelated = filteredData.filter(r => r.status && r.status.toLowerCase().includes('not related')).length;
   
-  const close = filteredData.filter(r => r.status === 'Close').length;
-  const notRelated = filteredData.filter(r => r.status.includes('Not related')).length;
   const trainers = new Set(filteredData.map(r => r.trainer)).size;
 
   const kpis = [
-    { label: 'Total Ticket', val: total, sub: 'Total Records', color: '' },
-    { label: 'Done', val: totalDone, sub: 'Combined Done', color: 'neon' },
-    { label: 'Close', val: close, sub: 'Status: Close', color: 'danger' },
-    { label: 'Not Related', val: notRelated, sub: 'Other Status', color: 'warn' },
-    { label: 'Virtual Done', val: doneVirtual, sub: 'Virtual Mode', color: '' },
-    { label: 'Physical Visit', val: donePhysical, sub: 'Physical Mode', color: '' },
-    { label: 'Trainer', val: trainers, sub: 'Unique Agents', color: 'neon' }
+    { label: 'Total Ticket', val: total, color: '' },
+    { label: 'Done', val: totalDone, color: 'neon' },
+    { label: 'Close', val: close, color: 'danger' },
+    { label: 'Not Related', val: notRelated, color: 'warn' },
+    { label: 'Virtual Done', val: doneVirtual, color: '' },
+    { label: 'Physical Visit', val: physicalVisit, color: '' },
+    { label: 'Trainer', val: trainers, color: 'neon' }
   ];
 
   document.getElementById('kpi-row').innerHTML = kpis.map(k => `
