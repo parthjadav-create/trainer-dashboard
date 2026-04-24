@@ -329,32 +329,28 @@ function render() {
 }
 
 function renderKPIs() {
-  const total = filteredData.length; // Total Ticket: 1,215 [cite: 1, 114]
+  const total = filteredData.length; // Will show 1,215 once connected [cite: 1]
   
-  // Done Count: 1,154 [cite: 1, 116]
-  const doneCount = filteredData.filter(r => r.status === 'Done').length;
+  // Matches "Total Done" from Looker Studio [cite: 1]
+  const doneCount = filteredData.filter(r => r.status === 'Done').length; 
   
-  // Close Count: 51 [cite: 1, 116]
-  const closeCount = filteredData.filter(r => r.status === 'Close').length;
-  
-  // Virtual Done: 37 [cite: 1, 14, 118]
+  // Matches "Virtual Done" [cite: 1]
   const virtualDone = filteredData.filter(r => 
     r.status === 'Done' && r.mode === 'Virtual'
   ).length;
 
-  // Physical Visit: 1,116 (Combined Physical types) [cite: 1, 16]
+  // Matches "Physical Visit" (1,116) [cite: 1]
   const physicalVisit = filteredData.filter(r => 
-    r.status === 'Done' && r.mode === 'Physical Visit'
+    r.status === 'Done' && (r.mode === 'Physical Visit' || r.mode === 'Physical Re-training')
   ).length;
 
-  // Active Trainers: 35 [cite: 1, 18, 118]
-  const trainers = new Set(filteredData.map(r => r.trainer)).size;
+  const trainers = new Set(filteredData.map(r => r.trainer)).size; // Should be 35 [cite: 1]
 
   const kpis = [
     { label: 'Total Ticket', val: total, color: '' },
     { label: 'Done', val: doneCount, color: 'neon' },
-    { label: 'Close', val: closeCount, color: 'danger' },
-    { label: 'Not Related', val: 3, color: 'warn' }, // Fixed value from report [cite: 13, 116]
+    { label: 'Close', val: filteredData.filter(r => r.status === 'Close').length, color: 'danger' },
+    { label: 'Not Related', val: filteredData.filter(r => r.status.includes('Not related')).length, color: 'warn' },
     { label: 'Virtual Done', val: virtualDone, color: '' },
     { label: 'Physical Visit', val: physicalVisit, color: '' },
     { label: 'Trainer', val: trainers, color: 'neon' }
@@ -364,7 +360,7 @@ function renderKPIs() {
     <div class="kpi ${k.color}">
       <div class="kpi-label">${k.label}</div>
       <div class="kpi-val">${k.val.toLocaleString()}</div>
-      <div class="kpi-sub">${total > 0 ? (k.val / total * 100).toFixed(1) : 0}% of Total</div>
+      <div class="kpi-sub">${total > 0 ? (k.val / total * 100).toFixed(1) : 0}%</div>
     </div>
   `).join('');
 }
