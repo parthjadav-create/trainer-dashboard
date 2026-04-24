@@ -1,1724 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>On-Site Trainer Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>
-:root {
-  --bg:        #05070f;
-  --bg2:       #090d1a;
-  --bg3:       #0e1425;
-  --card:      #0d1120;
-  --card2:     #111828;
-  --border:    rgba(99,179,237,0.12);
-  --border2:   rgba(99,179,237,0.22);
-  --accent:    #63b3ed;
-  --accent2:   #90cdf4;
-  --neon:      #00f5d4;
-  --neon2:     #00d4b1;
-  --warn:      #f6ad55;
-  --danger:    #fc8181;
-  --success:   #68d391;
-  --purple:    #b794f4;
-  --pink:      #f687b3;
-  --text:      #e2e8f0;
-  --muted:     #64748b;
-  --muted2:    #94a3b8;
-  --r:         14px;
-  --r2:        10px;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'IBM Plex Sans',sans-serif;
-  font-size:13px;
-  min-height:100vh;
-  overflow-x:hidden;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Performance | Donezo Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #f8faf9;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --primary-green: #1d5c3d; /* Donezo Deep Green */
+            --accent-green: #74c69d; /* Progress Bar Green */
+            --text-main: #1a1c1e;
+            --text-muted: #626a6d;
+            --border: #eef2f0;
+            --radius-lg: 24px;
+            --radius-sm: 12px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
 
-/* ── GRID BACKGROUND ── */
-body::before{
-  content:'';
-  position:fixed;inset:0;
-  background-image:
-    linear-gradient(rgba(99,179,237,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99,179,237,0.03) 1px, transparent 1px);
-  background-size:40px 40px;
-  pointer-events:none;
-  z-index:0;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            line-height: 1.5;
+        }
 
-/* ── LOADER ── */
-#loader{
-  position:fixed;inset:0;
-  background:var(--bg);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  z-index:9999;gap:20px;
-}
-.loader-logo{
-  font-family:'Syne',sans-serif;
-  font-size:18px;font-weight:800;
-  color:var(--accent);
-  letter-spacing:4px;text-transform:uppercase;
-  opacity:0;animation:fadeUp .6s .2s forwards;
-}
-.loader-bar-wrap{
-  width:200px;height:2px;
-  background:rgba(99,179,237,0.1);
-  border-radius:2px;overflow:hidden;
-  opacity:0;animation:fadeUp .6s .4s forwards;
-}
-.loader-bar{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,var(--neon),var(--accent));
-  border-radius:2px;
-  animation:loadBar 2s .6s ease forwards;
-}
-.loader-msg{
-  font-size:11px;color:var(--muted2);letter-spacing:1px;
-  opacity:0;animation:fadeUp .6s .5s forwards;
-}
-@keyframes loadBar{to{width:100%;}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
 
-/* ── HEADER ── */
-.header{
-  position:sticky;top:0;z-index:100;
-  background:rgba(5,7,15,0.92);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-  padding:0 28px;
-  display:flex;align-items:center;justify-content:space-between;
-  height:60px;
-}
-.header-brand{
-  display:flex;align-items:center;gap:12px;
-}
-.brand-icon{
-  width:36px;height:36px;border-radius:10px;
-  background:linear-gradient(135deg,var(--neon),var(--accent));
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-  box-shadow:0 0 20px rgba(0,245,212,0.3);
-}
-.brand-title{
-  font-family:'Syne',sans-serif;
-  font-size:15px;font-weight:800;
-  color:var(--text);letter-spacing:.5px;
-}
-.brand-sub{font-size:10px;color:var(--muted2);letter-spacing:1px;margin-top:1px;}
-.header-right{display:flex;align-items:center;gap:10px;}
-.live-dot{
-  display:flex;align-items:center;gap:6px;
-  font-size:11px;color:var(--neon);font-family:'IBM Plex Mono',monospace;
-}
-.live-dot::before{
-  content:'';width:7px;height:7px;border-radius:50%;
-  background:var(--neon);
-  box-shadow:0 0 8px var(--neon);
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.btn{
-  padding:7px 16px;border-radius:8px;border:1px solid var(--border2);
-  background:transparent;color:var(--accent2);
-  font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:600;
-  cursor:pointer;transition:all .2s;letter-spacing:.5px;
-}
-.btn:hover{background:rgba(99,179,237,0.1);border-color:var(--accent);}
-.btn-primary{background:var(--neon);color:#000;border-color:var(--neon);}
-.btn-primary:hover{background:var(--neon2);box-shadow:0 0 20px rgba(0,245,212,0.4);}
+        .header h1 { font-size: 24px; font-weight: 700; color: var(--primary-green); }
 
-/* ── FILTER BAR ── */
-.filterbar{
-  background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  padding:10px 28px;
-  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
-}
-.filter-chip{display:flex;align-items:center;gap:6px;}
-.filter-chip label{
-  font-size:10px;font-weight:600;letter-spacing:.8px;
-  text-transform:uppercase;color:var(--neon);white-space:nowrap;
-}
-select,.date-in{
-  background:var(--card2);
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:5px 10px;border-radius:8px;
-  font-family:'IBM Plex Sans',sans-serif;font-size:11px;
-  outline:none;cursor:pointer;min-width:120px;
-  transition:border-color .2s;
-}
-select:focus,.date-in:focus{border-color:var(--accent);}
-.filter-divider{width:1px;height:20px;background:var(--border);margin:0 4px;}
+        /* Filters Bar */
+        .filters {
+            display: flex;
+            gap: 16px;
+            background: var(--card-bg);
+            padding: 16px 24px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
 
-/* ── MAIN ── */
-#app{
-  padding:24px 28px;
-  display:flex;flex-direction:column;gap:20px;
-  position:relative;z-index:1;
-  opacity:0;transition:opacity .5s;
-}
-#app.visible{opacity:1;}
+        .f-group { display: flex; flex-direction: column; gap: 6px; }
+        .f-group label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        
+        select, input {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #fcfdfc;
+            font-size: 13px;
+            outline: none;
+            color: var(--text-main);
+        }
 
-/* ── ALERT ── */
-.alert{
-  padding:12px 16px;border-radius:var(--r2);
-  font-size:12px;line-height:1.6;
-  display:none;
-}
-.alert-warn{background:rgba(252,129,74,0.08);border:1px solid rgba(252,129,74,0.3);color:var(--warn);}
+        .update-btn {
+            background: var(--primary-green);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
-/* ── KPI GRID ── */
-.kpi-grid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:12px;
-}
-.kpi{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:16px;
-  position:relative;overflow:hidden;
-  cursor:default;
-  transition:transform .2s,box-shadow .2s,border-color .2s;
-  animation:fadeUp .5s both;
-}
-.kpi:hover{
-  transform:translateY(-4px);
-  box-shadow:0 12px 40px rgba(0,0,0,0.4);
-  border-color:var(--border2);
-}
-.kpi-glow{
-  position:absolute;top:-30px;right:-30px;
-  width:80px;height:80px;border-radius:50%;
-  opacity:.12;filter:blur(20px);
-}
-.kpi-icon{font-size:18px;margin-bottom:8px;}
-.kpi-label{
-  font-size:9px;font-weight:600;
-  text-transform:uppercase;letter-spacing:1px;
-  color:var(--muted2);margin-bottom:6px;
-}
-.kpi-val{
-  font-family:'Syne',sans-serif;
-  font-size:28px;font-weight:800;
-  line-height:1;color:var(--text);
-}
-.kpi-meta{
-  display:flex;align-items:center;gap:6px;
-  margin-top:6px;
-}
-.kpi-pct{font-size:11px;font-weight:600;}
-.kpi-sub{font-size:10px;color:var(--muted);}
-.kpi-bar{
-  height:3px;border-radius:2px;
-  background:rgba(255,255,255,0.06);
-  margin-top:10px;overflow:hidden;
-}
-.kpi-bar-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
-/* accent colors per kpi */
-.kpi[data-c="neon"] .kpi-glow{background:var(--neon);}
-.kpi[data-c="neon"] .kpi-val{color:var(--neon);}
-.kpi[data-c="neon"] .kpi-bar-fill{background:var(--neon);}
-.kpi[data-c="success"] .kpi-glow{background:var(--success);}
-.kpi[data-c="success"] .kpi-val{color:var(--success);}
-.kpi[data-c="success"] .kpi-bar-fill{background:var(--success);}
-.kpi[data-c="danger"] .kpi-glow{background:var(--danger);}
-.kpi[data-c="danger"] .kpi-val{color:var(--danger);}
-.kpi[data-c="danger"] .kpi-bar-fill{background:var(--danger);}
-.kpi[data-c="warn"] .kpi-glow{background:var(--warn);}
-.kpi[data-c="warn"] .kpi-val{color:var(--warn);}
-.kpi[data-c="warn"] .kpi-bar-fill{background:var(--warn);}
-.kpi[data-c="purple"] .kpi-glow{background:var(--purple);}
-.kpi[data-c="purple"] .kpi-val{color:var(--purple);}
-.kpi[data-c="purple"] .kpi-bar-fill{background:var(--purple);}
-.kpi[data-c="pink"] .kpi-glow{background:var(--pink);}
-.kpi[data-c="pink"] .kpi-val{color:var(--pink);}
-.kpi[data-c="pink"] .kpi-bar-fill{background:var(--pink);}
-.kpi[data-c="accent"] .kpi-glow{background:var(--accent);}
-.kpi[data-c="accent"] .kpi-val{color:var(--accent);}
-.kpi[data-c="accent"] .kpi-bar-fill{background:var(--accent);}
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
 
-/* ── PANEL ── */
-.panel{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  overflow:hidden;
-  animation:fadeUp .5s both;
-}
-.panel-head{
-  padding:14px 18px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(90deg,rgba(99,179,237,0.05),transparent);
-}
-.panel-title{
-  font-family:'Syne',sans-serif;
-  font-size:13px;font-weight:700;
-  color:var(--text);letter-spacing:.3px;
-  display:flex;align-items:center;gap:8px;
-}
-.panel-title-icon{
-  width:24px;height:24px;border-radius:7px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;
-}
-.panel-badge{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:10px;color:var(--muted2);
-  background:rgba(255,255,255,0.05);
-  padding:2px 8px;border-radius:20px;
-  border:1px solid var(--border);
-}
-.panel-body{padding:16px 18px;}
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
 
-/* ── GRID LAYOUTS ── */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
-.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
-.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:16px;}
+        /* Highlighting the Featured Cards like Donezo UI */
+        .kpi-card.featured {
+            background: var(--primary-green);
+            color: white;
+        }
+        .kpi-card.featured .kpi-label { color: rgba(255,255,255,0.7); }
+        .kpi-card.featured .kpi-val { color: white; }
 
-/* ── CHART ── */
-.chart-box{position:relative;}
+        .kpi-label { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block; }
+        .kpi-val { font-size: 32px; font-weight: 700; display: block; margin-bottom: 12px; }
 
-/* ── TABLE ── */
-.tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.tbl th{
-  padding:9px 12px;
-  text-align:left;
-  font-size:9px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.8px;
-  color:var(--muted2);
-  border-bottom:1px solid var(--border);
-  white-space:nowrap;
-  background:rgba(255,255,255,0.02);
-}
-.tbl td{
-  padding:9px 12px;
-  border-bottom:1px solid rgba(255,255,255,0.03);
-  color:var(--text);white-space:nowrap;
-}
-.tbl tr:last-child td{border-bottom:none;}
-.tbl tbody tr:hover td{background:rgba(99,179,237,0.04);}
-.tbl tfoot td{
-  font-weight:700;color:var(--neon);
-  border-top:1px solid var(--border);
-  border-bottom:none;
-  background:rgba(0,245,212,0.04);
-}
-.tbl td.num{text-align:center;font-family:'IBM Plex Mono',monospace;}
-.tbl td.num-r{text-align:right;font-family:'IBM Plex Mono',monospace;}
+        /* Progress Bar inside KPI */
+        .progress-wrap { height: 6px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .progress-bar { height: 100%; background: var(--accent-green); border-radius: 10px; }
 
-/* rank badges */
-.rank{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:22px;height:22px;border-radius:50%;
-  font-size:10px;font-weight:700;
-  background:rgba(99,179,237,0.1);color:var(--accent);
-}
-.rank.g{background:rgba(255,215,0,0.15);color:gold;}
-.rank.s{background:rgba(192,192,192,0.15);color:silver;}
-.rank.b{background:rgba(205,127,50,0.15);color:#cd7f32;}
+        /* Main Content Layout */
+        .grid-row { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .panel { background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--primary-green); }
 
-/* scroll table */
-.scroll-table{max-height:260px;overflow-y:auto;}
-.scroll-table::-webkit-scrollbar{width:4px;}
-.scroll-table::-webkit-scrollbar-track{background:transparent;}
-.scroll-table::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 14px 12px; border-bottom: 1px solid #f9f9f9; font-size: 13px; }
+        tr:hover td { background: #fcfdfc; }
 
-/* ── HBAR ── */
-.hbar-wrap{display:flex;flex-direction:column;gap:10px;}
-.hbar-row{display:flex;align-items:center;gap:10px;}
-.hbar-lbl{
-  width:170px;flex-shrink:0;text-align:right;
-  font-size:11px;color:var(--muted2);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.hbar-track{
-  flex:1;height:8px;border-radius:4px;
-  background:rgba(255,255,255,0.05);overflow:hidden;
-}
-.hbar-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
-.hbar-num{
-  width:36px;text-align:right;flex-shrink:0;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:11px;font-weight:500;color:var(--text);
-}
-
-/* ── STATUS PILLS ── */
-.pill{
-  display:inline-block;padding:2px 9px;border-radius:20px;
-  font-size:10px;font-weight:600;letter-spacing:.3px;
-  white-space:nowrap;
-}
-
-/* ── TICKET STATUS LIST ── */
-.status-list{display:flex;flex-direction:column;gap:10px;}
-.status-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 12px;border-radius:10px;
-  background:rgba(255,255,255,0.02);
-  border:1px solid var(--border);
-  transition:background .2s;
-}
-.status-row:hover{background:rgba(255,255,255,0.04);}
-.status-row-left{display:flex;align-items:center;gap:8px;}
-.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.status-name{font-size:12px;color:var(--text);}
-.status-count{
-  font-family:'Syne',sans-serif;
-  font-size:20px;font-weight:800;
-}
-
-/* ── LANG TABLE ── */
-.lang-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);
-}
-.lang-row:last-child{border-bottom:none;}
-.lang-left{display:flex;align-items:center;gap:8px;}
-.lang-dot{width:8px;height:8px;border-radius:50%;}
-.lang-name{font-size:12px;color:var(--text);}
-.lang-cnt{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:13px;font-weight:500;
-}
-
-/* ── CITY CHART ── */
-.city-scroll{overflow-x:auto;padding-bottom:8px;}
-.city-scroll::-webkit-scrollbar{height:4px;}
-.city-scroll::-webkit-scrollbar-track{background:transparent;}
-.city-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-.city-bars{display:flex;gap:8px;align-items:flex-end;padding:8px 4px 4px;min-width:max-content;}
-.city-col{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.city-bar-item{
-  width:32px;border-radius:6px 6px 0 0;
-  transition:height .9s cubic-bezier(.4,0,.2,1),opacity .2s;
-  cursor:pointer;position:relative;
-}
-.city-bar-item:hover{opacity:.8;}
-.city-bar-item:hover::after{
-  content:attr(data-tip);
-  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
-  background:var(--card2);color:var(--text);
-  font-size:10px;font-weight:600;white-space:nowrap;
-  padding:3px 8px;border-radius:6px;
-  border:1px solid var(--border2);
-  pointer-events:none;z-index:10;
-}
-.city-top-val{font-size:10px;font-weight:600;color:var(--text);font-family:'IBM Plex Mono',monospace;}
-.city-lbl{
-  font-size:9px;color:var(--muted);
-  transform:rotate(-45deg);transform-origin:top center;
-  white-space:nowrap;margin-top:4px;
-}
-
-/* ── AVG BAR ── */
-.avg-wrap{display:flex;align-items:center;gap:6px;}
-.avg-track{flex:1;height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;}
-.avg-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--neon),var(--accent));}
-.avg-val{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--neon);width:30px;flex-shrink:0;}
-
-/* ── TREND CHIP ── */
-.trend-up{color:var(--success);}
-.trend-dn{color:var(--danger);}
-
-/* ── ANIMATIONS ── */
-.kpi:nth-child(1){animation-delay:.05s;}
-.kpi:nth-child(2){animation-delay:.10s;}
-.kpi:nth-child(3){animation-delay:.15s;}
-.kpi:nth-child(4){animation-delay:.20s;}
-.kpi:nth-child(5){animation-delay:.25s;}
-.kpi:nth-child(6){animation-delay:.30s;}
-.kpi:nth-child(7){animation-delay:.35s;}
-
-/* ── RESPONSIVE ── */
-@media(max-width:1300px){
-  .kpi-grid{grid-template-columns:repeat(4,1fr);}
-  .grid-3{grid-template-columns:1fr 1fr;}
-}
-@media(max-width:900px){
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .grid-2,.grid-2-1,.grid-1-2,.grid-3{grid-template-columns:1fr;}
-  #app{padding:16px;}
-  .header{padding:0 16px;}
-  .filterbar{padding:10px 16px;}
-}
-</style>
+        #overlay { position: fixed; inset: 0; background: white; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 15px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top: 4px solid var(--primary-green); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-logo">Trainer Dashboard</div>
-  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
-  <div class="loader-msg" id="loader-msg">Connecting to Google Sheet…</div>
+<div id="overlay"><div class="spinner"></div><p>Syncing Live Inventory Data...</p></div>
+
+<div class="dashboard-container">
+    <div class="header">
+        <h1>Dashboard</h1>
+        <div style="font-size: 12px; color: var(--accent-green);">● LIVE UPDATES</div>
+    </div>
+
+    <div class="filters">
+        <div class="f-group"><label>Trainer</label><select id="f-trainer"><option value="">All Agents</option></select></div>
+        <div class="f-group"><label>City</label><select id="f-city"><option value="">All Cities</option></select></div>
+        <div class="f-group"><label>Status</label><select id="f-status"><option value="">All Status</option></select></div>
+        <div class="f-group"><label>Date From</label><input type="date" id="f-from"></div>
+        <div class="f-group"><label>Date To</label><input type="date" id="f-to"></div>
+        <button class="update-btn" onclick="applyFilters()">Update View</button>
+    </div>
+
+    <div class="kpi-grid" id="kpi-row"></div>
+
+    <div class="grid-row">
+        <div class="panel">
+            <div class="panel-title">Daily Training Volume</div>
+            <div style="height: 300px;"><canvas id="mainChart"></canvas></div>
+        </div>
+        <div class="panel">
+            <div class="panel-title">Top Performers</div>
+            <table>
+                <thead><tr><th>Trainer</th><th>Done Count</th></tr></thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Trainer Status Matrix</div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>Trainer</th><th>Done</th><th>Close</th><th>Virtual Done</th><th>Physical Visit</th><th>Total</th></tr>
+                </thead>
+                <tbody id="matrix-body"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header-brand">
-    <div class="brand-icon">📋</div>
-    <div>
-      <div class="brand-title">Inventory On-Site Trainer</div>
-      <div class="brand-sub">LIVE PERFORMANCE DASHBOARD</div>
-    </div>
-  </div>
-  <div class="header-right">
-    <div class="live-dot" id="live-status">CONNECTING</div>
-    <button class="btn" onclick="loadData()">↻ Refresh</button>
-  </div>
-</header>
-
-<!-- FILTER BAR -->
-<div class="filterbar">
-  <div class="filter-chip">
-    <label>Trainer</label>
-    <select id="f-trainer"><option value="">All</option></select>
-  </div>
-  <div class="filter-divider"></div>
-  <div class="filter-chip">
-    <label>City</label>
-    <select id="f-city"><option value="">All</option></select>
-  </div>
-  <div class="filter-divider"></div>
-  <div class="filter-chip">
-    <label>Status</label>
-    <select id="f-status"><option value="">All</option></select>
-  </div>
-  <div class="filter-divider"></div>
-  <div class="filter-chip">
-    <label>Mode</label>
-    <select id="f-mode"><option value="">All</option></select>
-  </div>
-  <div class="filter-divider"></div>
-  <div class="filter-chip">
-    <label>From</label>
-    <input type="date" id="f-from" class="date-in"/>
-  </div>
-  <div class="filter-chip">
-    <label>To</label>
-    <input type="date" id="f-to" class="date-in"/>
-  </div>
-  <div class="filter-divider"></div>
-  <button class="btn btn-primary" onclick="applyFilters()">Apply</button>
-  <button class="btn" onclick="resetFilters()">Reset</button>
-</div>
-
-<!-- MAIN APP -->
-<div id="app">
-  <div class="alert alert-warn" id="alert-box"></div>
-
-  <!-- KPIs -->
-  <div class="kpi-grid" id="kpi-grid"></div>
-
-  <!-- ROW: Trend Chart + Trainer Leaderboard -->
-  <div class="grid-2">
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title">
-          <div class="panel-title-icon" style="background:rgba(0,245,212,0.1);">📈</div>
-          Daily Ticket Trend
-        </div>
-        <span class="panel-badge" id="trend-badge">–</span>
-      </div>
-      <div class="panel-body chart-box" style="height:240px;">
-        <canvas id="trendChart"></canvas>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title">
-          <div class="panel-title-icon" style="background:rgba(246,173,85,0.1);">🏆</div>
-          Trainer Leaderboard
-        </div>
-        <span class="panel-badge" id="trainer-badge">–</span>
-      </div>
-      <div class="scroll-table">
-        <table class="tbl">
-          <thead><tr><th>#</th><th>Trainer</th><th>Total</th><th>Done</th><th>Avg/Day</th></tr></thead>
-          <tbody id="trainer-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROW: Date-wise multi-line chart -->
-  <div class="panel">
-    <div class="panel-head">
-      <div class="panel-title">
-        <div class="panel-title-icon" style="background:rgba(183,148,244,0.1);">📅</div>
-        Date-Wise Training Mode Breakdown
-      </div>
-    </div>
-    <div class="panel-body chart-box" style="height:260px;">
-      <canvas id="dateChart"></canvas>
-    </div>
-  </div>
-
-  <!-- ROW: Training Mode + Ticket Status + Languages -->
-  <div class="grid-3">
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title">
-          <div class="panel-title-icon" style="background:rgba(99,179,237,0.1);">🎯</div>
-          Training Mode
-        </div>
-      </div>
-      <div class="panel-body" id="mode-body"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title">
-          <div class="panel-title-icon" style="background:rgba(104,211,145,0.1);">🎫</div>
-          Ticket Status
-        </div>
-      </div>
-      <div class="panel-body" id="status-body"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-title">
-          <div class="panel-title-icon" style="background:rgba(246,135,179,0.1);">🌐</div>
-          Virtual Language
-        </div>
-        <span class="panel-badge" id="lang-total">–</span>
-      </div>
-      <div class="panel-body" id="lang-body"></div>
-    </div>
-  </div>
-
-  <!-- ROW: City Chart -->
-  <div class="panel">
-    <div class="panel-head">
-      <div class="panel-title">
-        <div class="panel-title-icon" style="background:rgba(0,245,212,0.1);">🏙️</div>
-        Training Volume by City
-      </div>
-    </div>
-    <div class="panel-body city-scroll" style="padding:16px 18px 8px;">
-      <div class="city-bars" id="city-bars"></div>
-    </div>
-  </div>
-
-  <!-- ROW: Trainer Detail Table -->
-  <div class="panel">
-    <div class="panel-head">
-      <div class="panel-title">
-        <div class="panel-title-icon" style="background:rgba(183,148,244,0.1);">📊</div> Trainer-Wise Training Breakdown
-      </div>
-      <button class="btn" onclick="exportTrainerMatrixToExcel()">Export to Excel</button>
-    </div>
-    <div class="panel-body" style="padding:0;overflow-x:auto;">
-      <table class="tbl" id="detail-tbl">
-        <thead>
-          <tr>
-            <th>Trainer Name</th>
-            <th class="num">Physical Visit</th>
-            <th class="num">Physical Re-training</th>
-            <th class="num">Out of Station</th>
-            <th class="num">OFS Support</th>
-            <th class="num">Virtual</th>
-            <th class="num">Incomplete Visit</th>
-            <th class="num">Feedback</th>
-            <th class="num">Total</th>
-          </tr>
-        </thead>
-        <tbody id="detail-tbody"></tbody>
-        <tfoot id="detail-tfoot"></tfoot>
-      </table>
-    </div>
-  </div>
-
-</div><!-- /app -->
-
 <script>
-// ═══════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbxHoSQQZ7IzKxkUhJtsrli6cSo00VR1q3TVlCTBdOrbJV8xEZaL2GUtc4SdjxEaWTq4ZQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxHoSQQZ7IzKxkUhJtsrli6cSo00VR1q3TVlCTBdOrbJV8xEZaL2GUtc4SdjxEaWTq4ZQ/exec';
 
-const MODES = [
-  'Physical Visit','Physical Re-training','Out of Station Visit',
-  'OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'
-];
-// Exact Status values from Google Form
-const STATUS_VALS = [
-  'Done','Close','Re-schedule',
-  'Not related to inventory/Done by someone',
-  'Tech concern','Need other languge / Physical visit'
-];
-// Exact Training Mode values from Google Form
-const MODE_VALS = [
-  'Virtual','Physical Visit','Physical Re-training',
-  'Feedback Visit','Out of Station Visit',
-  'Incomplete Physical Visit','OFS (On-Field Support)'
-];
-const COLORS = ['#00f5d4','#63b3ed','#68d391','#b794f4','#f6ad55','#f687b3','#fc8181'];
+let allData = [];
+let filteredData = [];
+let charts = {};
 
-const STATUS_COLORS = {
-  'Done':                                         '#68d391',
-  'Close':                                        '#fc8181',
-  'Re-schedule':                                  '#b794f4',
-  'Not related to inventory/Done by someone':     '#63b3ed',
-  'Tech concern':                                 '#f6ad55',
-  'Need other languge / Physical visit':          '#00f5d4',
-};
-
-let allRows = [], filteredRows = [], charts = {};
-
-// ═══════════════════════════════════════════════
-// LOAD DATA
-// ═══════════════════════════════════════════════
-async function loadData() {
-  setLoader(true, 'Connecting to Google Sheet…');
-  document.getElementById('live-status').textContent = 'CONNECTING';
-
-  try {
-    const res = await fetch(API, { method:'GET', redirect:'follow' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const txt = await res.text();
-    const js  = JSON.parse(txt);
-    if (js.status === 'error') throw new Error(js.message);
-    if (!js.data?.length) throw new Error('Sheet returned 0 rows');
-    allRows = parseRows(js.data);
-    showAlert('', false);
-    document.getElementById('live-status').textContent = '🟢 LIVE · ' + new Date().toLocaleTimeString();
-    console.log('✅ Loaded', allRows.length, 'rows. Sample:', allRows[0]);
-  } catch(e) {
-    console.warn('⚠️ Using demo data:', e.message);
-    allRows = demoData();
-    showAlert(`⚠️ Live data unavailable (${e.message}). Showing demo data. Check Apps Script deployment.`, true);
-    document.getElementById('live-status').textContent = 'DEMO MODE';
-  }
-
-  populateFilters();
-  applyFilters();
-  setLoader(false);
-  document.getElementById('app').classList.add('visible');
+async function init() {
+    try {
+        const res = await fetch(APPS_SCRIPT_URL);
+        const json = await res.json();
+        allData = normalize(json.data);
+        populateFilters();
+        applyFilters();
+        document.getElementById('overlay').style.display = 'none';
+    } catch (e) {
+        alert("Connection Error. Ensure Apps Script deployment is set to 'Anyone'.");
+    }
 }
 
-// ═══════════════════════════════════════════════
-// PARSE — Exact columns from your sheet
-// Timestamp=col A, Training Mode=col D,
-// Status=col H, City Name=col I,
-// Languages=col S, Trainer Name=col W, date=col X
-// ═══════════════════════════════════════════════
-function parseRows(raw) {
-  if (raw.length > 0) {
-    console.log('📋 Sheet headers:', Object.keys(raw[0]));
-    console.log('📋 Row 1 sample:', JSON.stringify(raw[0]));
-    console.log('📋 Row 2 sample:', JSON.stringify(raw[1]));
-  }
-  const monthMap = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',
-                    Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
-
-  return raw.map(r => {
-    const g = (...keys) => {
-      for (const k of keys) {
-        if (r[k] !== undefined) {
-          const v = String(r[k]).trim();
-          // only skip truly empty / null values — NOT "0"
-          if (v && v.toLowerCase() !== 'null' && v.toLowerCase() !== 'undefined') return v;
-        }
-      }
-      return '';
-    };
-
-    // ── DATE from col X (header: "date") ──
-    let rawDate = g('date','Date','DATE','Timestamp','timestamp');
-
-    // Try to extract a date if it's a timestamp like "21/Mar/26, 10:30 AM"
-    rawDate = rawDate.split(',')[0].trim();
-
-    // DD/Mon/YY  e.g. 21/Mar/26
-    const m1 = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
-    if (m1) rawDate = `20${m1[3]}-${monthMap[m1[2]]||'01'}-${m1[1].padStart(2,'0')}`;
-
-    // DD/MM/YYYY
-    const m2 = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (m2) rawDate = `${m2[3]}-${m2[2].padStart(2,'0')}-${m2[1].padStart(2,'0')}`;
-
-    // MM/DD/YYYY
-    const m3 = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
-    if (m3) rawDate = `20${m3[3]}-${m3[1].padStart(2,'0')}-${m3[2].padStart(2,'0')}`;
-
-    // Already YYYY-MM-DD
-    const m4 = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (m4) rawDate = `${m4[1]}-${m4[2]}-${m4[3]}`;
-
-    return {
-      date:         rawDate,
-      trainingMode: g('Training Mode','TrainingMode','training_mode','Mode','training mode'),
-      status:       g('Status','status','STATUS'),
-      cityName:     g('City Name','CityName','City','city','CITY NAME','City Name '),
-      language:     g('Languages','Language','Virtual Language','languages','LANGUAGES'),
-      trainerName:  g('Trainer Name','TrainerName','Trainer','trainer_name','TRAINER NAME','Trainer Name '),
-    };
-  }).filter(r => r.trainerName || r.date);
+function normalize(raw) {
+    return raw.map(r => {
+        const get = (k) => String(r[k] || "").trim().toUpperCase();
+        return {
+            date: (r.Date || "").split('T')[0],
+            trainer: get('Trainer Name') || get('Agent Name'),
+            status: get('Status1') || get('Status'),
+            mode: get('Category') || get('Training Mode'),
+            city: get('City Name') || get('Restaurant Name')
+        };
+    }).filter(r => r.trainer && r.date);
 }
 
-// ═══════════════════════════════════════════════
-// DEMO DATA
-// ═══════════════════════════════════════════════
-function demoData() {
-  const trainers = ['NOMAN KHAN','ANKIT DAS','DASTAGIR ALAM','MANOJ SINGH','PRABHU V','DEEPAK PATEL','ABDUL REHMAN','RAHUL KUMAR','AMIT SHARMA','PRIYA SINGH','KUNAL ARSEKAR','GLADSON ANTO'];
-  const cities   = ['Delhi','Mumbai','Bangalore','Hyderabad','Pune','Chennai','Kolkata','Ahmedabad','Surat','Jaipur','Lucknow'];
-  const statuses = ['Done','Close','Re-schedule','Not related to inventory/Done by someone','Tech concern'];
-  const langs    = ['Telugu','Kannada','Hindi','Tamil','Marathi','Bengali','Gujarati','Oriya'];
-  const rows = [];
-  const base = new Date('2026-04-01');
-  for (let i=0;i<1100;i++) {
-    const d = new Date(base);
-    d.setDate(d.getDate() + Math.floor(Math.random()*22));
-    const mode = MODES[Math.floor(Math.random()*MODES.length)];
-    rows.push({
-      date: d.toISOString().slice(0,10),
-      trainerName: trainers[Math.floor(Math.random()*trainers.length)],
-      cityName:    cities[Math.floor(Math.random()*cities.length)],
-      status:      statuses[Math.floor(Math.random()*statuses.length)],
-      trainingMode:mode,
-      language:    mode==='Virtual' ? langs[Math.floor(Math.random()*langs.length)] : '',
-    });
-  }
-  return rows;
-}
-
-// ═══════════════════════════════════════════════
-// FILTERS
-// ═══════════════════════════════════════════════
 function populateFilters() {
-  fillSel('f-trainer', uniq(allRows,'trainerName'));
-  fillSel('f-city',    uniq(allRows,'cityName'));
-  fillSel('f-status',  uniq(allRows,'status'));
-  fillSel('f-mode',    uniq(allRows,'trainingMode'));
-  const dates = allRows.map(r=>r.date).filter(Boolean).sort();
-  if (dates.length) {
-    document.getElementById('f-from').value = dates[0];
-    document.getElementById('f-to').value   = dates[dates.length-1];
-  }
+    const trainers = [...new Set(allData.map(r => r.trainer))].sort();
+    const cities = [...new Set(allData.map(r => r.city))].sort();
+    trainers.forEach(t => document.getElementById('f-trainer').add(new Option(t, t)));
+    cities.forEach(c => document.getElementById('f-city').add(new Option(c, c)));
 }
-function uniq(rows, key) {
-  return [...new Set(rows.map(r=>r[key]).filter(Boolean))].sort();
-}
-function fillSel(id, vals) {
-  const el = document.getElementById(id);
-  const first = el.options[0];
-  el.innerHTML=''; el.appendChild(first);
-  vals.forEach(v => el.appendChild(new Option(v,v)));
-}
+
 function applyFilters() {
-  const t=v('f-trainer'),c=v('f-city'),s=v('f-status'),m=v('f-mode'),
-        fr=v('f-from'),to=v('f-to');
-  filteredRows = allRows.filter(r=>{
-    if(t && r.trainerName!==t) return false;
-    if(c && r.cityName!==c)    return false;
-    if(s && r.status!==s)      return false;
-    if(m && r.trainingMode!==m)return false;
-    if(fr && r.date<fr)        return false;
-    if(to && r.date>to)        return false;
-    return true;
-  });
-  render();
-}
-function resetFilters() {
-  ['f-trainer','f-city','f-status','f-mode'].forEach(id=>document.getElementById(id).value='');
-  populateFilters(); applyFilters();
-}
-function v(id){return document.getElementById(id).value;}
+    const t = document.getElementById('f-trainer').value;
+    const c = document.getElementById('f-city').value;
+    const fr = document.getElementById('f-from').value;
+    const to = document.getElementById('f-to').value;
 
-// ═══════════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════════
+    filteredData = allData.filter(r => {
+        if (t && r.trainer !== t) return false;
+        if (c && r.city !== c) return false;
+        if (fr && r.date < fr) return false;
+        if (to && r.date > to) return false;
+        return true;
+    });
+    render();
+}
+
 function render() {
-  renderKPIs();
-  renderTrend();
-  renderTrainers();
-  renderDateChart();
-  renderModes();
-  renderStatuses();
-  renderLanguages();
-  renderCities();
-  renderDetailTable();
+    renderKPIs();
+    renderLeaderboard();
+    renderMatrix();
+    renderChart();
 }
 
-// ── KPIs ──
 function renderKPIs() {
-  const total    = filteredRows.length;
-  // Case-insensitive matching to handle any whitespace/case issues
-  const norm = s => (s||'').trim().toLowerCase();
-  const done     = filteredRows.filter(r=>norm(r.status)==='done').length;
-  const close    = filteredRows.filter(r=>norm(r.status)==='close').length;
-  const resch    = filteredRows.filter(r=>norm(r.status)==='re-schedule').length;
-  const notRel   = filteredRows.filter(r=>norm(r.status).includes('not related')).length;
-  const techC    = filteredRows.filter(r=>norm(r.status).includes('tech concern')).length;
-  const virtual  = filteredRows.filter(r=>norm(r.trainingMode)==='virtual').length;
-  const physical = filteredRows.filter(r=>norm(r.trainingMode)==='physical visit').length;
-  const trainers = new Set(filteredRows.map(r=>r.trainerName).filter(Boolean)).size;
+    const total = filteredData.length;
+    const done = filteredData.filter(r => r.status === 'DONE').length;
+    const close = filteredData.filter(r => r.status === 'CLOSE').length;
+    const virtual = filteredData.filter(r => r.status === 'DONE' && r.mode.includes('VIRTUAL')).length;
+    const physical = filteredData.filter(r => r.status === 'DONE' && !r.mode.includes('VIRTUAL')).length;
+    const notRelated = filteredData.filter(r => r.status.includes('NOT RELATED')).length;
 
-  const kpis = [
-    {label:'Total Tickets',  val:total,    pct:'100%',                c:'neon',    icon:'🎫', bar:100},
-    {label:'Done',           val:done,     pct:pct(done,total),       c:'success', icon:'✅', bar:pct2n(done,total)},
-    {label:'Closed',         val:close,    pct:pct(close,total),      c:'danger',  icon:'❌', bar:pct2n(close,total)},
-    {label:'Re-scheduled',   val:resch,    pct:pct(resch,total),      c:'warn',    icon:'🔄', bar:pct2n(resch,total)},
-    {label:'Not Related',    val:notRel,   pct:pct(notRel,total),     c:'purple',  icon:'🔁', bar:pct2n(notRel,total)},
-    {label:'Tech Concern',   val:techC,    pct:pct(techC,total),      c:'pink',    icon:'🔧', bar:pct2n(techC,total)},
-    {label:'Trainers',       val:trainers, pct:'Active',              c:'accent',  icon:'👤', bar:100},
-  ];
+    const data = [
+        { label: 'Total Tickets', val: total, featured: true },
+        { label: 'Done Calls', val: done },
+        { label: 'Close Calls', val: close },
+        { label: 'Not Related', val: notRelated },
+        { label: 'Virtual Done', val: virtual },
+        { label: 'Physical Visit', val: physical }
+    ];
 
-  document.getElementById('kpi-grid').innerHTML = kpis.map(k=>`
-    <div class="kpi" data-c="${k.c}">
-      <div class="kpi-glow"></div>
-      <div class="kpi-icon">${k.icon}</div>
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-val">${k.val.toLocaleString()}</div>
-      <div class="kpi-meta">
-        <span class="kpi-pct">${k.pct}</span>
-      </div>
-      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${k.bar}%"></div></div>
-    </div>
-  `).join('');
+    document.getElementById('kpi-row').innerHTML = data.map(k => {
+        const p = total > 0 ? (k.val / total * 100).toFixed(0) : 0;
+        return `
+            <div class="kpi-card ${k.featured ? 'featured' : ''}">
+                <span class="kpi-label">${k.label}</span>
+                <span class="kpi-val">${k.val.toLocaleString()}</span>
+                <div class="progress-wrap"><div class="progress-bar" style="width:${p}%; background:${k.featured?'#74c69d':'#1d5c3d'}"></div></div>
+            </div>
+        `;
+    }).join('');
 }
 
-// ── TREND CHART ──
-function renderTrend() {
-  const byDate={};
-  filteredRows.forEach(r=>{ if(r.date){byDate[r.date]=(byDate[r.date]||0)+1;} });
-  const labels=Object.keys(byDate).sort();
-  const vals=labels.map(l=>byDate[l]);
-  document.getElementById('trend-badge').textContent = labels.length + ' days';
-
-  if(charts.trend) charts.trend.destroy();
-  const ctx=document.getElementById('trendChart').getContext('2d');
-  const grad=ctx.createLinearGradient(0,0,0,220);
-  grad.addColorStop(0,'rgba(0,245,212,0.3)');
-  grad.addColorStop(1,'rgba(0,245,212,0)');
-
-  charts.trend = new Chart(ctx,{
-    type:'line',
-    data:{
-      labels:labels.map(d=>d.slice(5)),
-      datasets:[{
-        data:vals,
-        borderColor:'#00f5d4',
-        backgroundColor:grad,
-        borderWidth:2,
-        pointRadius:3,
-        pointBackgroundColor:'#00f5d4',
-        tension:.4,fill:true
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{
-        backgroundColor:'#0d1120',borderColor:'rgba(99,179,237,0.3)',borderWidth:1,
-        titleColor:'#94a3b8',bodyColor:'#e2e8f0',
-      }},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{size:9},maxTicksLimit:15},grid:{color:'rgba(255,255,255,0.03)'}},
-        y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(255,255,255,0.03)'}}
-      }
-    }
-  });
+function renderLeaderboard() {
+    const map = {};
+    filteredData.forEach(r => { if(r.status==='DONE') map[r.trainer] = (map[r.trainer] || 0) + 1; });
+    const sorted = Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0, 5);
+    document.getElementById('leaderboard-body').innerHTML = sorted.map(s => `<tr><td>${s[0]}</td><td style="font-weight:700; color:var(--primary-green)">${s[1]}</td></tr>`).join('');
 }
 
-// ── TRAINER TABLE ──
-function renderTrainers() {
-  const map={};
-  filteredRows.forEach(r=>{
-    if(!r.trainerName) return;
-    if(!map[r.trainerName]) map[r.trainerName]={total:0,done:0,dates:new Set()};
-    map[r.trainerName].total++;
-    if((r.status||'').trim().toLowerCase()==='done') map[r.trainerName].done++;
-    if(r.date) map[r.trainerName].dates.add(r.date);
-  });
-  const arr=Object.entries(map)
-    .map(([n,d])=>({n,total:d.total,done:d.done,days:d.dates.size,avg:(d.done/Math.max(1,d.dates.size)).toFixed(2)}))
-    .sort((a,b)=>b.done-a.done);
-  const maxDone=arr[0]?.done||1;
-  document.getElementById('trainer-badge').textContent=arr.length+' trainers';
-  document.getElementById('trainer-tbody').innerHTML=arr.slice(0,20).map((t,i)=>`
-    <tr>
-      <td><span class="rank ${i===0?'g':i===1?'s':i===2?'b':''}">${i+1}</span></td>
-      <td style="font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;">${t.n}</td>
-      <td class="num">${t.total}</td>
-      <td class="num" style="color:var(--success);font-weight:600;">${t.done}</td>
-      <td class="num">
-        <div class="avg-wrap">
-          <div class="avg-track"><div class="avg-fill" style="width:${Math.round(t.done/maxDone*100)}%"></div></div>
-          <span class="avg-val">${t.avg}</span>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// ── DATE CHART ──
-function renderDateChart() {
-  const mbd={};const ds=new Set();
-  filteredRows.forEach(r=>{
-    if(!r.date) return;
-    ds.add(r.date);
-    if(!mbd[r.trainingMode]) mbd[r.trainingMode]={};
-    mbd[r.trainingMode][r.date]=(mbd[r.trainingMode][r.date]||0)+1;
-  });
-  const dates=[...ds].sort();
-  const activeModes=MODES.filter(m=>filteredRows.some(r=>r.trainingMode===m));
-  const datasets=activeModes.map((mode,i)=>({
-    label:mode,
-    data:dates.map(d=>mbd[mode]?.[d]||0),
-    borderColor:COLORS[i],
-    backgroundColor:COLORS[i]+'18',
-    borderWidth:2,pointRadius:2,tension:.3,fill:false
-  }));
-
-  if(charts.date) charts.date.destroy();
-  const ctx=document.getElementById('dateChart').getContext('2d');
-  charts.date=new Chart(ctx,{
-    type:'line',data:{labels:dates.map(d=>d.slice(5)),datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{
-        labels:{color:'#94a3b8',font:{size:10},boxWidth:10,padding:14}
-      },tooltip:{
-        backgroundColor:'#0d1120',borderColor:'rgba(99,179,237,0.3)',borderWidth:1,
-        titleColor:'#94a3b8',bodyColor:'#e2e8f0',
-      }},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{size:9},maxTicksLimit:20},grid:{color:'rgba(255,255,255,0.03)'}},
-        y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(255,255,255,0.03)'}}
-      }
-    }
-  });
-}
-
-// ── TRAINING MODES ──
-function renderModes() {
-  const cnt={};
-  filteredRows.forEach(r=>{ 
-    if(r.trainingMode) {
-      const key = r.trainingMode.trim();
-      cnt[key]=(cnt[key]||0)+1;
-    }
-  });
-  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
-  const max=sorted[0]?.[1]||1;
-  document.getElementById('mode-body').innerHTML=`<div class="hbar-wrap">`+
-    sorted.map(([m,c],i)=>`
-      <div class="hbar-row">
-        <div class="hbar-lbl" title="${m}">${m}</div>
-        <div class="hbar-track">
-          <div class="hbar-fill" style="width:${c/max*100}%;background:${COLORS[i%COLORS.length]};"></div>
-        </div>
-        <div class="hbar-num">${c}</div>
-      </div>
-    `).join('')+`</div>`;
-}
-
-// ── TICKET STATUS ──
-function renderStatuses() {
-  const cnt={};
-  filteredRows.forEach(r=>{ 
-    if(r.status) {
-      // normalize key for display
-      const key = r.status.trim();
-      cnt[key]=(cnt[key]||0)+1;
-    }
-  });
-  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[a[1]]);
-  document.getElementById('status-body').innerHTML=`<div class="slist">`+
-    sorted.map(([s,c])=>{
-      const col=STATUS_COLORS[s]||'#94a3b8';
-      return `
-        <div class="status-row">
-          <div class="status-row-left">
-            <div class="status-dot" style="background:${col};box-shadow:0 0 6px ${col}66;"></div>
-            <span class="status-name">${s}</span>
-          </div>
-          <span class="status-count" style="color:${col};">${c.toLocaleString()}</span>
-        </div>
-      `;
-    }).join('')+`</div>`;
-}
-
-// ── LANGUAGES ──
-function renderLanguages() {
-  const cnt={};
-  filteredRows.filter(r=>r.language).forEach(r=>{ cnt[r.language]=(cnt[r.language]||0)+1; });
-  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
-  const total=sorted.reduce((s,[,v])=>s+v,0);
-  const lc=['#00f5d4','#63b3ed','#68d391','#b794f4','#f6ad55','#f687b3','#fc8181','#94a3b8'];
-  document.getElementById('lang-total').textContent=total+' virtual';
-  document.getElementById('lang-body').innerHTML=
-    sorted.map(([l,c],i)=>`
-      <div class="lang-row">
-        <div class="lang-left">
-          <div class="lang-dot" style="background:${lc[i%lc.length]};box-shadow:0 0 5px ${lc[i%lc.length]}66;"></div>
-          <span class="lang-name">${l}</span>
-        </div>
-        <span class="lang-cnt" style="color:${lc[i%lc.length]};">${c}</span>
-      </div>
-    `).join('')+
-    `<div class="lang-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;">
-      <div class="lang-left" style="font-weight:700;color:var(--neon);">Grand Total</div>
-      <span class="lang-cnt" style="color:var(--neon);font-weight:700;">${total}</span>
-    </div>`;
-}
-
-// ── CITY BARS ──
-function renderCities() {
-  const cnt={};
-  filteredRows.forEach(r=>{ if(r.cityName) cnt[r.cityName]=(cnt[r.cityName]||0)+1; });
-  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,35);
-  const max=sorted[0]?.[1]||1;
-  document.getElementById('city-bars').innerHTML=sorted.map(([city,c],i)=>{
-    const h=Math.max(10,Math.round(c/max*100));
-    return `
-      <div class="city-col">
-        <div class="city-top-val">${c}</div>
-        <div class="city-bar-item" style="height:${h}px;background:${COLORS[i%COLORS.length]};" data-tip="${city}: ${c}"></div>
-        <div class="city-lbl">${city}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-// ── DETAIL TABLE ──
-function renderDetailTable() {
-  const modeKeys=['Physical Visit','Physical Re-training','Out of Station Visit','OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'];
-  const map={};
-  filteredRows.forEach(r=>{
-    const k=r.trainerName||'(Unknown)';
-    if(!map[k]) { map[k]={}; modeKeys.forEach(m=>map[k][m]=0); }
-    if(modeKeys.includes(r.trainingMode)) map[k][r.trainingMode]++;
-  });
-  const totals={}; modeKeys.forEach(m=>totals[m]=0);
-  let grand=0;
-  const rows=Object.entries(map).sort((a,b)=>{
-    const at=modeKeys.reduce((s,m)=>s+a[1][m],0);
-    const bt=modeKeys.reduce((s,m)=>s+b[1][m],0);
-    return bt-at;
-  });
-  document.getElementById('detail-tbody').innerHTML=rows.map(([name,data])=>{
-    const rowT=modeKeys.reduce((s,m)=>s+data[m],0);
-    grand+=rowT; modeKeys.forEach(m=>totals[m]+=data[m]);
-    return `<tr>
-      <td style="font-weight:500;min-width:150px;">${name}</td>
-      ${modeKeys.map(m=>`<td class="num">${data[m]||'–'}</td>`).join('')}
-      <td class="num" style="font-weight:700;color:var(--neon);">${rowT}</td>
-    </tr>`;
-  }).join('');
-  document.getElementById('detail-tfoot').innerHTML=`
-    <tr>
-      <td>Total</td>
-      ${modeKeys.map(m=>`<td class="num">${totals[m]}</td>`).join('')}
-      <td class="num">${grand}</td>
-    </tr>`;
-}
-
-// ═══════════════════════════════════════════════
-// EXPORT FUNCTION
-// ═══════════════════════════════════════════════
-function exportTrainerMatrixToExcel() {
-  const table = document.getElementById('detail-tbl');
-  let csv = [];
-
-  // Get headers
-  const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
-  csv.push(headers.join(','));
-
-  // Get body rows
-  const tbodyRows = table.querySelectorAll('tbody tr');
-  tbodyRows.forEach(row => {
-    const rowData = Array.from(row.querySelectorAll('td')).map(td => {
-      let text = td.innerText.trim();
-      // Handle commas in data by enclosing in quotes
-      if (text.includes(',')) text = `"${text}"`;
-      return text;
-    });
-    csv.push(rowData.join(','));
-  });
-
-  // Get footer row
-  const tfootRow = table.querySelector('tfoot tr');
-  if (tfootRow) {
-    const footerData = Array.from(tfootRow.querySelectorAll('td')).map(td => {
-      let text = td.innerText.trim();
-      if (text.includes(',')) text = `"${text}"`;
-      return text;
-    });
-    csv.push(footerData.join(','));
-  }
-
-  const csvString = csv.join('\n');
-  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.setAttribute('download', 'Trainer_Matrix_Export.csv');
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-// ═══════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════
-function pct(a,b){ return b? (a/b*100).toFixed(1)+'%' : '–'; }
-function pct2n(a,b){ return b? a/b*100 : 0; }
-function setLoader(show, msg=''){
-  document.getElementById('loader').style.display=show?'flex':'none';
-  if(msg) document.getElementById('loader-msg').textContent=msg;
-}
-function showAlert(msg,show){
-  const el=document.getElementById('alert-box');
-  el.textContent=msg; el.style.display=show?'block':'none';
-}
-
-// ═══════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(loadData, 2200); // let loader animation play
-});
-</script>
-</body>
-</html>
-        Trainer-Wise Training Breakdown
-      </div>
-    </div>
-    <div class="panel-body" style="padding:0;overflow-x:auto;">
-      <table class="tbl" id="detail-tbl">
-        <thead>
-          <tr>
-            <th>Trainer Name</th>
-            <th class="num">Physical Visit</th>
-            <th class="num">Physical Re-training</th>
-            <th class="num">Out of Station</th>
-            <th class="num">OFS Support</th>
-            <th class="num">Virtual</th>
-            <th class="num">Incomplete Visit</th>
-            <th class="num">Feedback</th>
-            <th class="num">Total</th>
-          </tr>
-        </thead>
-        <tbody id="detail-tbody"></tbody>
-        <tfoot id="detail-tfoot"></tfoot>
-      </table>
-    </div>
-  </div>
-
-</div><!-- /app -->
-
-<script>
-// ═══════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════
-const API = 'https://script.google.com/macros/s/AKfycbxJSWqkwB7Z8vkGIfGBwfoSzMrd-YbJBenn5FNzro7pQDM_sjchNOR6QqQ5n9q8izebzw/exec';
-
-const MODES = [
-  'Physical Visit','Physical Re-training','Out of Station Visit',
-  'OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'
-];
-// Exact Status values from Google Form
-const STATUS_VALS = [
-  'Done','Close','Re-schedule',
-  'Not related to inventory/Done by someone',
-  'Tech concern','Need other languge / Physical visit'
-];
-// Exact Training Mode values from Google Form
-const MODE_VALS = [
-  'Virtual','Physical Visit','Physical Re-training',
-  'Feedback Visit','Out of Station Visit',
-  'Incomplete Physical Visit','OFS (On-Field Support)'
-];
-const COLORS = ['#00f5d4','#63b3ed','#68d391','#b794f4','#f6ad55','#f687b3','#fc8181'];
-
-const STATUS_COLORS = {
-  'Done':                                         '#68d391',
-  'Close':                                        '#fc8181',
-  'Re-schedule':                                  '#b794f4',
-  'Not related to inventory/Done by someone':     '#63b3ed',
-  'Tech concern':                                 '#f6ad55',
-  'Need other languge / Physical visit':          '#00f5d4',
-};
-
-let allRows = [], filteredRows = [], charts = {};
-
-// ═══════════════════════════════════════════════
-// LOAD DATA
-// ═══════════════════════════════════════════════
-async function loadData() {
-  setLoader(true, 'Connecting to Google Sheet…');
-  document.getElementById('live-status').textContent = 'CONNECTING';
-
-  try {
-    const res = await fetch(API, { method:'GET', redirect:'follow' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const txt = await res.text();
-    const js  = JSON.parse(txt);
-    if (js.status === 'error') throw new Error(js.message);
-    if (!js.data?.length) throw new Error('Sheet returned 0 rows');
-    allRows = parseRows(js.data);
-    showAlert('', false);
-    document.getElementById('live-status').textContent = '🟢 LIVE · ' + new Date().toLocaleTimeString();
-    console.log('✅ Loaded', allRows.length, 'rows. Sample:', allRows[0]);
-  } catch(e) {
-    console.warn('⚠️ Using demo data:', e.message);
-    allRows = demoData();
-    showAlert(`⚠️ Live data unavailable (${e.message}). Showing demo data. Check Apps Script deployment.`, true);
-    document.getElementById('live-status').textContent = 'DEMO MODE';
-  }
-
-  populateFilters();
-  applyFilters();
-  setLoader(false);
-  document.getElementById('app').classList.add('visible');
-}
-
-// ═══════════════════════════════════════════════
-// PARSE — Exact columns from your sheet
-// Timestamp=col A, Training Mode=col D,
-// Status=col H, City Name=col I,
-// Languages=col S, Trainer Name=col W, date=col X
-// ═══════════════════════════════════════════════
-function parseRows(raw) {
-  if (raw.length > 0) {
-    console.log('📋 Sheet headers:', Object.keys(raw[0]));
-    console.log('📋 Row 1 sample:', JSON.stringify(raw[0]));
-    console.log('📋 Row 2 sample:', JSON.stringify(raw[1]));
-  }
-  const monthMap = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',
-                    Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
-
-  return raw.map(r => {
-    const g = (...keys) => {
-      for (const k of keys) {
-        if (r[k] !== undefined) {
-          const v = String(r[k]).trim();
-          // only skip truly empty / null values — NOT "0"
-          if (v && v.toLowerCase() !== 'null' && v.toLowerCase() !== 'undefined') return v;
+function renderMatrix() {
+    const map = {};
+    filteredData.forEach(r => {
+        if(!map[r.trainer]) map[r.trainer] = {d:0, c:0, v:0, p:0, t:0};
+        map[r.trainer].t++;
+        if(r.status==='DONE') {
+            map[r.trainer].d++;
+            if(r.mode.includes('VIRTUAL')) map[r.trainer].v++; else map[r.trainer].p++;
         }
-      }
-      return '';
-    };
-
-    // ── DATE from col X (header: "date") ──
-    let rawDate = g('date','Date','DATE','Timestamp','timestamp');
-
-    // Try to extract a date if it's a timestamp like "21/Mar/26, 10:30 AM"
-    rawDate = rawDate.split(',')[0].trim();
-
-    // DD/Mon/YY  e.g. 21/Mar/26
-    const m1 = rawDate.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);
-    if (m1) rawDate = `20${m1[3]}-${monthMap[m1[2]]||'01'}-${m1[1].padStart(2,'0')}`;
-
-    // DD/MM/YYYY
-    const m2 = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (m2) rawDate = `${m2[3]}-${m2[2].padStart(2,'0')}-${m2[1].padStart(2,'0')}`;
-
-    // MM/DD/YYYY
-    const m3 = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
-    if (m3) rawDate = `20${m3[3]}-${m3[1].padStart(2,'0')}-${m3[2].padStart(2,'0')}`;
-
-    // Already YYYY-MM-DD
-    const m4 = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (m4) rawDate = `${m4[1]}-${m4[2]}-${m4[3]}`;
-
-    return {
-      date:         rawDate,
-      trainingMode: g('Training Mode','TrainingMode','training_mode','Mode','training mode'),
-      status:       g('Status','status','STATUS'),
-      cityName:     g('City Name','CityName','City','city','CITY NAME','City Name '),
-      language:     g('Languages','Language','Virtual Language','languages','LANGUAGES'),
-      trainerName:  g('Trainer Name','TrainerName','Trainer','trainer_name','TRAINER NAME','Trainer Name '),
-    };
-  }).filter(r => r.trainerName || r.date);
-}
-
-// ═══════════════════════════════════════════════
-// DEMO DATA
-// ═══════════════════════════════════════════════
-function demoData() {
-  const trainers = ['NOMAN KHAN','ANKIT DAS','DASTAGIR ALAM','MANOJ SINGH','PRABHU V','DEEPAK PATEL','ABDUL REHMAN','RAHUL KUMAR','AMIT SHARMA','PRIYA SINGH','KUNAL ARSEKAR','GLADSON ANTO'];
-  const cities   = ['Delhi','Mumbai','Bangalore','Hyderabad','Pune','Chennai','Kolkata','Ahmedabad','Surat','Jaipur','Lucknow'];
-  const statuses = ['Done','Close','Re-schedule','Not related to inventory/Done by someone','Tech concern'];
-  const langs    = ['Telugu','Kannada','Hindi','Tamil','Marathi','Bengali','Gujarati','Oriya'];
-  const rows = [];
-  const base = new Date('2026-04-01');
-  for (let i=0;i<1100;i++) {
-    const d = new Date(base);
-    d.setDate(d.getDate() + Math.floor(Math.random()*22));
-    const mode = MODES[Math.floor(Math.random()*MODES.length)];
-    rows.push({
-      date: d.toISOString().slice(0,10),
-      trainerName: trainers[Math.floor(Math.random()*trainers.length)],
-      cityName:    cities[Math.floor(Math.random()*cities.length)],
-      status:      statuses[Math.floor(Math.random()*statuses.length)],
-      trainingMode:mode,
-      language:    mode==='Virtual' ? langs[Math.floor(Math.random()*langs.length)] : '',
+        if(r.status==='CLOSE') map[r.trainer].c++;
     });
-  }
-  return rows;
+    const sorted = Object.entries(map).sort((a,b) => b[1].t - a[1].t);
+    document.getElementById('matrix-body').innerHTML = sorted.map(s => `
+        <tr><td>${s[0]}</td><td>${s[1].d}</td><td>${s[1].c}</td><td>${s[1].v}</td><td>${s[1].p}</td><td style="font-weight:700;">${s[1].t}</td></tr>
+    `).join('');
 }
 
-// ═══════════════════════════════════════════════
-// FILTERS
-// ═══════════════════════════════════════════════
-function populateFilters() {
-  fillSel('f-trainer', uniq(allRows,'trainerName'));
-  fillSel('f-city',    uniq(allRows,'cityName'));
-  fillSel('f-status',  uniq(allRows,'status'));
-  fillSel('f-mode',    uniq(allRows,'trainingMode'));
-  const dates = allRows.map(r=>r.date).filter(Boolean).sort();
-  if (dates.length) {
-    document.getElementById('f-from').value = dates[0];
-    document.getElementById('f-to').value   = dates[dates.length-1];
-  }
-}
-function uniq(rows, key) {
-  return [...new Set(rows.map(r=>r[key]).filter(Boolean))].sort();
-}
-function fillSel(id, vals) {
-  const el = document.getElementById(id);
-  const first = el.options[0];
-  el.innerHTML=''; el.appendChild(first);
-  vals.forEach(v => el.appendChild(new Option(v,v)));
-}
-function applyFilters() {
-  const t=v('f-trainer'),c=v('f-city'),s=v('f-status'),m=v('f-mode'),
-        fr=v('f-from'),to=v('f-to');
-  filteredRows = allRows.filter(r=>{
-    if(t && r.trainerName!==t) return false;
-    if(c && r.cityName!==c)    return false;
-    if(s && r.status!==s)      return false;
-    if(m && r.trainingMode!==m)return false;
-    if(fr && r.date<fr)        return false;
-    if(to && r.date>to)        return false;
-    return true;
-  });
-  render();
-}
-function resetFilters() {
-  ['f-trainer','f-city','f-status','f-mode'].forEach(id=>document.getElementById(id).value='');
-  populateFilters(); applyFilters();
-}
-function v(id){return document.getElementById(id).value;}
-
-// ═══════════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════════
-function render() {
-  renderKPIs();
-  renderTrend();
-  renderTrainers();
-  renderDateChart();
-  renderModes();
-  renderStatuses();
-  renderLanguages();
-  renderCities();
-  renderDetailTable();
+function renderChart() {
+    const days = {};
+    filteredData.forEach(r => { days[r.date] = (days[r.date] || 0) + 1; });
+    const labels = Object.keys(days).sort();
+    if(charts.main) charts.main.destroy();
+    charts.main = new Chart(document.getElementById('mainChart'), {
+        type: 'line',
+        data: {
+            labels: labels.map(l => l.split('-').slice(1).join('/')),
+            datasets: [{ label: 'Tickets', data: labels.map(l => days[l]), borderColor: '#1d5c3d', tension: 0.4, fill: true, backgroundColor: 'rgba(29, 92, 61, 0.05)' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } }
+    });
 }
 
-// ── KPIs ──
-function renderKPIs() {
-  const total = filteredData.length;
-  const donePhysical = filteredData.filter(r => r.status === 'Done' && r.mode !== 'Virtual').length;
-  const doneVirtual = filteredData.filter(r => r.status === 'Done' && r.mode === 'Virtual').length;
-  
-  // Total Done is the sum of Physical Done and Virtual Done
-  const totalDone = donePhysical + doneVirtual;
-  
-  const close = filteredData.filter(r => r.status === 'Close').length;
-  const notRelated = filteredData.filter(r => r.status.includes('Not related')).length;
-  const trainers = new Set(filteredData.map(r => r.trainer)).size;
-
-  const kpis = [
-    { label: 'Total Ticket', val: total, sub: 'Total Records', color: '' },
-    { label: 'Done', val: totalDone, sub: 'Combined Done', color: 'neon' },
-    { label: 'Close', val: close, sub: 'Status: Close', color: 'danger' },
-    { label: 'Not Related', val: notRelated, sub: 'Other Status', color: 'warn' },
-    { label: 'Virtual Done', val: doneVirtual, sub: 'Virtual Mode', color: '' },
-    { label: 'Physical Visit', val: donePhysical, sub: 'Physical Mode', color: '' },
-    { label: 'Trainer', val: trainers, sub: 'Unique Agents', color: 'neon' }
-  ];
-
-  document.getElementById('kpi-grid').innerHTML = kpis.map(k=>`
-    <div class="kpi" data-c="${k.c}">
-      <div class="kpi-glow"></div>
-      <div class="kpi-icon">${k.icon}</div>
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-val">${k.val.toLocaleString()}</div>
-      <div class="kpi-sub">${total > 0 ? (k.val / total * 100).toFixed(1) : 0}%</div>
-    </div>
-  `).join('');
-}
-
-// ── TREND CHART ──
-function renderTrend() {
-  const byDate={};
-  filteredRows.forEach(r=>{ if(r.date){byDate[r.date]=(byDate[r.date]||0)+1;} });
-  const labels=Object.keys(byDate).sort();
-  const vals=labels.map(l=>byDate[l]);
-  document.getElementById('trend-badge').textContent = labels.length + ' days';
-
-  if(charts.trend) charts.trend.destroy();
-  const ctx=document.getElementById('trendChart').getContext('2d');
-  const grad=ctx.createLinearGradient(0,0,0,220);
-  grad.addColorStop(0,'rgba(0,245,212,0.3)');
-  grad.addColorStop(1,'rgba(0,245,212,0)');
-
-  charts.trend = new Chart(ctx,{
-    type:'line',
-    data:{
-      labels:labels.map(d=>d.slice(5)),
-      datasets:[{
-        data:vals,
-        borderColor:'#00f5d4',
-        backgroundColor:grad,
-        borderWidth:2,
-        pointRadius:3,
-        pointBackgroundColor:'#00f5d4',
-        tension:.4,fill:true
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{
-        backgroundColor:'#0d1120',borderColor:'rgba(99,179,237,0.3)',borderWidth:1,
-        titleColor:'#94a3b8',bodyColor:'#e2e8f0',
-      }},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{size:9},maxTicksLimit:15},grid:{color:'rgba(255,255,255,0.03)'}},
-        y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(255,255,255,0.03)'}}
-      }
-    }
-  });
-}
-
-// ── TRAINER TABLE ──
-function renderTrainers() {
-  const map={};
-  filteredRows.forEach(r=>{
-    if(!r.trainerName) return;
-    if(!map[r.trainerName]) map[r.trainerName]={total:0,done:0,dates:new Set()};
-    map[r.trainerName].total++;
-    if((r.status||'').trim().toLowerCase()==='done') map[r.trainerName].done++;
-    if(r.date) map[r.trainerName].dates.add(r.date);
-  });
-  const arr=Object.entries(map)
-    .map(([n,d])=>({n,total:d.total,done:d.done,days:d.dates.size,avg:(d.done/Math.max(1,d.dates.size)).toFixed(2)}))
-    .sort((a,b)=>b.done-a.done);
-  const maxDone=arr[0]?.done||1;
-  document.getElementById('trainer-badge').textContent=arr.length+' trainers';
-  document.getElementById('trainer-tbody').innerHTML=arr.slice(0,20).map((t,i)=>`
-    <tr>
-      <td><span class="rank ${i===0?'g':i===1?'s':i===2?'b':''}">${i+1}</span></td>
-      <td style="font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;">${t.n}</td>
-      <td class="num">${t.total}</td>
-      <td class="num" style="color:var(--success);font-weight:600;">${t.done}</td>
-      <td class="num">
-        <div class="avg-wrap">
-          <div class="avg-track"><div class="avg-fill" style="width:${Math.round(t.done/maxDone*100)}%"></div></div>
-          <span class="avg-val">${t.avg}</span>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// ── DATE CHART ──
-function renderDateChart() {
-  const mbd={};const ds=new Set();
-  filteredRows.forEach(r=>{
-    if(!r.date) return;
-    ds.add(r.date);
-    if(!mbd[r.trainingMode]) mbd[r.trainingMode]={};
-    mbd[r.trainingMode][r.date]=(mbd[r.trainingMode][r.date]||0)+1;
-  });
-  const dates=[...ds].sort();
-  const activeModes=MODES.filter(m=>filteredRows.some(r=>r.trainingMode===m));
-  const datasets=activeModes.map((mode,i)=>({
-    label:mode,
-    data:dates.map(d=>mbd[mode]?.[d]||0),
-    borderColor:COLORS[i],
-    backgroundColor:COLORS[i]+'18',
-    borderWidth:2,pointRadius:2,tension:.3,fill:false
-  }));
-
-  if(charts.date) charts.date.destroy();
-  const ctx=document.getElementById('dateChart').getContext('2d');
-  charts.date=new Chart(ctx,{
-    type:'line',data:{labels:dates.map(d=>d.slice(5)),datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{
-        labels:{color:'#94a3b8',font:{size:10},boxWidth:10,padding:14}
-      },tooltip:{
-        backgroundColor:'#0d1120',borderColor:'rgba(99,179,237,0.3)',borderWidth:1,
-        titleColor:'#94a3b8',bodyColor:'#e2e8f0',
-      }},
-      scales:{
-        x:{ticks:{color:'#64748b',font:{size:9},maxTicksLimit:20},grid:{color:'rgba(255,255,255,0.03)'}},
-        y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(255,255,255,0.03)'}}
-      }
-    }
-  });
-}
-
-// ── TRAINING MODES ──
-function renderModes() {
-  const cnt={};
-  filteredRows.forEach(r=>{ 
-    if(r.trainingMode) {
-      const key = r.trainingMode.trim();
-      cnt[key]=(cnt[key]||0)+1;
-    }
-  });
-  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
-  const max=sorted[0]?.[1]||1;
-  document.getElementById('mode-body').innerHTML=`<div class="hbar-wrap">`+
-    sorted.map(([m,c],i)=>`
-      <div class="hbar-row">
-        <div class="hbar-lbl" title="${m}">${m}</div>
-        <div class="hbar-track">
-          <div class="hbar-fill" style="width:${c/max*100}%;background:${COLORS[i%COLORS.length]};"></div>
-        </div>
-        <div class="hbar-num">${c}</div>
-      </div>
-    `).join('')+`</div>`;
-}
-
-// ── TICKET STATUS ──
-function renderStatuses() {
-  const cnt={};
-  filteredRows.forEach(r=>{ 
-    if(r.status) {
-      // normalize key for display
-      const key = r.status.trim();
-      cnt[key]=(cnt[key]||0)+1;
-    }
-  });
-  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
-  document.getElementById('status-body').innerHTML=`<div class="status-list">`+
-    sorted.map(([s,c])=>{
-      const col=STATUS_COLORS[s]||'#94a3b8';
-      return `
-        <div class="status-row">
-          <div class="status-row-left">
-            <div class="status-dot" style="background:${col};box-shadow:0 0 6px ${col}66;"></div>
-            <span class="status-name">${s}</span>
-          </div>
-          <span class="status-count" style="color:${col};">${c.toLocaleString()}</span>
-        </div>
-      `;
-    }).join('')+`</div>`;
-}
-
-// ── LANGUAGES ──
-function renderLanguages() {
-  const cnt={};
-  filteredRows.filter(r=>r.language).forEach(r=>{ cnt[r.language]=(cnt[r.language]||0)+1; });
-  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
-  const total=sorted.reduce((s,[,v])=>s+v,0);
-  const lc=['#00f5d4','#63b3ed','#68d391','#b794f4','#f6ad55','#f687b3','#fc8181','#94a3b8'];
-  document.getElementById('lang-total').textContent=total+' virtual';
-  document.getElementById('lang-body').innerHTML=
-    sorted.map(([l,c],i)=>`
-      <div class="lang-row">
-        <div class="lang-left">
-          <div class="lang-dot" style="background:${lc[i%lc.length]};box-shadow:0 0 5px ${lc[i%lc.length]}66;"></div>
-          <span class="lang-name">${l}</span>
-        </div>
-        <span class="lang-cnt" style="color:${lc[i%lc.length]};">${c}</span>
-      </div>
-    `).join('')+
-    `<div class="lang-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;">
-      <div class="lang-left" style="font-weight:700;color:var(--neon);">Grand Total</div>
-      <span class="lang-cnt" style="color:var(--neon);font-weight:700;">${total}</span>
-    </div>`;
-}
-
-// ── CITY BARS ──
-function renderCities() {
-  const cnt={};
-  filteredRows.forEach(r=>{ if(r.cityName) cnt[r.cityName]=(cnt[r.cityName]||0)+1; });
-  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,35);
-  const max=sorted[0]?.[1]||1;
-  document.getElementById('city-bars').innerHTML=sorted.map(([city,c],i)=>{
-    const h=Math.max(10,Math.round(c/max*100));
-    return `
-      <div class="city-col">
-        <div class="city-top-val">${c}</div>
-        <div class="city-bar-item" style="height:${h}px;background:${COLORS[i%COLORS.length]};" data-tip="${city}: ${c}"></div>
-        <div class="city-lbl">${city}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-// ── DETAIL TABLE ──
-function renderDetailTable() {
-  const modeKeys=['Physical Visit','Physical Re-training','Out of Station Visit','OFS (On-Field Support)','Virtual','Incomplete Physical Visit','Feedback Visit'];
-  const map={};
-  filteredRows.forEach(r=>{
-    const k=r.trainerName||'(Unknown)';
-    if(!map[k]) { map[k]={}; modeKeys.forEach(m=>map[k][m]=0); }
-    if(modeKeys.includes(r.trainingMode)) map[k][r.trainingMode]++;
-  });
-  const totals={}; modeKeys.forEach(m=>totals[m]=0);
-  let grand=0;
-  const rows=Object.entries(map).sort((a,b)=>{
-    const at=modeKeys.reduce((s,m)=>s+a[1][m],0);
-    const bt=modeKeys.reduce((s,m)=>s+b[1][m],0);
-    return bt-at;
-  });
-  document.getElementById('detail-tbody').innerHTML=rows.map(([name,data])=>{
-    const rowT=modeKeys.reduce((s,m)=>s+data[m],0);
-    grand+=rowT; modeKeys.forEach(m=>totals[m]+=data[m]);
-    return `<tr>
-      <td style="font-weight:500;min-width:150px;">${name}</td>
-      ${modeKeys.map(m=>`<td class="num">${data[m]||'–'}</td>`).join('')}
-      <td class="num" style="font-weight:700;color:var(--neon);">${rowT}</td>
-    </tr>`;
-  }).join('');
-  document.getElementById('detail-tfoot').innerHTML=`
-    <tr>
-      <td>Total</td>
-      ${modeKeys.map(m=>`<td class="num">${totals[m]}</td>`).join('')}
-      <td class="num">${grand}</td>
-    </tr>`;
-}
-
-// ═══════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════
-function pct(a,b){ return b? (a/b*100).toFixed(1)+'%' : '–'; }
-function pct2n(a,b){ return b? a/b*100 : 0; }
-function setLoader(show, msg=''){
-  document.getElementById('loader').style.display=show?'flex':'none';
-  if(msg) document.getElementById('loader-msg').textContent=msg;
-}
-function showAlert(msg,show){
-  const el=document.getElementById('alert-box');
-  el.textContent=msg; el.style.display=show?'block':'none';
-}
-
-// ═══════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(loadData, 2200); // let loader animation play
-});
+window.onload = init;
 </script>
 </body>
 </html>
