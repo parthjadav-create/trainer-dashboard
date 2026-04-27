@@ -4,140 +4,162 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Inventory Trainer Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f4f6f3;--sidebar:#1a2e1a;--card:#fff;--card2:#f0f4ef;
-  --green:#2d6a2d;--green2:#3d8b3d;--green3:#e8f5e8;
-  --accent:#4caf50;--accent2:#81c784;
-  --text:#1a2e1a;--text2:#4a6741;--muted:#8fa885;--border:#dde8db;
-  --danger:#e53935;--warn:#f57c00;--blue:#1976d2;--purple:#7b1fa2;--teal:#00796b;--indigo:#3949ab;
-  --r:16px;--r2:12px;
-  --shadow:0 2px 12px rgba(26,46,26,0.08);
-  --shadow2:0 8px 32px rgba(26,46,26,0.14);
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;
+  --card:#1c2128;--card2:#21262d;--card3:#2d333b;
+  --border:#30363d;--border2:#444c56;
+  --green:#3fb950;--green2:#238636;--green3:rgba(63,185,80,0.1);
+  --blue:#58a6ff;--blue2:rgba(88,166,255,0.1);
+  --purple:#bc8cff;--purple2:rgba(188,140,255,0.1);
+  --orange:#ffa657;--orange2:rgba(255,166,87,0.1);
+  --red:#f85149;--red2:rgba(248,81,73,0.1);
+  --teal:#39d353;--yellow:#e3b341;
+  --text:#e6edf3;--text2:#8b949e;--text3:#c9d1d9;
+  --r:10px;--r2:8px;
+  --shadow:0 1px 3px rgba(0,0,0,0.5);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;display:flex;min-height:100vh;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;display:flex;min-height:100vh;overflow-x:hidden;}
 
 /* SIDEBAR */
-.sidebar{width:240px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:200;flex-shrink:0;}
-.sb-logo{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.sidebar{width:220px;min-height:100vh;background:var(--bg2);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:200;border-right:1px solid var(--border);flex-shrink:0;}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
 .logo-wrap{display:flex;align-items:center;gap:10px;}
-.logo-icon{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#4caf50,#66bb6a);display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 14px rgba(76,175,80,0.45);flex-shrink:0;}
-.logo-txt{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.2px;}
-.logo-sub{font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:.8px;margin-top:1px;}
-.sb-sec{padding:18px 18px 6px;font-size:9px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,0.28);text-transform:uppercase;}
-.nav{display:flex;align-items:center;gap:9px;padding:9px 14px;margin:2px 8px;border-radius:10px;color:rgba(255,255,255,0.5);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .18s;}
-.nav:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);}
-.nav.on{background:var(--accent);color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(76,175,80,0.38);}
-.nav-ic{width:17px;text-align:center;font-size:14px;}
-.nav-bd{margin-left:auto;background:rgba(255,255,255,0.13);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
-.nav-bd.g{background:var(--accent);}
-.sb-bot{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,0.07);}
-.u-card{display:flex;align-items:center;gap:9px;padding:9px;border-radius:11px;background:rgba(255,255,255,0.05);}
-.u-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#388e3c);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
-.u-nm{font-size:12px;font-weight:600;color:#fff;}
-.u-rl{font-size:10px;color:rgba(255,255,255,0.38);}
+.logo-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#3fb950,#2ea043);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.logo-txt{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.2px;}
+.logo-sub{font-size:9px;color:var(--text2);letter-spacing:1px;margin-top:1px;text-transform:uppercase;}
+.sb-sec{padding:16px 18px 5px;font-size:9.5px;font-weight:600;letter-spacing:1px;color:var(--text2);text-transform:uppercase;}
+.nav{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:1px 8px;border-radius:6px;color:var(--text2);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;}
+.nav:hover{background:var(--card3);color:var(--text);}
+.nav.on{background:var(--green3);color:var(--green);font-weight:600;border:1px solid rgba(63,185,80,0.2);}
+.nav-ic{width:16px;text-align:center;font-size:13px;}
+.nav-bd{margin-left:auto;background:var(--card3);color:var(--text2);font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;}
+.nav-bd.g{background:var(--green3);color:var(--green);}
+.sb-bot{margin-top:auto;padding:12px;border-top:1px solid var(--border);}
+.u-card{display:flex;align-items:center;gap:9px;padding:8px;border-radius:8px;background:var(--card3);}
+.u-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--green),#2ea043);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.u-nm{font-size:12px;font-weight:600;color:var(--text);}
+.u-rl{font-size:10px;color:var(--text2);}
 
 /* MAIN */
-.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
 
 /* TOPBAR */
-.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(26,46,26,0.05);}
-.pg-title{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.4px;}
-.pg-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.pg-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.pg-sub{font-size:11px;color:var(--text2);margin-top:1px;}
 .tb-right{display:flex;align-items:center;gap:10px;}
-.live-pill{display:flex;align-items:center;gap:6px;background:var(--green3);padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;color:var(--green);}
-.ld{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+.live-pill{display:flex;align-items:center;gap:5px;background:var(--green3);padding:4px 11px;border-radius:20px;font-size:10.5px;font-weight:600;color:var(--green);border:1px solid rgba(63,185,80,0.25);}
+.ld{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-.tb-btn{background:var(--green);color:#fff;border:none;padding:8px 18px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
-.tb-btn:hover{background:var(--green2);box-shadow:0 4px 14px rgba(45,106,45,0.3);transform:translateY(-1px);}
-#sync-txt{font-size:11px;color:var(--muted);}
+.tb-btn{background:var(--green2);color:#fff;border:1px solid rgba(63,185,80,0.4);padding:7px 16px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.tb-btn:hover{background:var(--green);border-color:var(--green);}
+#sync-txt{font-size:11px;color:var(--text2);}
 
-/* FILTERBAR */
-.filterbar{background:var(--card);border-bottom:1px solid var(--border);padding:11px 28px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
-.fg{display:flex;flex-direction:column;gap:3px;}
-.fg label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
-select,.di{background:var(--bg);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;outline:none;cursor:pointer;min-width:120px;transition:border-color .18s;}
-select:focus,.di:focus{border-color:var(--accent);}
-.ap-btn{background:var(--green);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;}
-.ap-btn:hover{background:var(--green2);}
-.rs-btn{background:transparent;color:var(--text2);border:1.5px solid var(--border);padding:8px 14px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;}
-.rs-btn:hover{border-color:var(--accent);color:var(--green);}
+/* FILTERBAR - completely redesigned */
+.filterbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;}
+.filter-grid{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fg label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);}
+.f-select,.f-input{
+  background:var(--card3);border:1px solid var(--border);color:var(--text);
+  padding:7px 11px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;
+  outline:none;cursor:pointer;min-width:130px;transition:all .15s;
+  -webkit-appearance:none;appearance:none;
+}
+.f-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b949e'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.f-input{min-width:140px;}
+.f-select:focus,.f-input:focus{border-color:var(--green);background:var(--bg3);}
+.f-select option{background:var(--card3);}
+
+/* Date range picker styled */
+.date-range{display:flex;align-items:center;gap:6px;background:var(--card3);border:1px solid var(--border);border-radius:7px;padding:4px 10px;transition:border-color .15s;}
+.date-range:focus-within{border-color:var(--green);}
+.date-range span{font-size:11px;color:var(--text2);}
+.date-range input[type=date]{
+  background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:12px;outline:none;cursor:pointer;padding:3px 0;
+  color-scheme:dark;
+}
+
+.ap-btn{background:var(--green2);color:#fff;border:1px solid rgba(63,185,80,0.4);padding:7px 18px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ap-btn:hover{background:var(--green);}
+.rs-btn{background:transparent;color:var(--text2);border:1px solid var(--border);padding:7px 14px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.rs-btn:hover{border-color:var(--border2);color:var(--text);}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--bg2);padding:0 24px;}
+.tab{padding:12px 18px;font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap;}
+.tab:hover{color:var(--text);}
+.tab.on{color:var(--green);border-bottom-color:var(--green);font-weight:600;}
 
 /* CONTENT */
-.content{padding:22px 28px;display:flex;flex-direction:column;gap:18px;}
+.content{padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+.view{display:none;}
+.view.on{display:flex;flex-direction:column;gap:16px;}
 
 /* KPI GRID */
-.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:13px;}
-.kpi{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 16px 14px;position:relative;overflow:hidden;transition:all .22s;cursor:default;}
-.kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow2);border-color:var(--accent2);}
-.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
-.kpi-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;}
-.kpi-arr{width:26px;height:26px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);}
-.kpi-v{font-size:26px;font-weight:800;color:var(--text);line-height:1;margin-bottom:3px;}
-.kpi-l{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;}
-.kpi-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
-.bg{background:#e8f5e8;color:var(--green);}
-.br{background:#ffebee;color:var(--danger);}
-.bn{background:var(--card2);color:var(--muted);}
-.kpi-bar{height:3px;background:var(--card2);border-radius:2px;margin-top:10px;overflow:hidden;}
-.kpi-fill{height:100%;border-radius:2px;transition:width 1s ease;}
-.kpi[dc="green"] .kpi-ic{background:#e8f5e8;color:var(--green);} .kpi[dc="green"] .kpi-v{color:var(--green);} .kpi[dc="green"] .kpi-fill{background:var(--accent);}
-.kpi[dc="red"] .kpi-ic{background:#ffebee;color:var(--danger);} .kpi[dc="red"] .kpi-v{color:var(--danger);} .kpi[dc="red"] .kpi-fill{background:var(--danger);}
-.kpi[dc="orange"] .kpi-ic{background:#fff3e0;color:var(--warn);} .kpi[dc="orange"] .kpi-v{color:var(--warn);} .kpi[dc="orange"] .kpi-fill{background:var(--warn);}
-.kpi[dc="blue"] .kpi-ic{background:#e3f2fd;color:var(--blue);} .kpi[dc="blue"] .kpi-v{color:var(--blue);} .kpi[dc="blue"] .kpi-fill{background:var(--blue);}
-.kpi[dc="purple"] .kpi-ic{background:#f3e5f5;color:var(--purple);} .kpi[dc="purple"] .kpi-v{color:var(--purple);} .kpi[dc="purple"] .kpi-fill{background:var(--purple);}
-.kpi[dc="teal"] .kpi-ic{background:#e0f2f1;color:var(--teal);} .kpi[dc="teal"] .kpi-v{color:var(--teal);} .kpi[dc="teal"] .kpi-fill{background:var(--teal);}
-.kpi[dc="dark"] .kpi-ic{background:var(--sidebar);color:#fff;} .kpi[dc="dark"] .kpi-v{color:var(--sidebar);} .kpi[dc="dark"] .kpi-fill{background:var(--sidebar);}
+.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 14px 12px;cursor:default;transition:all .2s;}
+.kpi:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px);}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.kpi-ic{font-size:18px;line-height:1;}
+.kpi-trend{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;}
+.kpi-v{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;line-height:1;margin-bottom:3px;}
+.kpi-l{font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:400;}
+.kpi-bar{height:2px;background:var(--card3);border-radius:2px;margin-top:8px;overflow:hidden;}
+.kpi-fill{height:100%;border-radius:2px;transition:width 1.2s ease;}
 
 /* CARD */
-.card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
-.ch{padding:16px 20px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
-.ct{font-size:13.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
-.ci{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;}
-.cm{font-size:11px;color:var(--muted);background:var(--card2);padding:3px 10px;border-radius:20px;border:1px solid var(--border);}
-.cb{padding:16px 20px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.ch{padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.ct{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px;}
+.ci{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.cm{font-size:10.5px;color:var(--text2);background:var(--card2);padding:3px 10px;border-radius:20px;border:1px solid var(--border);}
+.cb{padding:14px 18px;}
 
 /* GRID */
-.g2{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.g2{display:grid;grid-template-columns:2fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 
 /* TABLE */
 .tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.tbl th{padding:10px 13px;text-align:left;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap;}
-.tbl td{padding:10px 13px;border-bottom:1px solid rgba(0,0,0,0.04);white-space:nowrap;}
+.tbl th{padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);border-bottom:1px solid var(--border);background:var(--bg2);white-space:nowrap;}
+.tbl td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);white-space:nowrap;color:var(--text3);}
 .tbl tr:last-child td{border-bottom:none;}
-.tbl tbody tr:hover td{background:var(--green3);}
-.tbl tfoot td{font-weight:700;color:var(--green);border-top:1.5px solid var(--border);border-bottom:none;background:var(--green3);}
+.tbl tbody tr:hover td{background:var(--card2);}
+.tbl tfoot td{font-weight:700;color:var(--green);border-top:1px solid var(--border);border-bottom:none;background:var(--green3);}
 .tc{text-align:center;}
+.tr{text-align:right;}
 .st{max-height:280px;overflow-y:auto;}
-.st::-webkit-scrollbar{width:4px;}
-.st::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.rnk{width:24px;height:24px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;background:var(--card2);color:var(--muted);}
-.rnk.g{background:linear-gradient(135deg,#ffd700,#ffb300);color:#fff;}
-.rnk.s{background:linear-gradient(135deg,#b0bec5,#90a4ae);color:#fff;}
-.rnk.b{background:linear-gradient(135deg,#a1887f,#8d6e63);color:#fff;}
+.st::-webkit-scrollbar{width:3px;}
+.st::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.rnk{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--card3);color:var(--text2);}
+.rnk.g{background:linear-gradient(135deg,#ffd700,#ffb300);color:#000;}
+.rnk.s{background:linear-gradient(135deg,#b0bec5,#78909c);color:#fff;}
+.rnk.b{background:linear-gradient(135deg,#a1887f,#795548);color:#fff;}
 
 /* HBARS */
-.hbars{display:flex;flex-direction:column;gap:9px;}
-.hbar{display:flex;align-items:center;gap:9px;}
-.hl{width:175px;flex-shrink:0;text-align:right;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ht{flex:1;height:8px;border-radius:4px;background:var(--card2);overflow:hidden;}
-.hf{height:100%;border-radius:4px;transition:width 1.2s ease;}
-.hn{width:34px;text-align:right;font-size:11px;font-weight:700;color:var(--text);flex-shrink:0;}
+.hbars{display:flex;flex-direction:column;gap:8px;}
+.hbar{display:flex;align-items:center;gap:8px;}
+.hl{width:170px;flex-shrink:0;text-align:right;font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ht{flex:1;height:6px;border-radius:3px;background:var(--card3);overflow:hidden;}
+.hf{height:100%;border-radius:3px;transition:width 1.2s ease;}
+.hn{width:32px;text-align:right;font-size:11px;font-weight:600;color:var(--text);flex-shrink:0;}
 
-/* STATUS */
-.slist{display:flex;flex-direction:column;gap:7px;}
-.srow{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-radius:10px;background:var(--bg);border:1px solid var(--border);transition:background .15s;}
-.srow:hover{background:var(--green3);}
+/* STATUS list */
+.slist{display:flex;flex-direction:column;gap:6px;}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:7px;background:var(--bg2);border:1px solid var(--border);transition:all .15s;}
+.srow:hover{background:var(--card2);border-color:var(--border2);}
 .sleft{display:flex;align-items:center;gap:8px;}
-.sdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.sname{font-size:12px;color:var(--text);}
-.scnt{font-size:19px;font-weight:800;}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sname{font-size:12px;color:var(--text3);}
+.scnt{font-size:17px;font-weight:700;}
 
-/* LANG */
+/* LANG list */
 .llist{display:flex;flex-direction:column;}
 .lrow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
 .lrow:last-child{border-bottom:none;}
@@ -145,44 +167,74 @@ select:focus,.di:focus{border-color:var(--accent);}
 .ldot{width:8px;height:8px;border-radius:50%;}
 .lcnt{font-size:13px;font-weight:700;}
 
-/* CITY */
+/* CITY bars */
 .cscroll{overflow-x:auto;padding-bottom:6px;}
-.cscroll::-webkit-scrollbar{height:4px;}
-.cscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.cbars{display:flex;gap:9px;align-items:flex-end;padding:6px 4px 0;min-width:max-content;}
+.cscroll::-webkit-scrollbar{height:3px;}
+.cscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.cbars{display:flex;gap:10px;align-items:flex-end;padding:6px 4px 0;min-width:max-content;}
 .ccol{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.cbar{width:34px;border-radius:8px 8px 0 0;transition:height .8s ease;cursor:pointer;position:relative;}
-.cbar:hover{opacity:.8;}
-.cbar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100%+6px);left:50%;transform:translateX(-50%);background:var(--sidebar);color:#fff;font-size:10px;font-weight:600;white-space:nowrap;padding:4px 10px;border-radius:7px;pointer-events:none;z-index:10;}
-.cnum{font-size:10px;font-weight:700;color:var(--text2);}
-.clbl{font-size:9px;color:var(--muted);transform:rotate(-40deg);transform-origin:top center;white-space:nowrap;margin-top:5px;}
+.cbar{width:32px;border-radius:6px 6px 0 0;transition:height .8s ease;cursor:pointer;position:relative;}
+.cbar:hover{opacity:.75;}
+.cbar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100%+6px);left:50%;transform:translateX(-50%);background:var(--card3);color:var(--text);font-size:10px;font-weight:600;white-space:nowrap;padding:4px 10px;border-radius:6px;pointer-events:none;z-index:10;border:1px solid var(--border);}
+.cnum{font-size:10px;font-weight:600;color:var(--text2);}
+.clbl{font-size:9px;color:var(--text2);transform:rotate(-40deg);transform-origin:top center;white-space:nowrap;margin-top:5px;}
 
 /* AVG */
 .aw{display:flex;align-items:center;gap:5px;}
-.at{flex:1;height:5px;background:var(--card2);border-radius:3px;overflow:hidden;}
-.af{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),#388e3c);}
-.av{font-size:11px;font-weight:700;color:var(--green);width:30px;flex-shrink:0;}
+.at{flex:1;height:4px;background:var(--card3);border-radius:2px;overflow:hidden;}
+.af{height:100%;border-radius:2px;background:var(--green);}
+.av{font-size:11px;font-weight:600;color:var(--green);width:30px;flex-shrink:0;}
+
+/* TRAINER DETAIL TABLE */
+.trainer-section{display:flex;flex-direction:column;gap:14px;}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;}
+.badge-g{background:var(--green3);color:var(--green);border:1px solid rgba(63,185,80,0.3);}
+.badge-r{background:var(--red2);color:var(--red);border:1px solid rgba(248,81,73,0.3);}
+.badge-b{background:var(--blue2);color:var(--blue);border:1px solid rgba(88,166,255,0.3);}
+.badge-o{background:var(--orange2);color:var(--orange);border:1px solid rgba(255,166,87,0.3);}
+.badge-p{background:var(--purple2);color:var(--purple);border:1px solid rgba(188,140,255,0.3);}
+.badge-n{background:var(--card3);color:var(--text2);}
 
 /* LOADER */
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px;}
-.spin{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+.spin{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.l-txt{font-size:14px;font-weight:700;color:var(--text);}
-.l-sub{font-size:11px;color:var(--muted);}
+.l-txt{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text);}
+.l-sub{font-size:11px;color:var(--text2);}
 
 /* ALERT */
-.alert{padding:12px 16px;border-radius:var(--r2);font-size:12px;line-height:1.6;display:none;}
-.alert-w{background:#fff3e0;border:1.5px solid #ffcc02;color:var(--warn);}
+.alert{padding:10px 14px;border-radius:7px;font-size:12px;line-height:1.6;display:none;}
+.alert-w{background:rgba(255,166,87,0.1);border:1px solid rgba(255,166,87,0.3);color:var(--orange);}
 
-/* RESPONSIVE */
+/* Virtual Summary */
+.virt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+.virt-stat{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.virt-stat .v{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--blue);}
+.virt-stat .l{font-size:11px;color:var(--text2);margin-top:2px;}
+
+/* SEARCH */
+.search-wrap{position:relative;display:flex;align-items:center;}
+.search-wrap input{background:var(--card3);border:1px solid var(--border);color:var(--text);padding:7px 11px 7px 32px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;min-width:200px;transition:border-color .15s;}
+.search-wrap input:focus{border-color:var(--green);}
+.search-icon{position:absolute;left:10px;color:var(--text2);font-size:12px;}
+
+/* PROGRESS RING small */
+.prog-ring{display:inline-flex;align-items:center;gap:6px;}
+.prog-bar-h{flex:1;height:5px;border-radius:3px;background:var(--card3);overflow:hidden;min-width:60px;}
+.prog-fill-h{height:100%;border-radius:3px;}
+
+/* EMPTY */
+.empty{text-align:center;padding:30px;color:var(--text2);font-size:12px;}
+
 @media(max-width:1400px){.kpi-grid{grid-template-columns:repeat(4,1fr);}.g3{grid-template-columns:1fr 1fr;}}
-@media(max-width:1100px){.sidebar{width:64px;}.logo-txt,.logo-sub,.nav span:not(.nav-ic),.u-nm,.u-rl,.nav-bd,.sb-sec{display:none;}.main{margin-left:64px;}.nav{justify-content:center;padding:10px;}}
-@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.g2,.g3{grid-template-columns:1fr;}.content,.topbar,.filterbar{padding-left:16px;padding-right:16px;}}
+@media(max-width:1100px){.sidebar{width:52px;}.logo-txt,.logo-sub,.nav span:not(.nav-ic),.u-nm,.u-rl,.nav-bd,.sb-sec{display:none;}.main{margin-left:52px;}.nav{justify-content:center;padding:9px;}}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.g2,.g3{grid-template-columns:1fr;}.content,.topbar,.filterbar{padding-left:14px;padding-right:14px;}}
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
 <div id="loader">
   <div class="spin"></div>
   <div class="l-txt">Syncing Live Data</div>
@@ -197,14 +249,13 @@ select:focus,.di:focus{border-color:var(--accent);}
       <div><div class="logo-txt">Inventory</div><div class="logo-sub">TRAINER PORTAL</div></div>
     </div>
   </div>
-  <div class="sb-sec">Main Menu</div>
-  <div class="nav on"><span class="nav-ic">📊</span><span>Dashboard</span><span class="nav-bd g" id="total-bd">–</span></div>
-  <div class="nav"><span class="nav-ic">👥</span><span>Trainers</span></div>
-  <div class="nav"><span class="nav-ic">🏙️</span><span>Cities</span></div>
-  <div class="nav"><span class="nav-ic">📅</span><span>Calendar</span></div>
+  <div class="sb-sec">Menu</div>
+  <div class="nav on" onclick="showTab('overview')"><span class="nav-ic">📊</span><span>Overview</span><span class="nav-bd g" id="total-bd">–</span></div>
+  <div class="nav" onclick="showTab('trainers')"><span class="nav-ic">👥</span><span>Trainers</span></div>
+  <div class="nav" onclick="showTab('virtual')"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
+  <div class="nav" onclick="showTab('cities')"><span class="nav-ic">🏙️</span><span>Cities</span></div>
   <div class="sb-sec">Reports</div>
-  <div class="nav"><span class="nav-ic">📈</span><span>Analytics</span></div>
-  <div class="nav"><span class="nav-ic">🎯</span><span>Performance</span></div>
+  <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
   <div class="nav"><span class="nav-ic">⚙️</span><span>Settings</span></div>
   <div class="sb-bot">
     <div class="u-card">
@@ -218,8 +269,8 @@ select:focus,.di:focus{border-color:var(--accent);}
 <div class="main">
   <div class="topbar">
     <div>
-      <div class="pg-title">Dashboard</div>
-      <div class="pg-sub">Monitor and improve on-site trainer performance in real time.</div>
+      <div class="pg-title">Trainer Dashboard</div>
+      <div class="pg-sub">Real-time inventory trainer performance monitoring</div>
     </div>
     <div class="tb-right">
       <span id="sync-txt">–</span>
@@ -228,61 +279,182 @@ select:focus,.di:focus{border-color:var(--accent);}
     </div>
   </div>
 
+  <!-- FILTERBAR -->
   <div class="filterbar">
-    <div class="fg"><label>Trainer</label><select id="f-trainer"><option value="">All Trainers</option></select></div>
-    <div class="fg"><label>City</label><select id="f-city"><option value="">All Cities</option></select></div>
-    <div class="fg"><label>Status</label><select id="f-status"><option value="">All Status</option></select></div>
-    <div class="fg"><label>Training Mode</label><select id="f-mode"><option value="">All Modes</option></select></div>
-    <div class="fg"><label>From</label><input type="date" id="f-from" class="di"/></div>
-    <div class="fg"><label>To</label><input type="date" id="f-to" class="di"/></div>
-    <button class="ap-btn" onclick="applyFilters()">Apply</button>
-    <button class="rs-btn" onclick="resetFilters()">Reset</button>
+    <div class="filter-grid">
+      <div class="fg">
+        <label>Trainer</label>
+        <select class="f-select" id="f-trainer"><option value="">All Trainers</option></select>
+      </div>
+      <div class="fg">
+        <label>City</label>
+        <select class="f-select" id="f-city"><option value="">All Cities</option></select>
+      </div>
+      <div class="fg">
+        <label>Status</label>
+        <select class="f-select" id="f-status"><option value="">All Status</option></select>
+      </div>
+      <div class="fg">
+        <label>Training Mode</label>
+        <select class="f-select" id="f-mode"><option value="">All Modes</option></select>
+      </div>
+      <div class="fg">
+        <label>Date Range</label>
+        <div class="date-range">
+          <input type="date" id="f-from" title="From date"/>
+          <span>→</span>
+          <input type="date" id="f-to" title="To date"/>
+        </div>
+      </div>
+      <button class="ap-btn" onclick="applyFilters()">Apply Filters</button>
+      <button class="rs-btn" onclick="resetFilters()">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab on" id="tab-overview" onclick="showTab('overview')">Overview</div>
+    <div class="tab" id="tab-trainers" onclick="showTab('trainers')">Trainer Details</div>
+    <div class="tab" id="tab-virtual" onclick="showTab('virtual')">Virtual Calls</div>
+    <div class="tab" id="tab-cities" onclick="showTab('cities')">Cities</div>
+    <div class="tab" id="tab-matrix" onclick="showTab('matrix')">Mode Matrix</div>
   </div>
 
   <div class="content" id="content" style="display:none;">
     <div class="alert alert-w" id="alert-box"></div>
-    <div class="kpi-grid" id="kpi-grid"></div>
-    <div class="g2">
-      <div class="card">
-        <div class="ch"><div class="ct"><div class="ci" style="background:#e8f5e8;">📈</div>Daily Training Performance</div><span class="cm" id="trend-m">–</span></div>
-        <div class="cb" style="height:260px;"><canvas id="trendChart"></canvas></div>
+
+    <!-- OVERVIEW TAB -->
+    <div class="view on" id="view-overview">
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="g2">
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">📈</div>Daily Training Volume</div><span class="cm" id="trend-m">–</span></div>
+          <div class="cb" style="height:240px;"><canvas id="trendChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci" style="background:var(--orange2);">🏆</div>Top Performers</div><span class="cm" id="trainer-m">–</span></div>
+          <div class="st">
+            <table class="tbl"><thead><tr><th>#</th><th>Trainer</th><th>Total</th><th>Done</th><th>Avg/Day</th></tr></thead><tbody id="lb-body"></tbody></table>
+          </div>
+        </div>
       </div>
       <div class="card">
-        <div class="ch"><div class="ct"><div class="ci" style="background:#fff3e0;">🏆</div>Top Trainers</div><span class="cm" id="trainer-m">–</span></div>
-        <div class="st">
-          <table class="tbl"><thead><tr><th>#</th><th>Trainer</th><th>Total</th><th>Done</th><th>Avg</th></tr></thead><tbody id="lb-body"></tbody></table>
+        <div class="ch"><div class="ct"><div class="ci" style="background:var(--purple2);">📅</div>Date-wise Training Mode Trend</div></div>
+        <div class="cb" style="height:240px;"><canvas id="dateChart"></canvas></div>
+      </div>
+      <div class="g3">
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci" style="background:var(--blue2);">🎯</div>Training Mode</div></div>
+          <div class="cb" id="mode-body"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">🎫</div>Ticket Status</div></div>
+          <div class="cb" id="status-body"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci" style="background:var(--red2);">🌐</div>Virtual Language</div><span class="cm" id="lang-tot">–</span></div>
+          <div class="cb" id="lang-body"></div>
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="ch"><div class="ct"><div class="ci" style="background:#f3e5f5;">📅</div>Date-Wise Training Mode Trend</div></div>
-      <div class="cb" style="height:260px;"><canvas id="dateChart"></canvas></div>
-    </div>
-    <div class="g3">
-      <div class="card">
-        <div class="ch"><div class="ct"><div class="ci" style="background:#e3f2fd;">🎯</div>Training Mode</div></div>
-        <div class="cb" id="mode-body"></div>
+
+    <!-- TRAINER DETAILS TAB -->
+    <div class="view" id="view-trainers">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="trainer-search" placeholder="Search trainer..." oninput="renderTrainerDetail()"/>
+        </div>
+        <select class="f-select" id="td-sort" onchange="renderTrainerDetail()" style="min-width:160px;">
+          <option value="done">Sort by Done</option>
+          <option value="total">Sort by Total</option>
+          <option value="avg">Sort by Avg/Day</option>
+          <option value="name">Sort by Name</option>
+        </select>
+        <span class="cm" id="trainer-count-label">–</span>
       </div>
       <div class="card">
-        <div class="ch"><div class="ct"><div class="ci" style="background:#e8f5e8;">🎫</div>Ticket Status</div></div>
-        <div class="cb" id="status-body"></div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Trainer</th>
+                <th class="tc">Total</th>
+                <th class="tc">Done</th>
+                <th class="tc">Closed</th>
+                <th class="tc">Re-schedule</th>
+                <th class="tc">Not Related</th>
+                <th class="tc">Physical</th>
+                <th class="tc">Re-training</th>
+                <th class="tc">OFS</th>
+                <th class="tc">Virtual</th>
+                <th class="tc">Other</th>
+                <th class="tc">Days Active</th>
+                <th class="tc">Avg/Day</th>
+                <th class="tc">Done %</th>
+              </tr>
+            </thead>
+            <tbody id="trainer-detail-body"></tbody>
+            <tfoot id="trainer-detail-foot"></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIRTUAL CALLS TAB -->
+    <div class="view" id="view-virtual">
+      <div class="virt-grid" id="virt-kpi"></div>
+      <div class="g2">
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci" style="background:var(--blue2);">💻</div>Virtual Calls by Trainer</div></div>
+          <div style="overflow-x:auto;">
+            <table class="tbl">
+              <thead><tr><th>#</th><th>Trainer</th><th class="tc">Virtual Total</th><th class="tc">Done</th><th class="tc">Other</th><th class="tc">Languages</th><th class="tc">Done %</th></tr></thead>
+              <tbody id="virt-trainer-body"></tbody>
+              <tfoot id="virt-trainer-foot"></tfoot>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci" style="background:var(--purple2);">🌐</div>Language Breakdown</div></div>
+          <div class="cb" id="virt-lang-body"></div>
+        </div>
       </div>
       <div class="card">
-        <div class="ch"><div class="ct"><div class="ci" style="background:#fce4ec;">🌐</div>Virtual Language</div><span class="cm" id="lang-tot">–</span></div>
-        <div class="cb" id="lang-body"></div>
+        <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">📅</div>Virtual Call Status</div></div>
+        <div class="cb" id="virt-status-body"></div>
       </div>
     </div>
-    <div class="card">
-      <div class="ch"><div class="ct"><div class="ci" style="background:#e0f2f1;">🏙️</div>Training Volume by City</div></div>
-      <div class="cb cscroll"><div class="cbars" id="city-bars"></div></div>
+
+    <!-- CITIES TAB -->
+    <div class="view" id="view-cities">
+      <div class="card">
+        <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">🏙️</div>Training Volume by City</div><span class="cm" id="city-count">–</span></div>
+        <div class="cb cscroll"><div class="cbars" id="city-bars"></div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct"><div class="ci" style="background:var(--blue2);">📋</div>City-wise Breakdown</div></div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr><th>#</th><th>City</th><th class="tc">Total</th><th class="tc">Done</th><th class="tc">Virtual</th><th class="tc">Physical</th><th class="tc">Trainers</th><th class="tc">Done %</th></tr></thead>
+            <tbody id="city-detail-body"></tbody>
+            <tfoot id="city-detail-foot"></tfoot>
+          </table>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <div class="ch"><div class="ct"><div class="ci" style="background:#f3e5f5;">📊</div>Trainer Training Mode Matrix</div></div>
-      <div style="overflow-x:auto;">
-        <table class="tbl">
-          <thead><tr><th>Trainer</th><th class="tc">Physical Visit</th><th class="tc">Physical Re-training</th><th class="tc">Out of Station</th><th class="tc">OFS Support</th><th class="tc">Virtual</th><th class="tc">Incomplete</th><th class="tc">Feedback</th><th class="tc">Total</th></tr></thead>
-          <tbody id="mx-body"></tbody><tfoot id="mx-foot"></tfoot>
-        </table>
+
+    <!-- MATRIX TAB -->
+    <div class="view" id="view-matrix">
+      <div class="card">
+        <div class="ch"><div class="ct"><div class="ci" style="background:var(--purple2);">📊</div>Trainer × Training Mode Matrix</div></div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr><th>Trainer</th><th class="tc">Physical Visit</th><th class="tc">Physical Re-training</th><th class="tc">Out of Station</th><th class="tc">OFS Support</th><th class="tc">Virtual</th><th class="tc">Incomplete</th><th class="tc">Feedback</th><th class="tc">Total</th></tr></thead>
+            <tbody id="mx-body"></tbody><tfoot id="mx-foot"></tfoot>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -291,9 +463,22 @@ select:focus,.di:focus{border-color:var(--accent);}
 <script>
 var API="https://script.google.com/macros/s/AKfycbwKFuUejRjC9Qt7a8al5A55dkrIZGozz6nT0Mmp9wtMkgTA8eSl2eDlfP-9FbHspaqreA/exec";
 var MODES=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
-var COLORS=["#4caf50","#2196f3","#9c27b0","#ff9800","#f44336","#00bcd4","#795548"];
-var SC={"Done":"#4caf50","Close":"#f44336","Re-schedule":"#9c27b0","Not related to inventory/Done by someone":"#2196f3","Tech concern":"#ff9800","Need other languge / Physical visit":"#00bcd4"};
+var COLORS=["#3fb950","#58a6ff","#bc8cff","#ffa657","#f85149","#39d353","#e3b341","#79c0ff","#d2a8ff","#ffb628"];
+var SC={"Done":"#3fb950","Close":"#f85149","Re-schedule":"#bc8cff","Not related to inventory/Done by someone":"#58a6ff","Tech concern":"#ffa657","Need other languge / Physical visit":"#39d353"};
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",status:"",mode:"",lang:""};
+var curTab="overview";
+
+function showTab(t){
+  curTab=t;
+  ["overview","trainers","virtual","cities","matrix"].forEach(function(n){
+    document.getElementById("view-"+n).classList.toggle("on",n===t);
+    document.getElementById("tab-"+n).classList.toggle("on",n===t);
+  });
+  document.querySelectorAll(".nav").forEach(function(el){el.classList.remove("on");});
+  var navMap={overview:0,trainers:1,virtual:2,cities:3,matrix:4};
+  var navs=document.querySelectorAll(".nav");
+  if(navs[navMap[t]])navs[navMap[t]].classList.add("on");
+}
 
 function loadData(){
   document.getElementById("lmsg").textContent="Fetching data from Google Sheet...";
@@ -313,7 +498,7 @@ function loadData(){
     .catch(function(e){
       console.error("Error:",e.message);
       var al=document.getElementById("alert-box");
-      al.textContent="Could not load live data: "+e.message;
+      al.textContent="Could not load live data: "+e.message+". Please check your connection and try again.";
       al.style.display="block";
       document.getElementById("live-txt").textContent="ERROR";
     });
@@ -330,8 +515,6 @@ function parseRows(raw){
   COL.status=find(["status"]);
   COL.mode=find(["trainingmode","training mode","mode"]);
   COL.lang=find(["languages","language"]);
-  console.log("Columns:",JSON.stringify(COL));
-  console.log("Sample:",JSON.stringify(raw[0]));
   var mm={Jan:"01",Feb:"02",Mar:"03",Apr:"04",May:"05",Jun:"06",Jul:"07",Aug:"08",Sep:"09",Oct:"10",Nov:"11",Dec:"12"};
   return raw.map(function(r){
     var g=function(c){return c?String(r[c]||"").trim():"";};
@@ -361,10 +544,13 @@ function applyFilters(){
     if(fr&&r.date<fr)return false;if(to&&r.date>to)return false;return true;
   });render();
 }
-function resetFilters(){["f-trainer","f-city","f-status","f-mode"].forEach(function(id){document.getElementById(id).value="";});populateFilters();applyFilters();}
+function resetFilters(){
+  ["f-trainer","f-city","f-status","f-mode"].forEach(function(id){document.getElementById(id).value="";});
+  populateFilters();applyFilters();
+}
 
-function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rMatrix();}
-function pct(a,b){return b?(a/b*100).toFixed(1)+"%":"0%";}
+function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rCityDetail();rMatrix();renderTrainerDetail();rVirtual();}
+function pct(a,b){return b?Math.round(a/b*100)+"%":"0%";}
 function pn(a,b){return b?a/b*100:0;}
 
 function rKPI(){
@@ -375,22 +561,22 @@ function rKPI(){
   var notrel=filteredRows.filter(function(r){return r.status==="Not related to inventory/Done by someone";}).length;
   var virt=filteredRows.filter(function(r){return r.mode==="Virtual";}).length;
   var trs=new Set(filteredRows.map(function(r){return r.trainer;}).filter(Boolean)).size;
+  var doneRate=tot?Math.round(done/tot*100):0;
   var kpis=[
-    {l:"Total Tickets",v:tot,p:"100%",dc:"dark",i:"🎫",b:100,bd:"bn"},
-    {l:"Done",v:done,p:pct(done,tot),dc:"green",i:"✅",b:pn(done,tot),bd:"bg"},
-    {l:"Closed",v:close,p:pct(close,tot),dc:"red",i:"❌",b:pn(close,tot),bd:"br"},
-    {l:"Re-scheduled",v:resch,p:pct(resch,tot),dc:"purple",i:"🔄",b:pn(resch,tot),bd:"bn"},
-    {l:"Not Related",v:notrel,p:pct(notrel,tot),dc:"orange",i:"🔁",b:pn(notrel,tot),bd:"bn"},
-    {l:"Virtual",v:virt,p:pct(virt,tot),dc:"blue",i:"💻",b:pn(virt,tot),bd:"bn"},
-    {l:"Trainers",v:trs,p:"Active",dc:"teal",i:"👤",b:100,bd:"bg"},
+    {l:"Total Tickets",v:tot,p:"100%",dc:"#8b949e",ic:"🎫",fill:100,bd:"badge-n"},
+    {l:"Done",v:done,p:doneRate+"%",dc:"#3fb950",ic:"✅",fill:pn(done,tot),bd:"badge-g"},
+    {l:"Closed",v:close,p:pct(close,tot),dc:"#f85149",ic:"❌",fill:pn(close,tot),bd:"badge-r"},
+    {l:"Re-scheduled",v:resch,p:pct(resch,tot),dc:"#bc8cff",ic:"🔄",fill:pn(resch,tot),bd:"badge-p"},
+    {l:"Not Related",v:notrel,p:pct(notrel,tot),dc:"#ffa657",ic:"🔁",fill:pn(notrel,tot),bd:"badge-o"},
+    {l:"Virtual Calls",v:virt,p:pct(virt,tot),dc:"#58a6ff",ic:"💻",fill:pn(virt,tot),bd:"badge-b"},
+    {l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"},
   ];
   document.getElementById("kpi-grid").innerHTML=kpis.map(function(k){
-    return '<div class="kpi" dc="'+k.dc+'">'+
-      '<div class="kpi-top"><div class="kpi-ic">'+k.i+'</div><div class="kpi-arr">↗</div></div>'+
-      '<div class="kpi-v">'+k.v.toLocaleString()+'</div>'+
+    return '<div class="kpi">'+
+      '<div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div>'+
+      '<div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div>'+
       '<div class="kpi-l">'+k.l+'</div>'+
-      '<span class="kpi-badge '+k.bd+'">'+k.p+'</span>'+
-      '<div class="kpi-bar"><div class="kpi-fill" style="width:'+k.b+'%"></div></div></div>';
+      '<div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';
   }).join("");
 }
 
@@ -400,8 +586,8 @@ function rTrend(){
   document.getElementById("trend-m").textContent=lbls.length+" days";
   if(charts.t)charts.t.destroy();
   var ctx=document.getElementById("trendChart").getContext("2d");
-  var gr=ctx.createLinearGradient(0,0,0,240);gr.addColorStop(0,"rgba(76,175,80,0.2)");gr.addColorStop(1,"rgba(76,175,80,0)");
-  charts.t=new Chart(ctx,{type:"line",data:{labels:lbls.map(function(d){return d.slice(5);}),datasets:[{data:lbls.map(function(l){return bd[l];}),borderColor:"#4caf50",backgroundColor:gr,borderWidth:2.5,pointRadius:3,pointBackgroundColor:"#4caf50",tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:"#8fa885",font:{size:9},maxTicksLimit:15}},y:{grid:{color:"rgba(0,0,0,0.04)"},ticks:{color:"#8fa885",font:{size:9}}}}}});
+  var gr=ctx.createLinearGradient(0,0,0,220);gr.addColorStop(0,"rgba(63,185,80,0.25)");gr.addColorStop(1,"rgba(63,185,80,0.02)");
+  charts.t=new Chart(ctx,{type:"line",data:{labels:lbls.map(function(d){return d.slice(5);}),datasets:[{data:lbls.map(function(l){return bd[l];}),borderColor:"#3fb950",backgroundColor:gr,borderWidth:2,pointRadius:3,pointBackgroundColor:"#3fb950",tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9},maxTicksLimit:15}},y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9}}}}}});
 }
 
 function rLeader(){
@@ -411,13 +597,13 @@ function rLeader(){
     if(!map[r.trainer])map[r.trainer]={total:0,done:0,dates:{}};
     map[r.trainer].total++;if(r.status==="Done")map[r.trainer].done++;if(r.date)map[r.trainer].dates[r.date]=1;
   });
-  var arr=Object.keys(map).map(function(n){var d=map[n],dy=Object.keys(d.dates).length||1;return{n:n,total:d.total,done:d.done,avg:(d.done/dy).toFixed(2)};}).sort(function(a,b){return b.done-a.done;});
+  var arr=Object.keys(map).map(function(n){var d=map[n],dy=Object.keys(d.dates).length||1;return{n:n,total:d.total,done:d.done,avg:(d.done/dy).toFixed(1)};}).sort(function(a,b){return b.done-a.done;});
   var mx=arr[0]?arr[0].done:1;
   document.getElementById("trainer-m").textContent=arr.length+" trainers";
   document.getElementById("lb-body").innerHTML=arr.slice(0,20).map(function(t,i){
     return "<tr><td><span class='rnk "+(i===0?"g":i===1?"s":i===2?"b":"")+"'>"+(i+1)+"</span></td>"+
-      "<td style='font-weight:600;max-width:150px;overflow:hidden;text-overflow:ellipsis;'>"+t.n+"</td>"+
-      "<td class='tc'>"+t.total+"</td><td class='tc' style='color:#4caf50;font-weight:700;'>"+t.done+"</td>"+
+      "<td style='font-weight:600;max-width:140px;overflow:hidden;text-overflow:ellipsis;color:var(--text);'>"+t.n+"</td>"+
+      "<td class='tc'>"+t.total+"</td><td class='tc' style='color:#3fb950;font-weight:700;'>"+t.done+"</td>"+
       "<td class='tc'><div class='aw'><div class='at'><div class='af' style='width:"+Math.round(t.done/mx*100)+"%'></div></div><span class='av'>"+t.avg+"</span></div></td></tr>";
   }).join("");
 }
@@ -430,7 +616,7 @@ function rDate(){
   var ds2=am.map(function(mode,i){return{label:mode,data:dates.map(function(d){return mbd[mode]?mbd[mode][d]||0:0;}),borderColor:COLORS[i],backgroundColor:COLORS[i]+"22",borderWidth:2,pointRadius:2,tension:.3,fill:false};});
   if(charts.d)charts.d.destroy();
   var ctx=document.getElementById("dateChart").getContext("2d");
-  charts.d=new Chart(ctx,{type:"line",data:{labels:dates.map(function(d){return d.slice(5);}),datasets:ds2},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#4a6741",font:{size:10},boxWidth:10,padding:12}}},scales:{x:{grid:{display:false},ticks:{color:"#8fa885",font:{size:9},maxTicksLimit:20}},y:{grid:{color:"rgba(0,0,0,0.04)"},ticks:{color:"#8fa885",font:{size:9}}}}}});
+  charts.d=new Chart(ctx,{type:"line",data:{labels:dates.map(function(d){return d.slice(5);}),datasets:ds2},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#8b949e",font:{size:9},boxWidth:8,padding:10}}},scales:{x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9},maxTicksLimit:20}},y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9}}}}}});
 }
 
 function rMode(){
@@ -445,8 +631,8 @@ function rStatus(){
   var cnt={};filteredRows.forEach(function(r){if(r.status)cnt[r.status]=(cnt[r.status]||0)+1;});
   var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];});
   document.getElementById("status-body").innerHTML='<div class="slist">'+sorted.map(function(s){
-    var col=SC[s]||"#90a4ae";
-    return '<div class="srow"><div class="sleft"><div class="sdot" style="background:'+col+';"></div><span class="sname">'+s+'</span></div><span class="scnt" style="color:'+col+';">'+cnt[s].toLocaleString()+'</span></div>';
+    var col=SC[s]||"#8b949e";
+    return '<div class="srow"><div class="sleft"><div class="sdot" style="background:'+col+';"></div><span class="sname">'+s+'</span></div><span class="scnt" style="color:'+col+';">'+cnt[s]+'</span></div>';
   }).join("")+'</div>';
 }
 
@@ -456,17 +642,169 @@ function rLang(){
   var tot=sorted.reduce(function(s,k){return s+cnt[k];},0);
   document.getElementById("lang-tot").textContent=tot+" virtual";
   document.getElementById("lang-body").innerHTML='<div class="llist">'+sorted.map(function(l,i){
-    return '<div class="lrow"><div class="ll"><div class="ldot" style="background:'+COLORS[i%COLORS.length]+';"></div><span>'+l+'</span></div><span class="lcnt" style="color:'+COLORS[i%COLORS.length]+';">'+cnt[l]+'</span></div>';
-  }).join("")+'<div class="lrow" style="border-top:2px solid var(--border);margin-top:4px;"><div class="ll" style="font-weight:700;color:var(--green);">Grand Total</div><span class="lcnt" style="color:var(--green);font-weight:800;">'+tot+'</span></div></div>';
+    return '<div class="lrow"><div class="ll"><div class="ldot" style="background:'+COLORS[i%COLORS.length]+';"></div><span style="color:var(--text3)">'+l+'</span></div><span class="lcnt" style="color:'+COLORS[i%COLORS.length]+';">'+cnt[l]+'</span></div>';
+  }).join("")+'<div class="lrow" style="border-top:1px solid var(--border);margin-top:4px;"><div class="ll" style="font-weight:700;color:var(--green);">Grand Total</div><span class="lcnt" style="color:var(--green);">'+tot+'</span></div></div>';
 }
 
 function rCity(){
   var cnt={};filteredRows.forEach(function(r){if(r.city)cnt[r.city]=(cnt[r.city]||0)+1;});
-  var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).slice(0,35);var max=sorted[0]?cnt[sorted[0]]:1;
+  var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).slice(0,40);var max=sorted[0]?cnt[sorted[0]]:1;
+  document.getElementById("city-count").textContent=Object.keys(cnt).length+" cities";
   document.getElementById("city-bars").innerHTML=sorted.map(function(city,i){
     var h=Math.max(10,Math.round(cnt[city]/max*100));
     return '<div class="ccol"><div class="cnum">'+cnt[city]+'</div><div class="cbar" style="height:'+h+'px;background:'+COLORS[i%COLORS.length]+'" data-tip="'+city+': '+cnt[city]+'"></div><div class="clbl">'+city+'</div></div>';
   }).join("");
+}
+
+function rCityDetail(){
+  var map={};
+  filteredRows.forEach(function(r){
+    var c=r.city||"(Unknown)";
+    if(!map[c])map[c]={total:0,done:0,virt:0,phys:0,trainers:{}};
+    map[c].total++;
+    if(r.status==="Done")map[c].done++;
+    if(r.mode==="Virtual")map[c].virt++;
+    if(r.mode==="Physical Visit"||r.mode==="Physical Re-training")map[c].phys++;
+    if(r.trainer)map[c].trainers[r.trainer]=1;
+  });
+  var sorted=Object.keys(map).sort(function(a,b){return map[b].total-map[a].total;});
+  var grandTotal=0,grandDone=0,grandVirt=0,grandPhys=0;
+  sorted.forEach(function(c){grandTotal+=map[c].total;grandDone+=map[c].done;grandVirt+=map[c].virt;grandPhys+=map[c].phys;});
+  document.getElementById("city-detail-body").innerHTML=sorted.map(function(city,i){
+    var d=map[city],dp=d.total?Math.round(d.done/d.total*100):0;
+    var col=dp>=80?"#3fb950":dp>=50?"#ffa657":"#f85149";
+    return "<tr><td style='color:var(--text2);'>"+(i+1)+"</td>"+
+      "<td style='font-weight:600;color:var(--text);'>"+city+"</td>"+
+      "<td class='tc'>"+d.total+"</td>"+
+      "<td class='tc' style='color:#3fb950;font-weight:600;'>"+d.done+"</td>"+
+      "<td class='tc' style='color:#58a6ff;'>"+d.virt+"</td>"+
+      "<td class='tc'>"+d.phys+"</td>"+
+      "<td class='tc'>"+Object.keys(d.trainers).length+"</td>"+
+      "<td class='tc'><span style='color:"+col+";font-weight:600;'>"+dp+"%</span></td></tr>";
+  }).join("");
+  document.getElementById("city-detail-foot").innerHTML=
+    "<tr><td colspan='2'>Total</td><td class='tc'>"+grandTotal+"</td><td class='tc'>"+grandDone+"</td><td class='tc'>"+grandVirt+"</td><td class='tc'>"+grandPhys+"</td><td class='tc'></td><td class='tc'>"+pct(grandDone,grandTotal)+"</td></tr>";
+}
+
+function buildTrainerMap(){
+  var map={};
+  filteredRows.forEach(function(r){
+    var k=r.trainer||"(Unknown)";
+    if(!map[k])map[k]={total:0,done:0,close:0,resch:0,notrel:0,phys:0,retrain:0,ofs:0,virt:0,other:0,dates:{},langs:{}};
+    map[k].total++;
+    if(r.status==="Done")map[k].done++;
+    if(r.status==="Close")map[k].close++;
+    if(r.status==="Re-schedule")map[k].resch++;
+    if(r.status==="Not related to inventory/Done by someone")map[k].notrel++;
+    if(r.mode==="Physical Visit")map[k].phys++;
+    if(r.mode==="Physical Re-training")map[k].retrain++;
+    if(r.mode==="OFS (On-Field Support)")map[k].ofs++;
+    if(r.mode==="Virtual"){map[k].virt++;if(r.lang)map[k].langs[r.lang]=(map[k].langs[r.lang]||0)+1;}
+    if(["Incomplete Physical Visit","Feedback Visit","Out of Station Visit"].indexOf(r.mode)!==-1)map[k].other++;
+    if(r.date)map[k].dates[r.date]=1;
+  });
+  return map;
+}
+
+function renderTrainerDetail(){
+  var map=buildTrainerMap();
+  var q=(document.getElementById("trainer-search").value||"").toLowerCase();
+  var sortBy=gv("td-sort");
+  var arr=Object.keys(map).filter(function(n){return !q||n.toLowerCase().indexOf(q)!==-1;}).map(function(n){
+    var d=map[n],dy=Object.keys(d.dates).length||1;
+    return{n:n,d:d,days:dy,avg:(d.done/dy).toFixed(1),pct:d.total?Math.round(d.done/d.total*100):0};
+  });
+  arr.sort(function(a,b){
+    if(sortBy==="total")return b.d.total-a.d.total;
+    if(sortBy==="avg")return parseFloat(b.avg)-parseFloat(a.avg);
+    if(sortBy==="name")return a.n.localeCompare(b.n);
+    return b.d.done-a.d.done;
+  });
+  document.getElementById("trainer-count-label").textContent=arr.length+" trainers";
+  var grandT=0,grandD=0,grandC=0,grandR=0,grandN=0,grandP=0,grandRe=0,grandO=0,grandV=0,grandOt=0,grandDy=0;
+  document.getElementById("trainer-detail-body").innerHTML=arr.map(function(t,i){
+    var d=t.d,col=t.pct>=80?"#3fb950":t.pct>=50?"#ffa657":"#f85149";
+    grandT+=d.total;grandD+=d.done;grandC+=d.close;grandR+=d.resch;grandN+=d.notrel;
+    grandP+=d.phys;grandRe+=d.retrain;grandO+=d.ofs;grandV+=d.virt;grandOt+=d.other;grandDy+=t.days;
+    return "<tr>"+
+      "<td style='color:var(--text2);'>"+(i+1)+"</td>"+
+      "<td style='font-weight:600;min-width:130px;color:var(--text);'>"+t.n+"</td>"+
+      "<td class='tc'>"+d.total+"</td>"+
+      "<td class='tc' style='color:#3fb950;font-weight:700;'>"+d.done+"</td>"+
+      "<td class='tc' style='color:#f85149;'>"+d.close+"</td>"+
+      "<td class='tc' style='color:#bc8cff;'>"+d.resch+"</td>"+
+      "<td class='tc' style='color:#ffa657;'>"+d.notrel+"</td>"+
+      "<td class='tc'>"+d.phys+"</td>"+
+      "<td class='tc'>"+d.retrain+"</td>"+
+      "<td class='tc'>"+d.ofs+"</td>"+
+      "<td class='tc' style='color:#58a6ff;font-weight:600;'>"+d.virt+"</td>"+
+      "<td class='tc'>"+d.other+"</td>"+
+      "<td class='tc' style='color:var(--text2);'>"+t.days+"</td>"+
+      "<td class='tc' style='color:#3fb950;font-weight:600;'>"+t.avg+"</td>"+
+      "<td class='tc'><span style='color:"+col+";font-weight:700;'>"+t.pct+"%</span></td></tr>";
+  }).join("")||'<tr><td colspan="15" class="empty">No trainers found</td></tr>';
+  document.getElementById("trainer-detail-foot").innerHTML=
+    "<tr><td></td><td>Grand Total</td><td class='tc'>"+grandT+"</td><td class='tc'>"+grandD+"</td><td class='tc'>"+grandC+"</td><td class='tc'>"+grandR+"</td><td class='tc'>"+grandN+"</td><td class='tc'>"+grandP+"</td><td class='tc'>"+grandRe+"</td><td class='tc'>"+grandO+"</td><td class='tc'>"+grandV+"</td><td class='tc'>"+grandOt+"</td><td class='tc'></td><td class='tc'></td><td class='tc'>"+pct(grandD,grandT)+"</td></tr>";
+}
+
+function rVirtual(){
+  var virtRows=filteredRows.filter(function(r){return r.mode==="Virtual";});
+  var tot=virtRows.length;
+  var done=virtRows.filter(function(r){return r.status==="Done";}).length;
+  var trs=new Set(virtRows.map(function(r){return r.trainer;}).filter(Boolean)).size;
+  var langs=new Set(virtRows.map(function(r){return r.lang;}).filter(Boolean)).size;
+
+  // KPI
+  document.getElementById("virt-kpi").innerHTML=[
+    {l:"Total Virtual Calls",v:tot,c:"#58a6ff"},
+    {l:"Done",v:done,c:"#3fb950"},
+    {l:"Other Status",v:tot-done,c:"#ffa657"},
+    {l:"Trainers Doing Virtual",v:trs,c:"#bc8cff"},
+  ].map(function(k){
+    return '<div class="virt-stat"><div class="v" style="color:'+k.c+';">'+k.v+'</div><div class="l">'+k.l+'</div></div>';
+  }).join("");
+
+  // By Trainer
+  var tmap={};
+  virtRows.forEach(function(r){
+    var k=r.trainer||"(Unknown)";
+    if(!tmap[k])tmap[k]={total:0,done:0,langs:{}};
+    tmap[k].total++;
+    if(r.status==="Done")tmap[k].done++;
+    if(r.lang)tmap[k].langs[r.lang]=(tmap[k].langs[r.lang]||0)+1;
+  });
+  var tarr=Object.keys(tmap).sort(function(a,b){return tmap[b].total-tmap[a].total;});
+  var gvt=0,gvd=0;
+  document.getElementById("virt-trainer-body").innerHTML=tarr.map(function(name,i){
+    var d=tmap[name],dp=d.total?Math.round(d.done/d.total*100):0;
+    var col=dp>=80?"#3fb950":dp>=50?"#ffa657":"#f85149";
+    var topLangs=Object.keys(d.langs).sort(function(a,b){return d.langs[b]-d.langs[a];}).slice(0,2).join(", ")||"–";
+    gvt+=d.total;gvd+=d.done;
+    return "<tr><td>"+(i+1)+"</td><td style='font-weight:600;color:var(--text);'>"+name+"</td>"+
+      "<td class='tc' style='color:#58a6ff;font-weight:600;'>"+d.total+"</td>"+
+      "<td class='tc' style='color:#3fb950;font-weight:700;'>"+d.done+"</td>"+
+      "<td class='tc' style='color:#ffa657;'>"+(d.total-d.done)+"</td>"+
+      "<td class='tc' style='color:var(--text2);font-size:11px;'>"+topLangs+"</td>"+
+      "<td class='tc'><span style='color:"+col+";font-weight:700;'>"+dp+"%</span></td></tr>";
+  }).join("")||'<tr><td colspan="7" class="empty">No virtual call data found</td></tr>';
+  document.getElementById("virt-trainer-foot").innerHTML=
+    "<tr><td colspan='2'>Total</td><td class='tc'>"+gvt+"</td><td class='tc'>"+gvd+"</td><td class='tc'>"+(gvt-gvd)+"</td><td></td><td class='tc'>"+pct(gvd,gvt)+"</td></tr>";
+
+  // Language breakdown
+  var lcnt={};virtRows.filter(function(r){return r.lang;}).forEach(function(r){lcnt[r.lang]=(lcnt[r.lang]||0)+1;});
+  var lsorted=Object.keys(lcnt).sort(function(a,b){return lcnt[b]-lcnt[a];});
+  var ltot=lsorted.reduce(function(s,k){return s+lcnt[k];},0);
+  document.getElementById("virt-lang-body").innerHTML='<div class="llist">'+lsorted.map(function(l,i){
+    return '<div class="lrow"><div class="ll"><div class="ldot" style="background:'+COLORS[i%COLORS.length]+';"></div><span style="color:var(--text3)">'+l+'</span></div><span class="lcnt" style="color:'+COLORS[i%COLORS.length]+';">'+lcnt[l]+'</span></div>';
+  }).join("")+(ltot?'<div class="lrow" style="border-top:1px solid var(--border);margin-top:4px;"><div class="ll" style="font-weight:700;color:var(--green);">Grand Total</div><span class="lcnt" style="color:var(--green);">'+ltot+'</span></div>':'<div class="empty">No language data for virtual calls</div>')+'</div>';
+
+  // Status breakdown for virtual
+  var scnt={};virtRows.forEach(function(r){if(r.status)scnt[r.status]=(scnt[r.status]||0)+1;});
+  var ssorted=Object.keys(scnt).sort(function(a,b){return scnt[b]-scnt[a];});
+  document.getElementById("virt-status-body").innerHTML='<div class="slist">'+ssorted.map(function(s){
+    var col=SC[s]||"#8b949e";
+    return '<div class="srow"><div class="sleft"><div class="sdot" style="background:'+col+';"></div><span class="sname">'+s+'</span></div><span class="scnt" style="color:'+col+';">'+scnt[s]+'</span></div>';
+  }).join("")+(ssorted.length===0?'<div class="empty">No virtual call data found</div>':'')+'</div>';
 }
 
 function rMatrix(){
@@ -479,9 +817,13 @@ function rMatrix(){
   var rows=Object.keys(map).sort(function(a,b){return mk.reduce(function(s,m){return s+map[b][m];},0)-mk.reduce(function(s,m){return s+map[a][m];},0);});
   document.getElementById("mx-body").innerHTML=rows.map(function(name){
     var rt=mk.reduce(function(s,m){return s+map[name][m];},0);grand+=rt;mk.forEach(function(m){totals[m]+=map[name][m];});
-    return "<tr><td style='font-weight:600;min-width:140px;'>"+name+"</td>"+mk.map(function(m){return "<td class='tc'>"+(map[name][m]||"–")+"</td>";}).join("")+"<td class='tc' style='font-weight:800;color:var(--green);'>"+rt+"</td></tr>";
+    return "<tr><td style='font-weight:600;min-width:130px;color:var(--text);'>"+name+"</td>"+mk.map(function(m){
+      var v=map[name][m];
+      var c=m==="Virtual"?"color:#58a6ff;":m==="Physical Visit"?"color:#3fb950;":"";
+      return "<td class='tc' style='"+c+"'>"+(v||"–")+"</td>";
+    }).join("")+"<td class='tc' style='font-weight:800;color:var(--green);'>"+rt+"</td></tr>";
   }).join("");
-  document.getElementById("mx-foot").innerHTML="<tr><td>Total</td>"+mk.map(function(m){return "<td class='tc'>"+totals[m]+"</td>";}).join("")+"<td class='tc'>"+grand+"</td></tr>";
+  document.getElementById("mx-foot").innerHTML="<tr><td>Grand Total</td>"+mk.map(function(m){return "<td class='tc'>"+totals[m]+"</td>";}).join("")+"<td class='tc'>"+grand+"</td></tr>";
 }
 
 window.addEventListener("DOMContentLoaded",function(){
