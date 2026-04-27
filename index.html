@@ -253,7 +253,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="nav on" onclick="showTab('overview')"><span class="nav-ic">📊</span><span>Overview</span><span class="nav-bd g" id="total-bd">–</span></div>
   <div class="nav" onclick="showTab('trainers')"><span class="nav-ic">👥</span><span>Trainers</span></div>
   <div class="nav" onclick="showTab('virtual')"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
-  <div class="nav" onclick="showTab('Cities ')"><span class="nav-ic">🏙️</span><span>Cities </span></div>
+  <div class="nav" onclick="showTab('cities')"><span class="nav-ic">🏙️</span><span>Cities</span></div>
   <div class="sb-sec">Reports</div>
   <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
   <div class="nav"><span class="nav-ic">⚙️</span><span>Settings</span></div>
@@ -288,7 +288,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
       <div class="fg">
         <label>City</label>
-        <select class="f-select" id="f-city"><option value="">All Cities </option></select>
+        <select class="f-select" id="f-city"><option value="">All Cities</option></select>
       </div>
       <div class="fg">
         <label>Status</label>
@@ -316,7 +316,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="tab on" id="tab-overview" onclick="showTab('overview')">Overview</div>
     <div class="tab" id="tab-trainers" onclick="showTab('trainers')">Trainer Details</div>
     <div class="tab" id="tab-virtual" onclick="showTab('virtual')">Virtual Calls</div>
-    <div class="tab" id="tab-Cities " onclick="showTab('Cities ')">Cities </div>
+    <div class="tab" id="tab-cities" onclick="showTab('cities')">Cities</div>
     <div class="tab" id="tab-matrix" onclick="showTab('matrix')">Mode Matrix</div>
   </div>
 
@@ -427,8 +427,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
     </div>
 
-    <!-- Cities  TAB -->
-    <div class="view" id="view-Cities ">
+    <!-- CITIES TAB -->
+    <div class="view" id="view-cities">
       <div class="card">
         <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">🏙️</div>Training Volume by City</div><span class="cm" id="city-count">–</span></div>
         <div class="cb cscroll"><div class="cbars" id="city-bars"></div></div>
@@ -463,7 +463,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 <script>
 var API="https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d9YbiYeJgkBmcigxAMCN7_B64Z8264K04bVzSZg/exec";
 var MODES=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
-var City Name=["Ahmedabad","Bengaluru","Bhopal","Bhubneshwar","Chandigarh","Chennai","Coimbatore","Delhi","Gaziabad","Goa","Gurugram","Hyderabad","Indore","Jaipur","Kochi","Kolkata","Kozhikode","Lucknow","Mumbai","Nagpur","Navi Mumbai","Noida","Pune","Surat","Thiruvananthapuram","Vijaywada"];
 var COLORS=["#3fb950","#58a6ff","#bc8cff","#ffa657","#f85149","#39d353","#e3b341","#79c0ff","#d2a8ff","#ffb628"];
 var SC={"Done":"#3fb950","Close":"#f85149","Re-schedule":"#bc8cff","Not related to inventory/Done by someone":"#58a6ff","Tech concern":"#ffa657","Need other languge / Physical visit":"#39d353"};
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",status:"",mode:"",lang:""};
@@ -471,12 +470,12 @@ var curTab="overview";
 
 function showTab(t){
   curTab=t;
-  ["overview","trainers","virtual","Cities ","matrix"].forEach(function(n){
+  ["overview","trainers","virtual","cities","matrix"].forEach(function(n){
     document.getElementById("view-"+n).classList.toggle("on",n===t);
     document.getElementById("tab-"+n).classList.toggle("on",n===t);
   });
   document.querySelectorAll(".nav").forEach(function(el){el.classList.remove("on");});
-  var navMap={overview:0,trainers:1,virtual:2,Cities :3,matrix:4};
+  var navMap={overview:0,trainers:1,virtual:2,cities:3,matrix:4};
   var navs=document.querySelectorAll(".nav");
   if(navs[navMap[t]])navs[navMap[t]].classList.add("on");
 }
@@ -668,7 +667,7 @@ function rLang(){
 function rCity(){
   var cnt={};filteredRows.forEach(function(r){if(r.city)cnt[r.city]=(cnt[r.city]||0)+1;});
   var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).slice(0,40);var max=sorted[0]?cnt[sorted[0]]:1;
-  document.getElementById("city-count").textContent=Object.keys(cnt).length+" Cities ";
+  document.getElementById("city-count").textContent=Object.keys(cnt).length+" cities";
   document.getElementById("city-bars").innerHTML=sorted.map(function(city,i){
     var h=Math.max(10,Math.round(cnt[city]/max*100));
     return '<div class="ccol"><div class="cnum">'+cnt[city]+'</div><div class="cbar" style="height:'+h+'px;background:'+COLORS[i%COLORS.length]+'" data-tip="'+city+': '+cnt[city]+'"></div><div class="clbl">'+city+'</div></div>';
