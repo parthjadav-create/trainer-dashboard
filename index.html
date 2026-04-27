@@ -528,13 +528,20 @@ function parseRows(raw){
 }
 
 function uniq(k){var s={};allRows.forEach(function(r){if(r[k])s[r[k]]=1;});return Object.keys(s).sort();}
-function fillSel(id,vals){var el=document.getElementById(id),f=el.options[0];el.innerHTML="";el.appendChild(f);vals.forEach(function(v){el.appendChild(new Option(v,v));});}
+function fillSel(id,vals){
+  var el=document.getElementById(id);
+  var currentVal = el.value;
+  var f=el.options[0];
+  el.innerHTML="";
+  el.appendChild(f);
+  vals.forEach(function(v){el.appendChild(new Option(v,v));});
+  if(currentVal && vals.indexOf(currentVal) !== -1) el.value = currentVal;
+}
 function populateFilters(){
   fillSel("f-trainer",uniq("trainer"));fillSel("f-city",uniq("city"));
   fillSel("f-status",uniq("status"));fillSel("f-mode",uniq("mode"));
-  var dates=allRows.map(function(r){return r.date;}).filter(Boolean).sort();
-  if(dates.length){document.getElementById("f-from").value=dates[0];document.getElementById("f-to").value=dates[dates.length-1];}
 }
+
 function gv(id){return document.getElementById(id).value;}
 function applyFilters(){
   var t=gv("f-trainer"),c=gv("f-city"),s=gv("f-status"),m=gv("f-mode"),fr=gv("f-from"),to=gv("f-to");
@@ -841,10 +848,19 @@ function rMatrix(){
 }
 
 window.addEventListener("DOMContentLoaded",function(){
+  // Set default date range to current month 1st to today
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = ("0" + (now.getMonth() + 1)).slice(-2);
+  var day = ("0" + now.getDate()).slice(-2);
+  document.getElementById("f-from").value = year + "-" + month + "-01";
+  document.getElementById("f-to").value = year + "-" + month + "-" + day;
+
   loadData().then(function(){
     document.getElementById("loader").style.display="none";
     document.getElementById("content").style.display="flex";
     document.getElementById("content").style.flexDirection="column";
+    setInterval(loadData, 60000); // Live refresh every 60 seconds
   }).catch(function(){
     document.getElementById("loader").style.display="none";
     document.getElementById("content").style.display="flex";
