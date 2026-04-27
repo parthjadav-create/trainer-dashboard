@@ -466,6 +466,37 @@ function loadData(){
       document.getElementById("live-txt").textContent="ERROR";
     });
 }
+  // ✅ CITY NORMALIZATION MAP (DO NOT CHANGE SHEET DATA)
+var CITY_MAP = {
+  "Bengaluru": "Bengaluru",
+  "Bangalore": "Bengaluru",
+
+  "Bhubneshwar": "Bhubneshwar",
+  "Bhubaneswar": "Bhubneshwar",
+
+  "Vijaywada": "Vijaywada",
+  "Vijayawada": "Vijaywada",
+
+  "Gaziabad": "Gaziabad",
+  "Ghaziabad": "Gaziabad",
+
+  "Gurugram": "Gurugram",
+  "Gurgaon": "Gurugram",
+
+  "Navi Mumbai": "Navi Mumbai",
+  "Mumbai": "Mumbai",
+
+  "Kochi": "Kochi",
+  "Coimbatore": "Coimbatore",
+
+  "Delhi": "Delhi",
+  "New Delhi": "Delhi"
+};
+
+// normalize function
+function normalizeCity(city){
+  return CITY_MAP[city] || city;
+}
 
 function parseRows(raw){
   if(!raw.length)return[];
@@ -474,7 +505,7 @@ function parseRows(raw){
   function find(vs){for(var i=0;i<vs.length;i++){var k=vs[i].toLowerCase().replace(/\s+/g,"");if(hmap[k])return hmap[k];}return"";}
   COL.date=find(["date","timestamp"]);
   COL.trainer=find(["trainername","trainer name","trainer"]);
-  COL.city=find(["cityname","city name","city"]);
+  COL.city=find(["cityname","City Name","city"]);
   COL.status=find(["status"]);
   COL.mode=find(["trainingmode","training mode","mode"]);
   COL.lang=find(["languages","language"]);
