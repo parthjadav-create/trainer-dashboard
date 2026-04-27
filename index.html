@@ -38,8 +38,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   width:100%;
   height:auto;
   /* white logo on dark background — invert to white then dim */
-  filter:brightness(50) invert(1) opacity(0.50);
-  display:block;
+  filter: brightness(0) invert(1) opacity(0.10);  /* was: 0.04 — increase to taste */
 }
 @keyframes wm-breathe{
   0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1);}
