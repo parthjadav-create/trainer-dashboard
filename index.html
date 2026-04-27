@@ -366,7 +366,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <input type="text" id="trainer-search" placeholder="Search trainer..." oninput="renderTrainerDetail()"/>
         </div>
         <select class="f-select" id="td-sort" onchange="renderTrainerDetail()" style="min-width:160px;">
-          <option value="done">Sort by Done</option>
+          <option value="Done">Sort by Done</option>
           <option value="total">Sort by Total</option>
           <option value="avg">Sort by Avg/Day</option>
           <option value="name">Sort by Name</option>
@@ -573,16 +573,16 @@ function pn(a,b){return b?a/b*100:0;}
 
 function rKPI(){
   var tot=filteredRows.length;
-  var done=filteredRows.filter(function(r){return matches(r.status, "Done");}).length;
+  var Done=filteredRows.filter(function(r){return matches(r.status, "Done");}).length;
   var close=filteredRows.filter(function(r){return matches(r.status, "Close");}).length;
   var resch=filteredRows.filter(function(r){return matches(r.status, "Re-schedule");}).length;
   var notrel=filteredRows.filter(function(r){return contains(r.status, "not related");}).length;
   var virt=filteredRows.filter(function(r){return matches(r.mode, "Virtual");}).length;
   var trs=new Set(filteredRows.map(function(r){return r.trainer;}).filter(Boolean)).size;
-  var doneRate=tot?Math.round(done/tot*100):0;
+  var DoneRate=tot?Math.round(Done/tot*100):0;
   var kpis=[
     {l:"Total Tickets",v:tot,p:"100%",dc:"#8b949e",ic:"🎫",fill:100,bd:"badge-n"},
-    {l:"Done",v:done,p:doneRate+"%",dc:"#3fb950",ic:"✅",fill:pn(done,tot),bd:"badge-g"},
+    {l:"Done",v:Done,p:DoneRate+"%",dc:"#3fb950",ic:"✅",fill:pn(Done,tot),bd:"badge-g"},
     {l:"Closed",v:close,p:pct(close,tot),dc:"#f85149",ic:"❌",fill:pn(close,tot),bd:"badge-r"},
     {l:"Re-scheduled",v:resch,p:pct(resch,tot),dc:"#bc8cff",ic:"🔄",fill:pn(resch,tot),bd:"badge-p"},
     {l:"Not Related",v:notrel,p:pct(notrel,tot),dc:"#ffa657",ic:"🔁",fill:pn(notrel,tot),bd:"badge-o"},
@@ -612,17 +612,17 @@ function rLeader(){
   var map={};
   filteredRows.forEach(function(r){
     if(!r.trainer)return;
-    if(!map[r.trainer])map[r.trainer]={total:0,done:0,dates:{}};
-    map[r.trainer].total++;if(matches(r.status, "Done"))map[r.trainer].done++;if(r.date)map[r.trainer].dates[r.date]=1;
+    if(!map[r.trainer])map[r.trainer]={total:0,Done:0,dates:{}};
+    map[r.trainer].total++;if(matches(r.status, "Done"))map[r.trainer].Done++;if(r.date)map[r.trainer].dates[r.date]=1;
   });
-  var arr=Object.keys(map).map(function(n){var d=map[n],dy=Object.keys(d.dates).length||1;return{n:n,total:d.total,done:d.done,avg:(d.done/dy).toFixed(1)};}).sort(function(a,b){return b.done-a.done;});
-  var mx=arr[0]?arr[0].done:1;
+  var arr=Object.keys(map).map(function(n){var d=map[n],dy=Object.keys(d.dates).length||1;return{n:n,total:d.total,Done:d.Done,avg:(d.Done/dy).toFixed(1)};}).sort(function(a,b){return b.Done-a.Done;});
+  var mx=arr[0]?arr[0].Done:1;
   document.getElementById("trainer-m").textContent=arr.length+" trainers";
   document.getElementById("lb-body").innerHTML=arr.slice(0,20).map(function(t,i){
     return "<tr><td><span class='rnk "+(i===0?"g":i===1?"s":i===2?"b":"")+"'>"+(i+1)+"</span></td>"+
       "<td style='font-weight:600;max-width:140px;overflow:hidden;text-overflow:ellipsis;color:var(--text);'>"+t.n+"</td>"+
-      "<td class='tc'>"+t.total+"</td><td class='tc' style='color:#3fb950;font-weight:700;'>"+t.done+"</td>"+
-      "<td class='tc'><div class='aw'><div class='at'><div class='af' style='width:"+Math.round(t.done/mx*100)+"%'></div></div><span class='av'>"+t.avg+"</span></div></td></tr>";
+      "<td class='tc'>"+t.total+"</td><td class='tc' style='color:#3fb950;font-weight:700;'>"+t.Done+"</td>"+
+      "<td class='tc'><div class='aw'><div class='at'><div class='af' style='width:"+Math.round(t.Done/mx*100)+"%'></div></div><span class='av'>"+t.avg+"</span></div></td></tr>";
   }).join("");
 }
 
@@ -678,23 +678,23 @@ function rCityDetail(){
   var map={};
   filteredRows.forEach(function(r){
     var c=r.city||"(Unknown)";
-    if(!map[c])map[c]={total:0,done:0,virt:0,phys:0,trainers:{}};
+    if(!map[c])map[c]={total:0,Done:0,virt:0,phys:0,trainers:{}};
     map[c].total++;
-    if(matches(r.status, "Done"))map[c].done++;
+    if(matches(r.status, "Done"))map[c].Done++;
     if(matches(r.mode, "Virtual"))map[c].virt++;
     if(contains(r.mode, "Physical"))map[c].phys++;
     if(r.trainer)map[c].trainers[r.trainer]=1;
   });
   var sorted=Object.keys(map).sort(function(a,b){return map[b].total-map[a].total;});
   var grandTotal=0,grandDone=0,grandVirt=0,grandPhys=0;
-  sorted.forEach(function(c){grandTotal+=map[c].total;grandDone+=map[c].done;grandVirt+=map[c].virt;grandPhys+=map[c].phys;});
+  sorted.forEach(function(c){grandTotal+=map[c].total;grandDone+=map[c].Done;grandVirt+=map[c].virt;grandPhys+=map[c].phys;});
   document.getElementById("city-detail-body").innerHTML=sorted.map(function(city,i){
-    var d=map[city],dp=d.total?Math.round(d.done/d.total*100):0;
+    var d=map[city],dp=d.total?Math.round(d.Done/d.total*100):0;
     var col=dp>=80?"#3fb950":dp>=50?"#ffa657":"#f85149";
     return "<tr><td style='color:var(--text2);'>"+(i+1)+"</td>"+
       "<td style='font-weight:600;color:var(--text);'>"+city+"</td>"+
       "<td class='tc'>"+d.total+"</td>"+
-      "<td class='tc' style='color:#3fb950;font-weight:600;'>"+d.done+"</td>"+
+      "<td class='tc' style='color:#3fb950;font-weight:600;'>"+d.Done+"</td>"+
       "<td class='tc' style='color:#58a6ff;'>"+d.virt+"</td>"+
       "<td class='tc'>"+d.phys+"</td>"+
       "<td class='tc'>"+Object.keys(d.trainers).length+"</td>"+
@@ -708,9 +708,9 @@ function buildTrainerMap(){
   var map={};
   filteredRows.forEach(function(r){
     var k=r.trainer||"(Unknown)";
-    if(!map[k])map[k]={total:0,done:0,close:0,resch:0,notrel:0,phys:0,retrain:0,ofs:0,virt:0,other:0,dates:{},langs:{}};
+    if(!map[k])map[k]={total:0,Done:0,close:0,resch:0,notrel:0,phys:0,retrain:0,ofs:0,virt:0,other:0,dates:{},langs:{}};
     map[k].total++;
-    if(matches(r.status, "Done"))map[k].done++;
+    if(matches(r.status, "Done"))map[k].Done++;
     if(matches(r.status, "Close"))map[k].close++;
     if(matches(r.status, "Re-schedule"))map[k].resch++;
     if(contains(r.status, "not related"))map[k].notrel++;
@@ -730,25 +730,25 @@ function renderTrainerDetail(){
   var sortBy=gv("td-sort");
   var arr=Object.keys(map).filter(function(n){return !q||n.toLowerCase().indexOf(q)!==-1;}).map(function(n){
     var d=map[n],dy=Object.keys(d.dates).length||1;
-    return{n:n,d:d,days:dy,avg:(d.done/dy).toFixed(1),pct:d.total?Math.round(d.done/d.total*100):0};
+    return{n:n,d:d,days:dy,avg:(d.Done/dy).toFixed(1),pct:d.total?Math.round(d.Done/d.total*100):0};
   });
   arr.sort(function(a,b){
     if(sortBy==="total")return b.d.total-a.d.total;
     if(sortBy==="avg")return parseFloat(b.avg)-parseFloat(a.avg);
     if(sortBy==="name")return a.n.localeCompare(b.n);
-    return b.d.done-a.d.done;
+    return b.d.Done-a.d.Done;
   });
   document.getElementById("trainer-count-label").textContent=arr.length+" trainers";
   var grandT=0,grandD=0,grandC=0,grandR=0,grandN=0,grandP=0,grandRe=0,grandO=0,grandV=0,grandOt=0,grandDy=0;
   document.getElementById("trainer-detail-body").innerHTML=arr.map(function(t,i){
     var d=t.d,col=t.pct>=80?"#3fb950":t.pct>=50?"#ffa657":"#f85149";
-    grandT+=d.total;grandD+=d.done;grandC+=d.close;grandR+=d.resch;grandN+=d.notrel;
+    grandT+=d.total;grandD+=d.Done;grandC+=d.close;grandR+=d.resch;grandN+=d.notrel;
     grandP+=d.phys;grandRe+=d.retrain;grandO+=d.ofs;grandV+=d.virt;grandOt+=d.other;grandDy+=t.days;
     return "<tr>"+
       "<td style='color:var(--text2);'>"+(i+1)+"</td>"+
       "<td style='font-weight:600;min-width:130px;color:var(--text);'>"+t.n+"</td>"+
       "<td class='tc'>"+d.total+"</td>"+
-      "<td class='tc' style='color:#3fb950;font-weight:700;'>"+d.done+"</td>"+
+      "<td class='tc' style='color:#3fb950;font-weight:700;'>"+d.Done+"</td>"+
       "<td class='tc' style='color:#f85149;'>"+d.close+"</td>"+
       "<td class='tc' style='color:#bc8cff;'>"+d.resch+"</td>"+
       "<td class='tc' style='color:#ffa657;'>"+d.notrel+"</td>"+
@@ -768,15 +768,15 @@ function renderTrainerDetail(){
 function rVirtual(){
   var virtRows=filteredRows.filter(function(r){return matches(r.mode, "Virtual");});
   var tot=virtRows.length;
-  var done=virtRows.filter(function(r){return matches(r.status, "Done");}).length;
+  var Done=virtRows.filter(function(r){return matches(r.status, "Done");}).length;
   var trs=new Set(virtRows.map(function(r){return r.trainer;}).filter(Boolean)).size;
   var langs=new Set(virtRows.map(function(r){return r.lang;}).filter(Boolean)).size;
 
   // KPI
   document.getElementById("virt-kpi").innerHTML=[
     {l:"Total Virtual Calls",v:tot,c:"#58a6ff"},
-    {l:"Done",v:done,c:"#3fb950"},
-    {l:"Other Status",v:tot-done,c:"#ffa657"},
+    {l:"Done",v:Done,c:"#3fb950"},
+    {l:"Other Status",v:tot-Done,c:"#ffa657"},
     {l:"Trainers Doing Virtual",v:trs,c:"#bc8cff"},
   ].map(function(k){
     return '<div class="virt-stat"><div class="v" style="color:'+k.c+';">'+k.v+'</div><div class="l">'+k.l+'</div></div>';
@@ -786,22 +786,22 @@ function rVirtual(){
   var tmap={};
   virtRows.forEach(function(r){
     var k=r.trainer||"(Unknown)";
-    if(!tmap[k])tmap[k]={total:0,done:0,langs:{}};
+    if(!tmap[k])tmap[k]={total:0,Done:0,langs:{}};
     tmap[k].total++;
-    if(matches(r.status, "Done"))tmap[k].done++;
+    if(matches(r.status, "Done"))tmap[k].Done++;
     if(r.lang)tmap[k].langs[r.lang]=(tmap[k].langs[r.lang]||0)+1;
   });
   var tarr=Object.keys(tmap).sort(function(a,b){return tmap[b].total-tmap[a].total;});
   var gvt=0,gvd=0;
   document.getElementById("virt-trainer-body").innerHTML=tarr.map(function(name,i){
-    var d=tmap[name],dp=d.total?Math.round(d.done/d.total*100):0;
+    var d=tmap[name],dp=d.total?Math.round(d.Done/d.total*100):0;
     var col=dp>=80?"#3fb950":dp>=50?"#ffa657":"#f85149";
     var topLangs=Object.keys(d.langs).sort(function(a,b){return d.langs[b]-d.langs[a];}).slice(0,2).join(", ")||"–";
-    gvt+=d.total;gvd+=d.done;
+    gvt+=d.total;gvd+=d.Done;
     return "<tr><td>"+(i+1)+"</td><td style='font-weight:600;color:var(--text);'>"+name+"</td>"+
       "<td class='tc' style='color:#58a6ff;font-weight:600;'>"+d.total+"</td>"+
-      "<td class='tc' style='color:#3fb950;font-weight:700;'>"+d.done+"</td>"+
-      "<td class='tc' style='color:#ffa657;'>"+(d.total-d.done)+"</td>"+
+      "<td class='tc' style='color:#3fb950;font-weight:700;'>"+d.Done+"</td>"+
+      "<td class='tc' style='color:#ffa657;'>"+(d.total-d.Done)+"</td>"+
       "<td class='tc' style='color:var(--text2);font-size:11px;'>"+topLangs+"</td>"+
       "<td class='tc'><span style='color:"+col+";font-weight:700;'>"+dp+"%</span></td></tr>";
   }).join("")||'<tr><td colspan="7" class="empty">No virtual call data found</td></tr>';
