@@ -252,7 +252,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="sb-sec">Menu</div>
   <div class="nav on" onclick="showTab('overview')"><span class="nav-ic">📊</span><span>Overview</span><span class="nav-bd g" id="total-bd">–</span></div>
   <div class="nav" onclick="showTab('trainers')"><span class="nav-ic">👥</span><span>Trainers</span></div>
-  <div class="nav" onclick="showTab('virtual')"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
+  <div class="nav" onclick="showTab('Virtual')"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
   <div class="nav" onclick="showTab('cities')"><span class="nav-ic">🏙️</span><span>Cities</span></div>
   <div class="sb-sec">Reports</div>
   <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
@@ -315,7 +315,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="tabs">
     <div class="tab on" id="tab-overview" onclick="showTab('overview')">Overview</div>
     <div class="tab" id="tab-trainers" onclick="showTab('trainers')">Trainer Details</div>
-    <div class="tab" id="tab-virtual" onclick="showTab('virtual')">Virtual Calls</div>
+    <div class="tab" id="tab-Virtual" onclick="showTab('Virtual')">Virtual Calls</div>
     <div class="tab" id="tab-cities" onclick="showTab('cities')">Cities</div>
     <div class="tab" id="tab-matrix" onclick="showTab('matrix')">Mode Matrix</div>
   </div>
@@ -403,7 +403,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </div>
 
     <!-- VIRTUAL CALLS TAB -->
-    <div class="view" id="view-virtual">
+    <div class="view" id="view-Virtual">
       <div class="virt-grid" id="virt-kpi"></div>
       <div class="g2">
         <div class="card">
@@ -658,7 +658,7 @@ function rLang(){
   var cnt={};filteredRows.filter(function(r){return r.lang;}).forEach(function(r){cnt[r.lang]=(cnt[r.lang]||0)+1;});
   var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];});
   var tot=sorted.reduce(function(s,k){return s+cnt[k];},0);
-  document.getElementById("lang-tot").textContent=tot+" virtual";
+  document.getElementById("lang-tot").textContent=tot+" Virtual";
   document.getElementById("lang-body").innerHTML='<div class="llist">'+sorted.map(function(l,i){
     return '<div class="lrow"><div class="ll"><div class="ldot" style="background:'+COLORS[i%COLORS.length]+';"></div><span style="color:var(--text3)">'+l+'</span></div><span class="lcnt" style="color:'+COLORS[i%COLORS.length]+';">'+cnt[l]+'</span></div>';
   }).join("")+'<div class="lrow" style="border-top:1px solid var(--border);margin-top:4px;"><div class="ll" style="font-weight:700;color:var(--green);">Grand Total</div><span class="lcnt" style="color:var(--green);">'+tot+'</span></div></div>';
