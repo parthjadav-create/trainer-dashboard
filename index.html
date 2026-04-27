@@ -550,16 +550,27 @@ function resetFilters(){
 }
 
 function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rCityDetail();rMatrix();renderTrainerDetail();rVirtual();}
+
+function matches(a, b) {
+  if (!a || !b) return false;
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+function contains(a, b) {
+  if (!a || !b) return false;
+  return a.toLowerCase().includes(b.toLowerCase());
+}
+
 function pct(a,b){return b?Math.round(a/b*100)+"%":"0%";}
 function pn(a,b){return b?a/b*100:0;}
 
 function rKPI(){
   var tot=filteredRows.length;
-  var done=filteredRows.filter(function(r){return r.status==="Done";}).length;
-  var close=filteredRows.filter(function(r){return r.status==="Close";}).length;
-  var resch=filteredRows.filter(function(r){return r.status==="Re-schedule";}).length;
-  var notrel=filteredRows.filter(function(r){return r.status==="Not related to inventory/Done by someone";}).length;
-  var virt=filteredRows.filter(function(r){return r.mode==="Virtual";}).length;
+  var done=filteredRows.filter(function(r){return matches(r.status, "Done");}).length;
+  var close=filteredRows.filter(function(r){return matches(r.status, "Close");}).length;
+  var resch=filteredRows.filter(function(r){return matches(r.status, "Re-schedule");}).length;
+  var notrel=filteredRows.filter(function(r){return contains(r.status, "not related");}).length;
+  var virt=filteredRows.filter(function(r){return matches(r.mode, "Virtual");}).length;
   var trs=new Set(filteredRows.map(function(r){return r.trainer;}).filter(Boolean)).size;
   var doneRate=tot?Math.round(done/tot*100):0;
   var kpis=[
@@ -595,7 +606,7 @@ function rLeader(){
   filteredRows.forEach(function(r){
     if(!r.trainer)return;
     if(!map[r.trainer])map[r.trainer]={total:0,done:0,dates:{}};
-    map[r.trainer].total++;if(r.status==="Done")map[r.trainer].done++;if(r.date)map[r.trainer].dates[r.date]=1;
+    map[r.trainer].total++;if(matches(r.status, "Done"))map[r.trainer].done++;if(r.date)map[r.trainer].dates[r.date]=1;
   });
   var arr=Object.keys(map).map(function(n){var d=map[n],dy=Object.keys(d.dates).length||1;return{n:n,total:d.total,done:d.done,avg:(d.done/dy).toFixed(1)};}).sort(function(a,b){return b.done-a.done;});
   var mx=arr[0]?arr[0].done:1;
@@ -662,9 +673,9 @@ function rCityDetail(){
     var c=r.city||"(Unknown)";
     if(!map[c])map[c]={total:0,done:0,virt:0,phys:0,trainers:{}};
     map[c].total++;
-    if(r.status==="Done")map[c].done++;
-    if(r.mode==="Virtual")map[c].virt++;
-    if(r.mode==="Physical Visit"||r.mode==="Physical Re-training")map[c].phys++;
+    if(matches(r.status, "Done"))map[c].done++;
+    if(matches(r.mode, "Virtual"))map[c].virt++;
+    if(contains(r.mode, "Physical"))map[c].phys++;
     if(r.trainer)map[c].trainers[r.trainer]=1;
   });
   var sorted=Object.keys(map).sort(function(a,b){return map[b].total-map[a].total;});
@@ -692,15 +703,15 @@ function buildTrainerMap(){
     var k=r.trainer||"(Unknown)";
     if(!map[k])map[k]={total:0,done:0,close:0,resch:0,notrel:0,phys:0,retrain:0,ofs:0,virt:0,other:0,dates:{},langs:{}};
     map[k].total++;
-    if(r.status==="Done")map[k].done++;
-    if(r.status==="Close")map[k].close++;
-    if(r.status==="Re-schedule")map[k].resch++;
-    if(r.status==="Not related to inventory/Done by someone")map[k].notrel++;
-    if(r.mode==="Physical Visit")map[k].phys++;
-    if(r.mode==="Physical Re-training")map[k].retrain++;
-    if(r.mode==="OFS (On-Field Support)")map[k].ofs++;
-    if(r.mode==="Virtual"){map[k].virt++;if(r.lang)map[k].langs[r.lang]=(map[k].langs[r.lang]||0)+1;}
-    if(["Incomplete Physical Visit","Feedback Visit","Out of Station Visit"].indexOf(r.mode)!==-1)map[k].other++;
+    if(matches(r.status, "Done"))map[k].done++;
+    if(matches(r.status, "Close"))map[k].close++;
+    if(matches(r.status, "Re-schedule"))map[k].resch++;
+    if(contains(r.status, "not related"))map[k].notrel++;
+    if(matches(r.mode, "Physical Visit"))map[k].phys++;
+    if(matches(r.mode, "Physical Re-training"))map[k].retrain++;
+    if(contains(r.mode, "OFS"))map[k].ofs++;
+    if(matches(r.mode, "Virtual")){map[k].virt++;if(r.lang)map[k].langs[r.lang]=(map[k].langs[r.lang]||0)+1;}
+    if(contains(r.mode, "Incomplete") || contains(r.mode, "Feedback") || contains(r.mode, "Station"))map[k].other++;
     if(r.date)map[k].dates[r.date]=1;
   });
   return map;
@@ -748,9 +759,9 @@ function renderTrainerDetail(){
 }
 
 function rVirtual(){
-  var virtRows=filteredRows.filter(function(r){return r.mode==="Virtual";});
+  var virtRows=filteredRows.filter(function(r){return matches(r.mode, "Virtual");});
   var tot=virtRows.length;
-  var done=virtRows.filter(function(r){return r.status==="Done";}).length;
+  var done=virtRows.filter(function(r){return matches(r.status, "Done");}).length;
   var trs=new Set(virtRows.map(function(r){return r.trainer;}).filter(Boolean)).size;
   var langs=new Set(virtRows.map(function(r){return r.lang;}).filter(Boolean)).size;
 
@@ -770,7 +781,7 @@ function rVirtual(){
     var k=r.trainer||"(Unknown)";
     if(!tmap[k])tmap[k]={total:0,done:0,langs:{}};
     tmap[k].total++;
-    if(r.status==="Done")tmap[k].done++;
+    if(matches(r.status, "Done"))tmap[k].done++;
     if(r.lang)tmap[k].langs[r.lang]=(tmap[k].langs[r.lang]||0)+1;
   });
   var tarr=Object.keys(tmap).sort(function(a,b){return tmap[b].total-tmap[a].total;});
@@ -812,7 +823,10 @@ function rMatrix(){
   var map={},totals={},grand=0;mk.forEach(function(m){totals[m]=0;});
   filteredRows.forEach(function(r){
     var k=r.trainer||"(Unknown)";if(!map[k]){map[k]={};mk.forEach(function(m){map[k][m]=0;});}
-    if(mk.indexOf(r.mode)!==-1)map[k][r.mode]++;
+    var matchedMode = mk.find(function(m) { return matches(m, r.mode); });
+    if(matchedMode) {
+        map[k][matchedMode]++;
+    }
   });
   var rows=Object.keys(map).sort(function(a,b){return mk.reduce(function(s,m){return s+map[b][m];},0)-mk.reduce(function(s,m){return s+map[a][m];},0);});
   document.getElementById("mx-body").innerHTML=rows.map(function(name){
