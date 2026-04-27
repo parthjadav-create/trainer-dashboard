@@ -253,7 +253,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="nav on" onclick="showTab('overview')"><span class="nav-ic">📊</span><span>Overview</span><span class="nav-bd g" id="total-bd">–</span></div>
   <div class="nav" onclick="showTab('trainers')"><span class="nav-ic">👥</span><span>Trainers</span></div>
   <div class="nav" onclick="showTab('virtual')"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
-  <div class="nav" onclick="showTab('cities')"><span class="nav-ic">🏙️</span><span>Cities</span></div>
+  <div class="nav" onclick="showTab('City Name ')"><span class="nav-ic">🏙️</span><span>City Name </span></div>
   <div class="sb-sec">Reports</div>
   <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
   <div class="nav"><span class="nav-ic">⚙️</span><span>Settings</span></div>
@@ -288,7 +288,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
       <div class="fg">
         <label>City</label>
-        <select class="f-select" id="f-city"><option value="">All Cities</option></select>
+        <select class="f-select" id="f-city"><option value="">All City Name </option></select>
       </div>
       <div class="fg">
         <label>Status</label>
@@ -316,7 +316,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="tab on" id="tab-overview" onclick="showTab('overview')">Overview</div>
     <div class="tab" id="tab-trainers" onclick="showTab('trainers')">Trainer Details</div>
     <div class="tab" id="tab-virtual" onclick="showTab('virtual')">Virtual Calls</div>
-    <div class="tab" id="tab-cities" onclick="showTab('cities')">Cities</div>
+    <div class="tab" id="tab-City Name " onclick="showTab('City Name ')">City Name </div>
     <div class="tab" id="tab-matrix" onclick="showTab('matrix')">Mode Matrix</div>
   </div>
 
@@ -427,8 +427,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
     </div>
 
-    <!-- CITIES TAB -->
-    <div class="view" id="view-cities">
+    <!-- City Name  TAB -->
+    <div class="view" id="view-City Name ">
       <div class="card">
         <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">🏙️</div>Training Volume by City</div><span class="cm" id="city-count">–</span></div>
         <div class="cb cscroll"><div class="cbars" id="city-bars"></div></div>
@@ -471,12 +471,12 @@ var curTab="overview";
 
 function showTab(t){
   curTab=t;
-  ["overview","trainers","virtual","cities","matrix"].forEach(function(n){
+  ["overview","trainers","virtual","City Name ","matrix"].forEach(function(n){
     document.getElementById("view-"+n).classList.toggle("on",n===t);
     document.getElementById("tab-"+n).classList.toggle("on",n===t);
   });
   document.querySelectorAll(".nav").forEach(function(el){el.classList.remove("on");});
-  var navMap={overview:0,trainers:1,virtual:2,cities:3,matrix:4};
+  var navMap={overview:0,trainers:1,virtual:2,City Name :3,matrix:4};
   var navs=document.querySelectorAll(".nav");
   if(navs[navMap[t]])navs[navMap[t]].classList.add("on");
 }
@@ -668,7 +668,7 @@ function rLang(){
 function rCity(){
   var cnt={};filteredRows.forEach(function(r){if(r.city)cnt[r.city]=(cnt[r.city]||0)+1;});
   var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).slice(0,40);var max=sorted[0]?cnt[sorted[0]]:1;
-  document.getElementById("city-count").textContent=Object.keys(cnt).length+" cities";
+  document.getElementById("city-count").textContent=Object.keys(cnt).length+" City Name ";
   document.getElementById("city-bars").innerHTML=sorted.map(function(city,i){
     var h=Math.max(10,Math.round(cnt[city]/max*100));
     return '<div class="ccol"><div class="cnum">'+cnt[city]+'</div><div class="cbar" style="height:'+h+'px;background:'+COLORS[i%COLORS.length]+'" data-tip="'+city+': '+cnt[city]+'"></div><div class="clbl">'+city+'</div></div>';
