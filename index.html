@@ -107,17 +107,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 }
 .f-select:focus{border-color:#e53935;background-color:var(--bg3);}
 .f-select option{background:var(--card3);}
-<input type="text" id="dateRange">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<script>
-flatpickr("#dateRange", {
-  mode: "range",
-  dateFormat: "Y-m-d"
-});
-
+.date-range{
+  display:flex;align-items:center;gap:6px;background:var(--card3);
+  border:1px solid var(--border);border-radius:7px;padding:4px 10px;transition:border-color .15s;
+}
 .date-range:focus-within{border-color:#e53935;}
 .date-range span{font-size:11px;color:var(--text2);}
 .date-range input[type=date]{
