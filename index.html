@@ -107,13 +107,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 }
 .f-select:focus{border-color:#e53935;background-color:var(--bg3);}
 .f-select option{background:var(--card3);}
-.date-range{
+.-range{
   display:flex;align-items:center;gap:6px;background:var(--card3);
   border:1px solid var(--border);border-radius:7px;padding:4px 10px;transition:border-color .15s;
 }
-.date-range:focus-within{border-color:#e53935;}
-.date-range span{font-size:11px;color:var(--text2);}
-.date-range input[type=date]{
+.-range:focus-within{border-color:#e53935;}
+.-range span{font-size:11px;color:var(--text2);}
+.-range input[type=date]{
   background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;
   font-size:12px;outline:none;cursor:pointer;padding:3px 0;color-scheme:dark;
 }
@@ -309,10 +309,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="fg"><label>Status</label><select class="f-select" id="f-status"><option value="">All Status</option></select></div>
       <div class="fg"><label>Training Mode</label><select class="f-select" id="f-mode"><option value="">All Modes</option></select></div>
       <div class="fg">
-        <label>Date Range</label>
         <div class="date-range">
-          <input type="date" id="f-from"/><span>→</span><input type="date" id="f-to"/>
-        </div>
+  <input type="text" id="datepicker" placeholder="Select date range"/>
+</div>
       </div>
       <button class="ap-btn" onclick="applyFilters()">Apply Filters</button>
       <button class="rs-btn" onclick="resetFilters()">↺ Reset</button>
@@ -698,6 +697,22 @@ function rMatrix(){
 }
 
 window.addEventListener("DOMContentLoaded",function(){
+  let selectedDates = { from: "", to: "" };
+
+flatpickr("#datepicker", {
+  mode: "range",
+  dateFormat: "Y-m-d",
+  defaultDate: [
+    new Date().toISOString().slice(0, 7) + "-01",
+    new Date()
+  ],
+  onChange: function (dates, dateStr) {
+    if (dates.length === 2) {
+      selectedDates.from = dates[0].toISOString().slice(0, 10);
+      selectedDates.to = dates[1].toISOString().slice(0, 10);
+    }
+  }
+});
   var now=new Date(),y=now.getFullYear(),mo=("0"+(now.getMonth()+1)).slice(-2),d=("0"+now.getDate()).slice(-2);
   document.getElementById("f-from").value=y+"-"+mo+"-01";
   document.getElementById("f-to").value=y+"-"+mo+"-"+d;
