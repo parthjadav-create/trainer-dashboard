@@ -506,7 +506,7 @@ headers.forEach(function(h) { hmap[h.toLowerCase().replace(/\s+/g, "")] = h.trim
   function find(vs){for(var i=0;i<vs.length;i++){var k=vs[i].toLowerCase().replace(/\s+/g,"");if(hmap[k])return hmap[k];}return"";}
   COL.date=find(["date","timestamp"]);
   COL.trainer=find(["trainername","trainer name","trainer"]);
-  COL.city  = find(["cityname", "City Name", "city"]);
+  COL.city  = find(["City Name "]);
   COL.city2 = find(["writecityname", "Write City name if you", "Write City name"]);
   COL.status=find(["status"]);
   COL.mode=find(["trainingmode","training mode","mode"]);
