@@ -6,6 +6,7 @@
 <title>Petpooja Inventory Trainer Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
   --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;
@@ -207,6 +208,17 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .tgt-miss{color:#f85149;font-weight:700;}
 .tgt-close{color:#ffa657;font-weight:700;}
 
+/* EXPORT BUTTON */
+.export-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(63,185,80,0.12);color:#3fb950;
+  border:1px solid rgba(63,185,80,0.35);
+  padding:5px 13px;border-radius:7px;
+  font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.export-btn:hover{background:rgba(63,185,80,0.22);border-color:rgba(63,185,80,0.6);}
+
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
 .loader-logo{width:180px;height:auto;filter:brightness(0) invert(1);animation:loader-pulse 1.5s ease-in-out infinite;}
 @keyframes loader-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(.97);}}
@@ -324,6 +336,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-size:10px;color:var(--text2);">Target: <span style="color:#ffa657;font-weight:700;">2.5/day</span></span>
               <span class="cm" id="trainer-m">–</span>
+              <button class="export-btn" onclick="exportLeaderboard()">⬇ Export Excel</button>
             </div>
           </div>
           <div class="st">
@@ -711,6 +724,56 @@ function rMatrix(){
   var rows=Object.keys(map).sort(function(a,b){return mk.reduce(function(s,m){return s+map[b][m];},0)-mk.reduce(function(s,m){return s+map[a][m];},0);});
   document.getElementById("mx-body").innerHTML=rows.map(function(name){var rt=mk.reduce(function(s,m){return s+map[name][m];},0);grand+=rt;mk.forEach(function(m){totals[m]+=map[name][m];});return "<tr><td style='font-weight:600;min-width:130px;color:var(--text);'>"+name+"</td>"+mk.map(function(m){var v=map[name][m];var c=m==="Virtual"?"color:#58a6ff;":m==="Physical Visit"?"color:#3fb950;":"";return "<td class='tc' style='"+c+"'>"+(v||"–")+"</td>";}).join("")+"<td class='tc' style='font-weight:800;color:var(--green);'>"+rt+"</td></tr>";}).join("");
   document.getElementById("mx-foot").innerHTML="<tr><td>Grand Total</td>"+mk.map(function(m){return "<td class='tc'>"+totals[m]+"</td>";}).join("")+"<td class='tc'>"+grand+"</td></tr>";
+}
+
+// ✅ EXPORT TOP PERFORMERS TO EXCEL
+function exportLeaderboard(){
+  var map={};
+  filteredRows.forEach(function(r){
+    if(!r.trainer)return;
+    if(!map[r.trainer])map[r.trainer]={total:0,done:0,dates:{}};
+    map[r.trainer].total++;
+    if(matches(r.status,"Done"))map[r.trainer].done++;
+    if(r.date)map[r.trainer].dates[r.date]=1;
+  });
+
+  var arr=Object.keys(map).map(function(n){
+    var d=map[n];
+    var days=Object.keys(d.dates).length||1;
+    var avg=parseFloat((d.done/days).toFixed(1));
+    var target=Math.ceil(days*TARGET_PER_DAY);
+    var tgtPct=target>0?d.done/target:0;
+    var status=tgtPct>=1?"✓ Target Met":tgtPct>=0.8?"Near Target":"Below Target";
+    return{n:n,total:d.total,done:d.done,days:days,target:target,avg:avg,status:status};
+  }).sort(function(a,b){return b.done-a.done;});
+
+  // Build worksheet data with headers
+  var wsData=[
+    ["#","Trainer Name","Total Tickets","Done","Working Days","Target ("+TARGET_PER_DAY+"/day)","Avg/Day","Target Status"]
+  ];
+  arr.forEach(function(t,i){
+    wsData.push([i+1, t.n, t.total, t.done, t.days, t.target, t.avg, t.status]);
+  });
+
+  // Add totals row
+  var totDone=arr.reduce(function(s,t){return s+t.done;},0);
+  var totTotal=arr.reduce(function(s,t){return s+t.total;},0);
+  wsData.push(["","Grand Total", totTotal, totDone, "", "", "", ""]);
+
+  var wb=XLSX.utils.book_new();
+  var ws=XLSX.utils.aoa_to_sheet(wsData);
+
+  // Column widths
+  ws["!cols"]=[
+    {wch:4},{wch:24},{wch:14},{wch:8},{wch:14},{wch:18},{wch:10},{wch:16}
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, "Top Performers");
+
+  // Filename with current date
+  var now=new Date();
+  var stamp=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);
+  XLSX.writeFile(wb, "Top_Performers_"+stamp+".xlsx");
 }
 
 window.addEventListener("DOMContentLoaded",function(){
