@@ -320,7 +320,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
   <div class="nav"><span class="nav-ic">⚙️</span><span>Settings</span></div>
   <div class="sb-bot">
-    <div class="u-card">
+    <div class="u-card" onclick="showTab('team')" style="cursor:pointer;">
       <div class="u-av">A</div>
       <div><div class="u-nm">Admin</div><div class="u-rl">Manager</div></div>
     </div>
@@ -366,6 +366,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="tab" id="tab-virtual" onclick="showTab('virtual')">Virtual Calls</div>
     <div class="tab" id="tab-cities" onclick="showTab('cities')">Cities</div>
     <div class="tab" id="tab-matrix" onclick="showTab('matrix')">Mode Matrix</div>
+    <div class="tab" id="tab-team" onclick="showTab('team')" style="display:none;">Team Info</div>
   </div>
 
   <div class="content" id="content" style="display:none;">
@@ -485,6 +486,28 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         </div>
       </div>
     </div>
+
+    <!-- TEAM INFO -->
+    <div class="view" id="view-team">
+      <div class="card">
+        <div class="ch">
+          <div class="ct"><div class="ci" style="background:var(--blue2);">👥</div>Petpooja Training Team</div>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="team-search" placeholder="Search team members..." oninput="rTeam()"/>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead>
+              <tr><th>Sr No</th><th>Emp Full Name</th><th>City</th><th>State</th><th>Languages</th><th>Zone</th><th>Email ID</th><th>Designation</th><th class="tc">Status</th></tr>
+            </thead>
+            <tbody id="team-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -493,6 +516,43 @@ var API="https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d
 var TARGET_PER_DAY=2.5;
 var MODES=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
 var COLORS=["#3fb950","#58a6ff","#bc8cff","#ffa657","#f85149","#39d353","#e3b341","#79c0ff","#d2a8ff","#ffb628"];
+var TEAM_DATA = [
+  {id:1, name:"Jadav Parth Alkeshklumar", city:"Ahmedabad", state:"Gujarat", lang:"-", zone:"-", email:"parth.jadav@petpooja.com", desig:"North-West-central Team-Lead"},
+  {id:2, name:"Patel Karp Kamleshbhai", city:"Ahmedabad", state:"Gujarat", lang:"-", zone:"-", email:"karp.patel@petpooja.com", desig:"South-East Team Lead"},
+  {id:3, name:"Noman Ahmed Khan", city:"Lucknow", state:"Uttar Pradesh", lang:"Hindi / English", zone:"North", email:"noman.khan@petpooja.com", desig:"North Team Lead"},
+  {id:4, name:"Antareksh Chandrakant Kakariya", city:"Mumbai / Palghar", state:"Maharashtra", lang:"Hindi / English / Marathi / Gujarati", zone:"West", email:"antareksh.kakariya@petpooja.com", desig:"West Team Lead"},
+  {id:5, name:"Santhoshkumar R", city:"Chennai", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"santhosh.kumar@petpooja.com", desig:"Sr. Executive"},
+  {id:6, name:"Deepak Patel", city:"Bengaluru", state:"Karnataka", lang:"Hindi / English", zone:"South", email:"deepak.patel@petpooja.com", desig:"South Team Lead"},
+  {id:7, name:"Prabhu V", city:"Bengaluru", state:"Karnataka", lang:"Kannada / English", zone:"South", email:"prabhu.v@petpooja.com", desig:"Sr. Executive"},
+  {id:8, name:"Nihal KA", city:"Cochin / Ernakulam", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nihal.ka@petpooja.com", desig:"Trainer"},
+  {id:9, name:"Sadikul Mallick", city:"Kolkata / Howrah", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"sadikul.mallick@petpooja.com", desig:"Sr. Executive"},
+  {id:10, name:"Arpit Dubey", city:"Indore / Ujjain / Dewas", state:"Madhya Pradesh", lang:"Hindi / English", zone:"Central", email:"arpit.dubey@petpooja.com", desig:"Sr. Executive"},
+  {id:11, name:"Dastagir Alam", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"dastagir.alam@petpooja.com", desig:"Trainer"},
+  {id:12, name:"Shahidali Shaban Shaikh", city:"Navi Mumbai / Thane", state:"Maharashtra", lang:"Hindi / English / Marathi", zone:"West", email:"shahidali.shaikh@petpooja.com", desig:"Sr. Executive"},
+  {id:13, name:"Pillamarapu Raghu Ram", city:"Hyderabad / Secundarabad", state:"Telangana", lang:"English / Telugu", zone:"South", email:"raghu.pillamarapu@petpooja.com", desig:"Trainer"},
+  {id:14, name:"Mudunuri Laxmi Sai Ramraju", city:"Hyderabad", state:"Telangana", lang:"Telugu / English", zone:"South", email:"laxmisai.mudunuri@petpooja.com", desig:"Trainer"},
+  {id:15, name:"Vijay Kumar Mahto", city:"Kolkata", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"vijay.mahto@petpooja.com", desig:"Trainer"},
+  {id:16, name:"Vignesh", city:"Coimbatore", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"vignesh.tn@petpooja.com", desig:"Trainer"},
+  {id:17, name:"Devendra Prasad", city:"Bhopal", state:"Madhya Pradesh", lang:"Hindi / English", zone:"Central", email:"devendra.prasad@petpooja.com", desig:"Trainer"},
+  {id:18, name:"Ankit Kumar Das", city:"Bhubaneswar / Cuttack / Puri", state:"Odisha", lang:"Odia / Hindi / English", zone:"East", email:"ankit.das@petpooja.com", desig:"Trainer"},
+  {id:19, name:"Abdul Rehman", city:"Noida / Ghaziabad / Greater Noida", state:"Uttar Pradesh", lang:"Hindi / English", zone:"North", email:"abdul.rehman@petpooja.com", desig:"Trainer"},
+  {id:20, name:"Mohammed Vasim", city:"Vijayawada", state:"Andhra Pradesh", lang:"Telugu / English / Hindi", zone:"South", email:"vasim.mohammed@petpooja.com", desig:"Trainer"},
+  {id:21, name:"Neeraj S Kumar", city:"Thiruvananthapuram", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"neeraj.kumar1@petpooja.com", desig:"Trainer"},
+  {id:22, name:"Gautam M", city:"Chandigarh / Mohali / Ambala", state:"Punjab", lang:"Punjabi / Hindi / English", zone:"North", email:"gautam.m@petpooja.com", desig:"Trainer"},
+  {id:23, name:"Vamja Aakash Pravin", city:"Surat / Bharuch", state:"Gujarat", lang:"Gujarati / Hindi / English", zone:"West", email:"aakash.vamja@petpooja.com", desig:"Trainer"},
+  {id:24, name:"Shubhashish", city:"Jaipur", state:"Rajasthan", lang:"Hindi / English", zone:"North", email:"shubhashish.rai@petpooja.com", desig:"Trainer"},
+  {id:25, name:"Manoj Singh", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"manoj.singh@petpooja.com", desig:"Trainer"},
+  {id:26, name:"Sharath S", city:"Bengaluru", state:"Karnataka", lang:"Kannada / English", zone:"South", email:"sharath.s@petpooja.com", desig:"Trainer"},
+  {id:27, name:"Keyur Hemant Kadu", city:"Mumbai", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"keyur.kadu@petpooja.com", desig:"Trainer"},
+  {id:28, name:"Kunal P Arsekar", city:"North Goa", state:"Goa", lang:"Hindi / English", zone:"West", email:"kunal.arsekar@petpooja.com", desig:"Trainer"},
+  {id:29, name:"Nibhun T", city:"Kozhikode (Calicut) / Malappuram", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nibhun.t@petpooja.com", desig:"Trainer"},
+  {id:30, name:"Krunal Manoharrao Mahulkar", city:"Nagpur / Wardha", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"krunal.mahulkar@petpooja.com", desig:"Trainer"},
+  {id:31, name:"Aniket Ashok Shirfule", city:"Pune", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"aniket.shirfule@petpooja.com", desig:"Trainer"},
+  {id:32, name:"Prakhar Tiwari", city:"Gurugram / Faridabad", state:"Haryana", lang:"Hindi / English", zone:"North", email:"prakhar.tiwari@petpooja.com", desig:"Trainer"},
+  {id:33, name:"Prabuddha Sidharth Gaikwad", city:"Pune", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"prabuddha.gaikwad@petpooja.com", desig:"Trainer"},
+  {id:34, name:"Vikrant Joon", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"vikrant.joon@petpooja.com", desig:"Trainer"},
+  {id:35, name:"Kasbati Mohd Mosin", city:"Mumbai", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"mohd.kasbati@petpooja.com", desig:"Trainer"}
+];
 var SC={"Done":"#3fb950","Close":"#f85149","Re-schedule":"#bc8cff","Not related to inventory/Done by someone":"#58a6ff","Tech concern":"#ffa657","Need other languge / Physical visit":"#39d353"};
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",city2:"",status:"",mode:"",lang:""};
 var curTab="overview";
@@ -509,12 +569,13 @@ function toggleSidebar(){
 
 function showTab(t){
   curTab=t;
-  ["overview","trainers","virtual","cities","matrix"].forEach(function(n){
+  ["overview","trainers","virtual","cities","matrix","team"].forEach(function(n){
     document.getElementById("view-"+n).classList.toggle("on",n===t);
-    document.getElementById("tab-"+n).classList.toggle("on",n===t);
+    var tab = document.getElementById("tab-"+n);
+    if(tab) tab.classList.toggle("on",n===t);
   });
   document.querySelectorAll(".nav").forEach(function(el){el.classList.remove("on");});
-  var nm={overview:0,trainers:1,virtual:2,cities:3,matrix:4};
+  var nm={overview:0,trainers:1,virtual:2,cities:3,matrix:4,team:99};
   var navs=document.querySelectorAll(".nav");
   if(navs[nm[t]])navs[nm[t]].classList.add("on");
 }
@@ -592,7 +653,7 @@ function applyFilters(){
   });render();
 }
 function resetFilters(){["f-trainer","f-city","f-status","f-mode"].forEach(function(id){document.getElementById(id).value="";});populateFilters();applyFilters();}
-function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rCityDetail();rMatrix();renderTrainerDetail();rVirtual();}
+function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rCityDetail();rMatrix();renderTrainerDetail();rVirtual();rTeam();}
 function matches(a,b){if(!a||!b)return false;return a.trim().toLowerCase()===b.trim().toLowerCase();}
 function contains(a,b){if(!a||!b)return false;return a.toLowerCase().includes(b.toLowerCase());}
 function pct(a,b){return b?Math.round(a/b*100)+"%":"0%";}
@@ -776,6 +837,32 @@ function rMatrix(){
   var rows=Object.keys(map).sort(function(a,b){return mk.reduce(function(s,m){return s+map[b][m];},0)-mk.reduce(function(s,m){return s+map[a][m];},0);});
   document.getElementById("mx-body").innerHTML=rows.map(function(name){var rt=mk.reduce(function(s,m){return s+map[name][m];},0);grand+=rt;mk.forEach(function(m){totals[m]+=map[name][m];});return "<tr><td style='font-weight:600;min-width:130px;color:var(--text);'>"+name+"</td>"+mk.map(function(m){var v=map[name][m];var c=m==="Virtual"?"color:#58a6ff;":m==="Physical Visit"?"color:#3fb950;":"";return "<td class='tc' style='"+c+"'>"+(v||"–")+"</td>";}).join("")+"<td class='tc' style='font-weight:800;color:var(--green);'>"+rt+"</td></tr>";}).join("");
   document.getElementById("mx-foot").innerHTML="<tr><td>Grand Total</td>"+mk.map(function(m){return "<td class='tc'>"+totals[m]+"</td>";}).join("")+"<td class='tc'>"+grand+"</td></tr>";
+}
+
+function rTeam(){
+  var q=(document.getElementById("team-search").value||"").toLowerCase();
+  var today=new Date().toISOString().slice(0,10);
+  var activeTrainers=new Set(allRows.filter(function(r){return r.date===today;}).map(function(r){return r.trainer;}));
+  
+  var filtered = TEAM_DATA.filter(function(t){
+    return !q || t.name.toLowerCase().includes(q) || t.city.toLowerCase().includes(q) || t.desig.toLowerCase().includes(q) || t.email.toLowerCase().includes(q);
+  });
+
+  document.getElementById("team-body").innerHTML = filtered.map(function(t){
+    var isActive = activeTrainers.has(t.name);
+    var statusBadge = isActive ? '<span class="badge badge-g">Live</span>' : '<span class="badge badge-n">Offline</span>';
+    return "<tr>"
+      +"<td style='color:var(--text2);'>"+t.id+"</td>"
+      +"<td style='font-weight:600;color:var(--text);'>"+t.name+"</td>"
+      +"<td>"+t.city+"</td>"
+      +"<td>"+t.state+"</td>"
+      +"<td style='font-size:11px;'>"+t.lang+"</td>"
+      +"<td>"+t.zone+"</td>"
+      +"<td><a href='mailto:"+t.email+"' style='color:var(--blue);text-decoration:none;'>"+t.email+"</a></td>"
+      +"<td style='color:var(--text2);'>"+t.desig+"</td>"
+      +"<td class='tc'>"+statusBadge+"</td>"
+      +"</tr>";
+  }).join("") || '<tr><td colspan="9" class="empty">No team members found</td></tr>';
 }
 
 function exportLeaderboard(){
