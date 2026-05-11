@@ -852,7 +852,7 @@ function rTeam(){
   if(fr && to) {
     var dStart = new Date(fr);
     var dEnd = new Date(to);
-    var dToday = new Date(todayStr);
+    var dToday = new Date(today);
     var dLimit = dEnd < dToday ? dEnd : dToday;
     if(dLimit >= dStart) {
       runningDays = Math.round((dLimit - dStart)/(1000*60*60*24)) + 1;
