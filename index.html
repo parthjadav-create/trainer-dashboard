@@ -841,18 +841,19 @@ function rMatrix(){
 
 function rTeam(){
   var q=(document.getElementById("team-search").value||"").toLowerCase();
-  var today=new Date().toISOString().slice(0,10);
+  var now = new Date();
+  var todayStr = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
 
   // Online status based on activity recorded TODAY in the full dataset
-  var activeToday = new Set(allRows.filter(function(r){return r.date===today;}).map(function(r){return r.trainer;}));
+  var activeToday = new Set(allRows.filter(function(r){return r.date===todayStr;}).map(function(r){return r.trainer;}));
 
   // Calculate Running Days: from start of range until (End Date or Today, whichever is earlier)
   var fr=gv("f-from"), to=gv("f-to");
   var runningDays = 0;
   if(fr && to) {
-    var dStart = new Date(fr);
-    var dEnd = new Date(to);
-    var dToday = new Date(today);
+    var dStart = new Date(fr + "T00:00:00");
+    var dEnd = new Date(to + "T00:00:00");
+    var dToday = new Date(todayStr + "T00:00:00");
     var dLimit = dEnd < dToday ? dEnd : dToday;
     if(dLimit >= dStart) {
       runningDays = Math.round((dLimit - dStart)/(1000*60*60*24)) + 1;
