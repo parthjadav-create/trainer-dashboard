@@ -520,7 +520,7 @@ var TEAM_DATA = [
   {id:2, name:"Patel Karp Kamleshbhai", city:"Ahmedabad", state:"Gujarat", lang:"-", zone:"-", email:"karp.patel@petpooja.com", desig:"South-East Regional Team Lead", lead:"-"},
   {id:3, name:"Noman Ahmed Khan", city:"Lucknow", state:"Uttar Pradesh", lang:"Hindi / English", zone:"North", email:"noman.khan@petpooja.com", desig:"North Zone Team Lead", lead:"Jadav Parth Alkeshklumar"},
   {id:4, name:"Antareksh Chandrakant Kakariya", city:"Mumbai / Palghar", state:"Maharashtra", lang:"Hindi / English / Marathi / Gujarati", zone:"West", email:"antareksh.kakariya@petpooja.com", desig:"West Zone Team Lead", lead:"Patel Karp Kamleshbhai"},
-  {id:5, name:"Santhoshkumar R", city:"Chennai", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"santhosh.kumar@petpooja.com", desig:"Sr. Executive", lead:"-"},
+  {id:5, name:"Santhoshkumar R", city:"Chennai", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"santhosh.kumar@petpooja.com", desig:"Sr. Executive", lead:"Deepak Patel"},
   {id:6, name:"Deepak Patel", city:"Bengaluru", state:"Karnataka", lang:"Hindi / English", zone:"South", email:"deepak.patel@petpooja.com", desig:"South Zone Team Lead", lead:"Patel Karp Kamleshbhai"},
   {id:7, name:"Prabhu V", city:"Bengaluru", state:"Karnataka", lang:"Kannada / English", zone:"South", email:"prabhu.v@petpooja.com", desig:"Sr. Executive", lead:"Deepak Patel"},
   {id:8, name:"Nihal KA", city:"Cochin / Ernakulam", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nihal.ka@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
@@ -558,6 +558,19 @@ var curTab="overview";
 
 function normalizeTrainerName(name) {
   return (name || "").toLowerCase().trim();
+}
+
+function isMatch(n1, n2) {
+  if (!n1 || !n2) return false;
+  var a = n1.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(function(x){return x.length>1;});
+  var b = n2.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(function(x){return x.length>1;});
+  if (!a.length || !b.length) return false;
+  // Check if all parts of the shorter name exist as substrings in the longer name
+  var shorter = a.length <= b.length ? a : b;
+  var longer = a.length <= b.length ? b : a;
+  return shorter.every(function(s) {
+    return longer.some(function(l) { return l.indexOf(s) !== -1 || s.indexOf(l) !== -1; });
+  });
 }
 
 /* ── SIDEBAR TOGGLE ── */
@@ -885,13 +898,15 @@ function rTeam() {
 
   // Map trainer to active days
   var trainerDates = {};
-  var normalizedKeys = [];
   filteredRows.forEach(function(r) {
     if (!r.trainer) return;
     var tk = r.trainer; // r.trainer is already normalized
-    if (!trainerDates[tk]) { trainerDates[tk] = new Set(); normalizedKeys.push(tk); }
+    if (!trainerDates[tk]) trainerDates[tk] = new Set();
     trainerDates[tk].add(r.date);
   });
+
+  var allSheetNames = Object.keys(lastTimes);
+  var filteredSheetNames = Object.keys(trainerDates);
 
   // Filter trainers based on search query
   var filteredTrainers = TEAM_DATA.filter(function(t) {
@@ -907,16 +922,18 @@ function rTeam() {
   // Generate table rows
   document.getElementById("team-body").innerHTML = filteredTrainers.map(function(t) {
     var tk = normalizeTrainerName(t.name); // Normalize TEAM_DATA name for lookup
-    
-    // Find best match in our activity data (handles partial name matches)
-    var activityKey = normalizedKeys.find(function(k) { return k === tk || k.includes(tk) || tk.includes(k); }) || tk;
 
-    var isOnline = activeToday.has(activityKey);
+    // Find best match in all sheet data (for Status and Last Active)
+    var matchKey = allSheetNames.find(function(k) { return isMatch(tk, k); }) || tk;
+    // Find best match in filtered data (for Working Days)
+    var filteredMatchKey = filteredSheetNames.find(function(k) { return isMatch(tk, k); });
+
+    var isOnline = activeToday.has(matchKey);
     var statusBadge = isOnline
       ? '<span class="badge badge-g">Online</span>'
       : '<span class="badge badge-n">Offline</span>';
 
-    var wDays = trainerDates[activityKey] ? trainerDates[activityKey].size : 0;
+    var wDays = filteredMatchKey ? trainerDates[filteredMatchKey].size : 0;
     var npDays = Math.max(0, runningDays - wDays);
 
     var leadCell = t.lead || "-";
@@ -928,7 +945,7 @@ function rTeam() {
       }
     }
 
-    var lt = lastTimes[activityKey];
+    var lt = lastTimes[matchKey];
     var lastActiveStr = "-";
     var rowStyle = "";
     var rowTitle = "";
