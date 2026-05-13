@@ -261,7 +261,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   border:1px solid rgba(63,185,80,0.35);
   padding:5px 13px;border-radius:7px;
   font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;
-  cursor:pointer;transition:all .15s;white-space:nowrap;
+  cursor:pointer;transition:all .15s;white-spa  ce:nowrap;
 }
 .export-btn:hover{background:rgba(63,185,80,0.22);border-color:rgba(63,185,80,0.6);}
 
@@ -632,10 +632,15 @@ function parseRows(raw){
     var g=function(c){return c?String(r[c]||r[c.trim()]||"").trim():"";};
     var d=g(COL.date);
     if(/^\d{4}-\d{2}-\d{2}/.test(d))d=d.slice(0,10);
-    var a=d.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);if(a)d="20"+a[3]+"-"+(mm[a[2]]||"01")+"-"+a[1].padStart(2,"0");
-    var b=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(b)d=b[3]+"-"+b[2].padStart(2,"0")+"-"+b[1].padStart(2,"0");
-    var c=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);if(c)d="20"+c[3]+"-"+c[1].padStart(2,"0")+"-"+c[2].padStart(2,"0");
-    return{date:d,ts:g(COL.date),trainer:g(COL.trainer),city:g(COL.city)||g(COL.city2),status:g(COL.status),mode:g(COL.mode),lang:g(COL.lang)};
+    var a=d.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);if(a)d="20"+a[3]+"-"+(mm[a[2]]||"01")+"-"+("0"+a[1]).slice(-2);
+    var b=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(b)d=b[3]+"-"+("0"+b[2]).slice(-2)+"-"+("0"+b[1]).slice(-2);
+    var c=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);if(c)d="20"+c[3]+"-"+("0"+c[1]).slice(-2)+"-"+("0"+c[2]).slice(-2);
+    
+    var tsRaw = g(COL.date);
+    var tsObj = new Date(tsRaw);
+    if(isNaN(tsObj.getTime())) tsObj = new Date(d.replace(/-/g,'/') + " 00:00:00");
+
+    return{date:d,ts:isNaN(tsObj.getTime())?null:tsObj,trainer:g(COL.trainer),city:g(COL.city)||g(COL.city2),status:g(COL.status),mode:g(COL.mode),lang:g(COL.lang)};
   }).filter(function(r){return r.trainer||r.date;});
 }
 
@@ -844,17 +849,16 @@ function rTeam() {
   var todayStr = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
 
   // Online status based on activity recorded TODAY in the full dataset
-  var activeToday = new Set(allRows.filter(function(r) { return r.date === todayStr; }).map(function(r) { return r.trainer; }));
+  var activeToday = new Set(allRows.filter(function(r) { return r.date === todayStr; }).map(function(r) { return (r.trainer||"").toLowerCase().trim(); }));
 
   // Find latest activity time for each trainer
   var lastTimes = {};
   allRows.forEach(function(r) {
     if (!r.trainer || !r.ts) return;
-    var dt = new Date(r.ts);
-    if (!isNaN(dt.getTime())) {
-      if (!lastTimes[r.trainer] || dt > lastTimes[r.trainer]) {
-        lastTimes[r.trainer] = dt;
-      }
+    var tk = r.trainer.toLowerCase().trim();
+    var dt = r.ts;
+    if (!lastTimes[tk] || dt > lastTimes[tk]) {
+      lastTimes[tk] = dt;
     }
   });
 
@@ -876,8 +880,9 @@ function rTeam() {
   var trainerDates = {};
   filteredRows.forEach(function(r) {
     if (!r.trainer) return;
-    if (!trainerDates[r.trainer]) trainerDates[r.trainer] = new Set();
-    trainerDates[r.trainer].add(r.date);
+    var tk = r.trainer.toLowerCase().trim();
+    if (!trainerDates[tk]) trainerDates[tk] = new Set();
+    trainerDates[tk].add(r.date);
   });
 
   // Filter trainers based on search query
@@ -893,12 +898,13 @@ function rTeam() {
 
   // Generate table rows
   document.getElementById("team-body").innerHTML = filteredTrainers.map(function(t) {
-    var isOnline = activeToday.has(t.name);
+    var tk = (t.name || "").toLowerCase().trim();
+    var isOnline = activeToday.has(tk);
     var statusBadge = isOnline
       ? '<span class="badge badge-g">Online</span>'
       : '<span class="badge badge-n">Offline</span>';
 
-    var wDays = trainerDates[t.name] ? trainerDates[t.name].size : 0;
+    var wDays = trainerDates[tk] ? trainerDates[tk].size : 0;
     var npDays = Math.max(0, runningDays - wDays);
 
     var leadCell = t.lead || "-";
@@ -910,7 +916,7 @@ function rTeam() {
       }
     }
 
-    var lt = lastTimes[t.name];
+    var lt = lastTimes[tk];
     var lastActiveStr = "-";
     var rowStyle = "";
     var rowTitle = "";
