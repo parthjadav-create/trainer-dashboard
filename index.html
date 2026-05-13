@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -98,6 +98,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;
   position:relative;z-index:1;
   transition:margin-left .3s cubic-bezier(.4,0,.2,1);
+  min-width: 0;
 }
 .main.sb-gone{margin-left:0;}
 
@@ -165,7 +166,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .tab:hover{color:var(--text);}
 .tab.on{color:#ef5350;border-bottom-color:#e53935;font-weight:600;}
 
-.content{padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+.content{padding:20px 24px;display:flex;flex-direction:column;gap:16px;min-width:0;}
 .view{display:none;}
 .view.on{display:flex;flex-direction:column;gap:16px;}
 
@@ -194,9 +195,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .tbl tbody tr:hover td{background:rgba(45,51,59,0.6);}
 .tbl tfoot td{font-weight:700;color:var(--green);border-top:1px solid var(--border);border-bottom:none;background:var(--green3);}
 .tc{text-align:center;}
-.st{max-height:320px;overflow-y:auto;}
-.st::-webkit-scrollbar{width:3px;}
-.st::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.st{max-height:320px;overflow:auto;}
+.st::-webkit-scrollbar, .cscroll::-webkit-scrollbar, [style*="overflow-x:auto"]::-webkit-scrollbar { width:4px; height:4px; }
+.st::-webkit-scrollbar-thumb, .cscroll::-webkit-scrollbar-thumb, [style*="overflow-x:auto"]::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
 .rnk{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--card3);color:var(--text2);}
 .rnk.g{background:linear-gradient(135deg,#ffd700,#ffb300);color:#000;}
 .rnk.s{background:linear-gradient(135deg,#b0bec5,#78909c);color:#fff;}
@@ -222,8 +223,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .ldot{width:8px;height:8px;border-radius:50%;}
 .lcnt{font-size:13px;font-weight:700;}
 .cscroll{overflow-x:auto;padding-bottom:6px;}
-.cscroll::-webkit-scrollbar{height:3px;}
-.cscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 .cbars{display:flex;gap:10px;align-items:flex-end;padding:6px 4px 0;min-width:max-content;}
 .ccol{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .cbar{width:32px;border-radius:6px 6px 0 0;transition:height .8s ease;cursor:pointer;position:relative;}
@@ -913,7 +912,16 @@ function rTeam() {
 
     var lt = lastTimes[t.name];
     var lastActiveStr = "-";
+    var rowStyle = "";
+    var rowTitle = "";
+    var isLead = (t.name === "Jadav Parth Alkeshklumar" || t.name === "Patel Karp Kamleshbhai");
+
     if (lt) {
+      var diffDays = Math.floor((now - lt) / 86400000);
+      if (diffDays > 7 && !isLead) {
+        rowStyle = "background:var(--red2);";
+        rowTitle = "Inactive for " + diffDays + " days";
+      }
       var isToday =
         lt.getFullYear() === now.getFullYear() &&
         lt.getMonth() === now.getMonth() &&
@@ -921,10 +929,13 @@ function rTeam() {
       lastActiveStr = isToday
         ? lt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : lt.toLocaleDateString([], { day: "2-digit", month: "short" });
+    } else if (!isLead) {
+      rowStyle = "background:var(--red2);";
+      rowTitle = "No activity records found";
     }
 
     return (
-      "<tr>" +
+      "<tr style='" + rowStyle + "' title='" + rowTitle + "'>" +
       "<td style='color:var(--text2);'>" + t.id + "</td>" +
       "<td style='font-weight:600;color:var(--text);'>" + t.name + "</td>" +
       "<td>" + t.city + "</td>" +
