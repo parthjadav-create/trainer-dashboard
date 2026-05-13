@@ -636,13 +636,16 @@ function parseRows(raw){
     var g=function(c){return c?String(r[c]||r[c.trim()]||"").trim():"";};
     var d=g(COL.date);
     if(/^\d{4}-\d{2}-\d{2}/.test(d))d=d.slice(0,10);
+    // Normalize M/D/YYYY or D/M/YYYY to YYYY-MM-DD
     var a=d.match(/^(\d{1,2})\/([A-Za-z]{3})\/(\d{2})$/);if(a)d="20"+a[3]+"-"+(mm[a[2]]||"01")+"-"+("0"+a[1]).slice(-2);
-    var b=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(b)d=b[3]+"-"+("0"+b[2]).slice(-2)+"-"+("0"+b[1]).slice(-2);
+    // Assuming US format M/D/YYYY from Google Sheets: Group 1 is Month, Group 2 is Day
+    var b=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(b)d=b[3]+"-"+("0"+b[1]).slice(-2)+"-"+("0"+b[2]).slice(-2);
     var c=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);if(c)d="20"+c[3]+"-"+("0"+c[1]).slice(-2)+"-"+("0"+c[2]).slice(-2);
     
     var tsRaw = g(COL.date);
     var tsObj = new Date(tsRaw);
-    if(isNaN(tsObj.getTime())) tsObj = new Date(d.replace(/-/g,'/') + " 00:00:00");
+    // Fallback if Date constructor fails
+    if(isNaN(tsObj.getTime()) && d) tsObj = new Date(d.replace(/-/g,'/') + " 00:00:00");
 
     return{date:d,ts:isNaN(tsObj.getTime())?null:tsObj,trainer:normalizeTrainerName(g(COL.trainer)),city:g(COL.city)||g(COL.city2),status:g(COL.status),mode:g(COL.mode),lang:g(COL.lang)};
   }).filter(function(r){return r.trainer||r.date;});
@@ -882,10 +885,11 @@ function rTeam() {
 
   // Map trainer to active days
   var trainerDates = {};
+  var normalizedKeys = [];
   filteredRows.forEach(function(r) {
     if (!r.trainer) return;
     var tk = r.trainer; // r.trainer is already normalized
-    if (!trainerDates[tk]) trainerDates[tk] = new Set();
+    if (!trainerDates[tk]) { trainerDates[tk] = new Set(); normalizedKeys.push(tk); }
     trainerDates[tk].add(r.date);
   });
 
@@ -903,12 +907,16 @@ function rTeam() {
   // Generate table rows
   document.getElementById("team-body").innerHTML = filteredTrainers.map(function(t) {
     var tk = normalizeTrainerName(t.name); // Normalize TEAM_DATA name for lookup
-    var isOnline = activeToday.has(tk);
+    
+    // Find best match in our activity data (handles partial name matches)
+    var activityKey = normalizedKeys.find(function(k) { return k === tk || k.includes(tk) || tk.includes(k); }) || tk;
+
+    var isOnline = activeToday.has(activityKey);
     var statusBadge = isOnline
       ? '<span class="badge badge-g">Online</span>'
       : '<span class="badge badge-n">Offline</span>';
 
-    var wDays = trainerDates[tk] ? trainerDates[tk].size : 0;
+    var wDays = trainerDates[activityKey] ? trainerDates[activityKey].size : 0;
     var npDays = Math.max(0, runningDays - wDays);
 
     var leadCell = t.lead || "-";
@@ -920,7 +928,7 @@ function rTeam() {
       }
     }
 
-    var lt = lastTimes[tk];
+    var lt = lastTimes[activityKey];
     var lastActiveStr = "-";
     var rowStyle = "";
     var rowTitle = "";
