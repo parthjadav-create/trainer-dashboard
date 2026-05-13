@@ -839,80 +839,97 @@ function rMatrix(){
   document.getElementById("mx-foot").innerHTML="<tr><td>Grand Total</td>"+mk.map(function(m){return "<td class='tc'>"+totals[m]+"</td>";}).join("")+"<td class='tc'>"+grand+"</td></tr>";
 }
 
-function rTeam(){
-  var q=(document.getElementById("team-search").value||"").toLowerCase();
+function rTeam() {
+  var q = (document.getElementById("team-search").value || "").toLowerCase();
   var now = new Date();
   var todayStr = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
 
   // Online status based on activity recorded TODAY in the full dataset
-  var activeToday = new Set(allRows.filter(function(r){return r.date===todayStr;}).map(function(r){return r.trainer;}));
+  var activeToday = new Set(allRows.filter(function(r) { return r.date === todayStr; }).map(function(r) { return r.trainer; }));
 
   // Find latest activity time for each trainer
   var lastTimes = {};
-  allRows.forEach(function(r){
-    if(!r.trainer || !r.ts) return;
+  allRows.forEach(function(r) {
+    if (!r.trainer || !r.ts) return;
     var dt = new Date(r.ts);
-    if(!isNaN(dt.getTime())){
-      if(!lastTimes[r.trainer] || dt > lastTimes[r.trainer]) {
+    if (!isNaN(dt.getTime())) {
+      if (!lastTimes[r.trainer] || dt > lastTimes[r.trainer]) {
         lastTimes[r.trainer] = dt;
       }
     }
   });
 
-  // Calculate Running Days: from start of range until (End Date or Today, whichever is earlier)
-  var fr=gv("f-from"), to=gv("f-to");
+  // Calculate the range of dates for the filtered dataset
+  var fr = document.getElementById("f-from").value;
+  var to = document.getElementById("f-to").value;
   var runningDays = 0;
-  if(fr && to) {
+  if (fr && to) {
     var dStart = new Date(fr + "T00:00:00");
     var dEnd = new Date(to + "T00:00:00");
     var dToday = new Date(todayStr + "T00:00:00");
     var dLimit = dEnd < dToday ? dEnd : dToday;
-    if(dLimit >= dStart) {
-      runningDays = Math.round((dLimit - dStart)/(1000*60*60*24)) + 1;
+    if (dLimit >= dStart) {
+      runningDays = Math.round((dLimit - dStart) / (1000 * 60 * 60 * 24)) + 1;
     }
   }
 
+  // Map trainer to active days
   var trainerDates = {};
-  filteredRows.forEach(function(r){
-    if(!r.trainer) return;
-    if(!trainerDates[r.trainer]) trainerDates[r.trainer] = new Set();
+  filteredRows.forEach(function(r) {
+    if (!r.trainer) return;
+    if (!trainerDates[r.trainer]) trainerDates[r.trainer] = new Set();
     trainerDates[r.trainer].add(r.date);
   });
-  
-  var filtered = TEAM_DATA.filter(function(t){
-    return !q || t.name.toLowerCase().includes(q) || t.city.toLowerCase().includes(q) || t.desig.toLowerCase().includes(q) || t.email.toLowerCase().includes(q);
+
+  // Filter trainers based on search query
+  var filteredTrainers = TEAM_DATA.filter(function(t) {
+    return (
+      !q ||
+      t.name.toLowerCase().includes(q) ||
+      t.city.toLowerCase().includes(q) ||
+      t.desig.toLowerCase().includes(q) ||
+      t.email.toLowerCase().includes(q)
+    );
   });
 
-  document.getElementById("team-body").innerHTML = filtered.map(function(t){
+  // Generate table rows
+  document.getElementById("team-body").innerHTML = filteredTrainers.map(function(t) {
     var isOnline = activeToday.has(t.name);
-    var statusBadge = isOnline ? '<span class="badge badge-g">Online</span>' : '<span class="badge badge-n">Offline</span>';
-    
-    var isLead = (t.name === "Jadav Parth Alkeshklumar" || t.name === "Patel Karp Kamleshbhai");
+    var statusBadge = isOnline
+      ? '<span class="badge badge-g">Online</span>'
+      : '<span class="badge badge-n">Offline</span>';
 
     var wDays = trainerDates[t.name] ? trainerDates[t.name].size : 0;
     var npDays = Math.max(0, runningDays - wDays);
 
     var lt = lastTimes[t.name];
     var lastActiveStr = "-";
-    if(lt){
-      var isT = lt.getFullYear() === now.getFullYear() && lt.getMonth() === now.getMonth() && lt.getDate() === now.getDate();
-      lastActiveStr = isT ? lt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : lt.toLocaleDateString([], {day:'2-digit', month:'short'});
+    if (lt) {
+      var isToday =
+        lt.getFullYear() === now.getFullYear() &&
+        lt.getMonth() === now.getMonth() &&
+        lt.getDate() === now.getDate();
+      lastActiveStr = isToday
+        ? lt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        : lt.toLocaleDateString([], { day: "2-digit", month: "short" });
     }
 
-    return "<tr>"
-      +"<td style='color:var(--text2);'>"+t.id+"</td>"
-      +"<td style='font-weight:600;color:var(--text);'>"+t.name+"</td>"
-      +"<td>"+t.city+"</td>"
-      +"<td>"+t.state+"</td>"
-      +"<td style='font-size:11px;'>"+t.lang+"</td>"
-      +"<td>"+t.zone+"</td>"
-      +"<td><a href='mailto:"+t.email+"' style='color:var(--blue);text-decoration:none;'>"+t.email+"</a></td>"
-      +"<td style='color:var(--text2);'>"+t.desig+"</td>"
-      +"<td class='tc' style='color:var(--green);font-weight:700;'>"+(isLead ? "-" : wDays)+"</td>"
-      +"<td class='tc' style='color:var(--red);font-weight:700;'>"+(isLead ? "-" : npDays)+"</td>"
-      +"<td class='tc' style='color:var(--text2);font-size:11px;'>"+lastActiveStr+"</td>"
-      +"<td class='tc'>"+statusBadge+"</td>"
-      +"</tr>";
+    return (
+      "<tr>" +
+      "<td style='color:var(--text2);'>" + t.id + "</td>" +
+      "<td style='font-weight:600;color:var(--text);'>" + t.name + "</td>" +
+      "<td>" + t.city + "</td>" +
+      "<td>" + t.state + "</td>" +
+      "<td style='font-size:11px;'>" + t.lang + "</td>" +
+      "<td>" + t.zone + "</td>" +
+      "<td><a href='mailto:" + t.email + "' style='color:var(--blue);text-decoration:none;'>" + t.email + "</a></td>" +
+      "<td style='color:var(--text2);'>" + t.desig + "</td>" +
+      "<td class='tc' style='color:var(--green);font-weight:700;'>" + (t.name === "Jadav Parth Alkeshklumar" || t.name === "Patel Karp Kamleshbhai" ? "-" : wDays) + "</td>" +
+      "<td class='tc' style='color:var(--red);font-weight:700;'>" + (t.name === "Jadav Parth Alkeshklumar" || t.name === "Patel Karp Kamleshbhai" ? "-" : npDays) + "</td>" +
+      "<td class='tc' style='color:var(--text2);font-size:11px;'>" + lastActiveStr + "</td>" +
+      "<td class='tc'>" + statusBadge + "</td>" +
+      "</tr>"
+    );
   }).join("") || '<tr><td colspan="12" class="empty">No team members found</td></tr>';
 }
 
