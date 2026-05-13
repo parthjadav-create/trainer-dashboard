@@ -491,11 +491,17 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="card">
         <div class="ch">
           <div class="ct"><div class="ci" style="background:var(--blue2);">👥</div>Petpooja Training Team</div>
-          <div class="search-wrap">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="team-search" placeholder="Search team members..." oninput="rTeam()"/>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <select class="f-select" id="team-lead-filter" onchange="rTeam()" style="min-width:180px;"></select>
+              <option value="">All Team Leads</option>
+            </select>
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="team-search" placeholder="Search team members..." oninput="rTeam()"/>
+            </div>
           </div>
         </div>
+        <div style="display:flex;justify-content:flex-end;padding:0 18px 10px;"><button class="export-btn" onclick="exportTeamInfo()">⬇ Export Excel</button></div>
         <div style="overflow-x:auto;">
           <table class="tbl">
             <thead>
@@ -523,20 +529,20 @@ var TEAM_DATA = [
   {id:5, name:"Santhoshkumar R", city:"Chennai", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"santhosh.kumar@petpooja.com", desig:"Sr. Executive", lead:"Deepak Patel"},
   {id:6, name:"Deepak Patel", city:"Bengaluru", state:"Karnataka", lang:"Hindi / English", zone:"South", email:"deepak.patel@petpooja.com", desig:"South Zone Team Lead", lead:"Patel Karp Kamleshbhai"},
   {id:7, name:"Prabhu V", city:"Bengaluru", state:"Karnataka", lang:"Kannada / English", zone:"South", email:"prabhu.v@petpooja.com", desig:"Sr. Executive", lead:"Deepak Patel"},
-  {id:8, name:"Nihal KA", city:"Cochin / Ernakulam", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nihal.ka@petpooja.com", desig:"Trainer", lead:"Santhoshkumar R"},
-  {id:9, name:"Sadikul Mallick", city:"Kolkata / Howrah", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"sadikul.mallick@petpooja.com", desig:"Sr. Executive", lead:"Patel Karp Kamleshbhai"},
+  {id:8, name:"Nihal KA", city:"Cochin / Ernakulam", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nihal.ka@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:9, name:"Sadikul Mallick", city:"Kolkata / Howrah", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"sadikul.mallick@petpooja.com", desig:"Sr. Executive", lead:"Jadav Parth Alkeshklumar"},
   {id:10, name:"Arpit Dubey", city:"Indore / Ujjain / Dewas", state:"Madhya Pradesh", lang:"Hindi / English", zone:"Central", email:"arpit.dubey@petpooja.com", desig:"Sr. Executive", lead:"Jadav Parth Alkeshklumar"},
   {id:11, name:"Dastagir Alam", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"dastagir.alam@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
   {id:12, name:"Shahidali Shaban Shaikh", city:"Navi Mumbai / Thane", state:"Maharashtra", lang:"Hindi / English / Marathi", zone:"West", email:"shahidali.shaikh@petpooja.com", desig:"Sr. Executive", lead:"Antareksh Chandrakant Kakariya"},
   {id:13, name:"Pillamarapu Raghu Ram", city:"Hyderabad / Secundarabad", state:"Telangana", lang:"English / Telugu", zone:"South", email:"raghu.pillamarapu@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
   {id:14, name:"Mudunuri Laxmi Sai Ramraju", city:"Hyderabad", state:"Telangana", lang:"Telugu / English", zone:"South", email:"laxmisai.mudunuri@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
-  {id:15, name:"Vijay Kumar Mahto", city:"Kolkata", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"vijay.mahto@petpooja.com", desig:"Trainer", lead:"Patel Karp Kamleshbhai"},
-  {id:16, name:"Vignesh", city:"Coimbatore", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"vignesh.tn@petpooja.com", desig:"Trainer", lead:"Santhoshkumar R"},
+  {id:15, name:"Vijay Kumar Mahto", city:"Kolkata", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"vijay.mahto@petpooja.com", desig:"Trainer", lead:"Sadikul Mallick"},
+  {id:16, name:"Vignesh", city:"Coimbatore", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"vignesh.tn@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
   {id:17, name:"Devendra Prasad", city:"Bhopal", state:"Madhya Pradesh", lang:"Hindi / English", zone:"Central", email:"devendra.prasad@petpooja.com", desig:"Trainer", lead:"Jadav Parth Alkeshklumar"},
-  {id:18, name:"Ankit Kumar Das", city:"Bhubaneswar / Cuttack / Puri", state:"Odisha", lang:"Odia / Hindi / English", zone:"East", email:"ankit.das@petpooja.com", desig:"Trainer", lead:"Patel Karp Kamleshbhai"},
+  {id:18, name:"Ankit Kumar Das", city:"Bhubaneswar / Cuttack / Puri", state:"Odisha", lang:"Odia / Hindi / English", zone:"East", email:"ankit.das@petpooja.com", desig:"Trainer", lead:"Sadikul Mallick"},
   {id:19, name:"Abdul Rehman", city:"Noida / Ghaziabad / Greater Noida", state:"Uttar Pradesh", lang:"Hindi / English", zone:"North", email:"abdul.rehman@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
-  {id:20, name:"Mohammed Vasim", city:"Vijayawada", state:"Andhra Pradesh", lang:"Telugu / English / Hindi", zone:"South", email:"vasim.mohammed@petpooja.com", desig:"Trainer", lead:"Santhoshkumar R"},
-  {id:21, name:"Neeraj S Kumar", city:"Thiruvananthapuram", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"neeraj.kumar1@petpooja.com", desig:"Trainer", lead:"Santhoshkumar R"},
+  {id:20, name:"Mohammed Vasim", city:"Vijayawada", state:"Andhra Pradesh", lang:"Telugu / English / Hindi", zone:"South", email:"vasim.mohammed@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:21, name:"Neeraj S Kumar", city:"Thiruvananthapuram", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"neeraj.kumar1@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
   {id:22, name:"Gautam M", city:"Chandigarh / Mohali / Ambala", state:"Punjab", lang:"Punjabi / Hindi / English", zone:"North", email:"gautam.m@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
   {id:23, name:"Vamja Aakash Pravin", city:"Surat / Bharuch", state:"Gujarat", lang:"Gujarati / Hindi / English", zone:"West", email:"aakash.vamja@petpooja.com", desig:"Trainer", lead:"Antareksh Chandrakant Kakariya"},
   {id:24, name:"Shubhashish", city:"Jaipur", state:"Rajasthan", lang:"Hindi / English", zone:"North", email:"shubhashish.rai@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
@@ -555,6 +561,11 @@ var TEAM_DATA = [
 var SC={"Done":"#3fb950","Close":"#f85149","Re-schedule":"#bc8cff","Not related to inventory/Done by someone":"#58a6ff","Tech concern":"#ffa657","Need other languge / Physical visit":"#39d353"};
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",city2:"",status:"",mode:"",lang:""};
 var curTab="overview";
+var currentTrainerDetailsData = []; // Global to store trainer details for export
+var currentVirtualTrainersData = []; // Global to store virtual trainer data for export
+var currentCityDetailsData = []; // Global to store city details for export
+var currentMatrixData = []; // Global to store matrix data for export
+var currentTeamInfoData = []; // Global to store team info data for export
 
 function normalizeTrainerName(name) {
   return (name || "").toLowerCase().trim();
@@ -676,8 +687,8 @@ function applyFilters(){
     if(fr&&r.date<fr)return false;if(to&&r.date>to)return false;return true;
   });render();
 }
-function resetFilters(){["f-trainer","f-city","f-status","f-mode"].forEach(function(id){document.getElementById(id).value="";});populateFilters();applyFilters();}
-function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rCityDetail();rMatrix();renderTrainerDetail();rVirtual();rTeam();}
+function resetFilters(){["f-trainer","f-city","f-status","f-mode"].forEach(function(id){document.getElementById(id).value="";});var tlf=document.getElementById("team-lead-filter");if(tlf)tlf.value="";var ts=document.getElementById("team-search");if(ts)ts.value="";populateFilters();applyFilters();}
+function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rCityDetail();rMatrix();renderTrainerDetail();rVirtual();rTeam();} // rTeam() added here
 function matches(a,b){if(!a||!b)return false;return a.trim().toLowerCase()===b.trim().toLowerCase();}
 function contains(a,b){if(!a||!b)return false;return a.toLowerCase().includes(b.toLowerCase());}
 function pct(a,b){return b?Math.round(a/b*100)+"%":"0%";}
@@ -815,6 +826,7 @@ function buildTrainerMap(){
     if(contains(r.mode,"Incomplete")||contains(r.mode,"Feedback")||contains(r.mode,"Station"))map[k].other++;
     if(r.date)map[k].dates[r.date]=1;
   });
+  currentTrainerDetailsData = arr; // Store for export
   return map;
 }
 
@@ -825,6 +837,7 @@ function renderTrainerDetail(){
   var arr=Object.keys(map).filter(function(n){return !q||n.includes(q);}).map(function(n){var d=map[n],dy=Object.keys(d.dates).length||1;return{n:n,d:d,days:dy,avg:(d.done/dy).toFixed(1),pct:d.total?Math.round(d.done/d.total*100):0};});
   arr.sort(function(a,b){if(sortBy==="total")return b.d.total-a.d.total;if(sortBy==="avg")return parseFloat(b.avg)-parseFloat(a.avg);if(sortBy==="name")return a.n.localeCompare(b.n);return b.d.done-a.d.done;});
   document.getElementById("trainer-count-label").textContent=arr.length+" trainers";
+  currentTrainerDetailsData = arr; // Store for export
   var gT=0,gD=0,gC=0,gR=0,gN=0,gP=0,gRe=0,gO=0,gV=0,gOt=0;
   document.getElementById("trainer-detail-body").innerHTML=arr.map(function(t,i){
     var d=t.d,col=t.pct>=80?"#3fb950":t.pct>=50?"#ffa657":"#f85149";
@@ -836,6 +849,7 @@ function renderTrainerDetail(){
 
 function rVirtual(){
   var virtRows=filteredRows.filter(function(r){return matches(r.mode,"Virtual");});
+  // KPI calculations
   var tot=virtRows.length,done=virtRows.filter(function(r){return matches(r.status,"Done");}).length;
   var trs=new Set(virtRows.map(function(r){return r.trainer;}).filter(Boolean)).size;
   document.getElementById("virt-kpi").innerHTML=[{l:"Total Virtual Calls",v:tot,c:"#58a6ff"},{l:"Done",v:done,c:"#3fb950"},{l:"Other Status",v:tot-done,c:"#ffa657"},{l:"Trainers Doing Virtual",v:trs,c:"#bc8cff"}].map(function(k){return '<div class="virt-stat"><div class="v" style="color:'+k.c+';">'+k.v+'</div><div class="l">'+k.l+'</div></div>';}).join("");
@@ -843,6 +857,7 @@ function rVirtual(){
   virtRows.forEach(function(r){var k=r.trainer||"(Unknown)";if(!tmap[k])tmap[k]={total:0,done:0,langs:{}};tmap[k].total++;if(matches(r.status,"Done"))tmap[k].done++;if(r.lang)tmap[k].langs[r.lang]=(tmap[k].langs[r.lang]||0)+1;});
   var tarr=Object.keys(tmap).sort(function(a,b){return tmap[b].total-tmap[a].total;});
   var gvt=0,gvd=0;
+  currentVirtualTrainersData = tarr.map(function(name){ return {name: name, data: tmap[name]}; }); // Store for export
   document.getElementById("virt-trainer-body").innerHTML=tarr.map(function(name,i){var d=tmap[name],dp=d.total?Math.round(d.done/d.total*100):0;var col=dp>=80?"#3fb950":dp>=50?"#ffa657":"#f85149";var tl=Object.keys(d.langs).sort(function(a,b){return d.langs[b]-d.langs[a];}).slice(0,2).join(", ")||"–";gvt+=d.total;gvd+=d.done;return "<tr><td>"+(i+1)+"</td><td style='font-weight:600;color:var(--text);'>"+name+"</td><td class='tc' style='color:#58a6ff;font-weight:600;'>"+d.total+"</td><td class='tc' style='color:#3fb950;font-weight:700;'>"+d.done+"</td><td class='tc' style='color:#ffa657;'>"+(d.total-d.done)+"</td><td class='tc' style='color:var(--text2);font-size:11px;'>"+tl+"</td><td class='tc'><span style='color:"+col+";font-weight:700;'>"+dp+"%</span></td></tr>";}).join("")||'<tr><td colspan="7" class="empty">No virtual call data found</td></tr>';
   document.getElementById("virt-trainer-foot").innerHTML="<tr><td colspan='2'>Total</td><td class='tc'>"+gvt+"</td><td class='tc'>"+gvd+"</td><td class='tc'>"+(gvt-gvd)+"</td><td></td><td class='tc'>"+pct(gvd,gvt)+"</td></tr>";
   var lcnt={};virtRows.filter(function(r){return r.lang;}).forEach(function(r){lcnt[r.lang]=(lcnt[r.lang]||0)+1;});
@@ -857,16 +872,28 @@ function rVirtual(){
 function rMatrix(){
   var mk=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
   var map={},totals={},grand=0;mk.forEach(function(m){totals[m]=0;});
+  // Build map and calculate totals
   filteredRows.forEach(function(r){var k=r.trainer||"(Unknown)";if(!map[k]){map[k]={};mk.forEach(function(m){map[k][m]=0;});}var mm=mk.find(function(m){return matches(m,r.mode);});if(mm)map[k][mm]++;});
   var rows=Object.keys(map).sort(function(a,b){return mk.reduce(function(s,m){return s+map[b][m];},0)-mk.reduce(function(s,m){return s+map[a][m];},0);});
   document.getElementById("mx-body").innerHTML=rows.map(function(name){var rt=mk.reduce(function(s,m){return s+map[name][m];},0);grand+=rt;mk.forEach(function(m){totals[m]+=map[name][m];});return "<tr><td style='font-weight:600;min-width:130px;color:var(--text);'>"+name+"</td>"+mk.map(function(m){var v=map[name][m];var c=m==="Virtual"?"color:#58a6ff;":m==="Physical Visit"?"color:#3fb950;":"";return "<td class='tc' style='"+c+"'>"+(v||"–")+"</td>";}).join("")+"<td class='tc' style='font-weight:800;color:var(--green);'>"+rt+"</td></tr>";}).join("");
   document.getElementById("mx-foot").innerHTML="<tr><td>Grand Total</td>"+mk.map(function(m){return "<td class='tc'>"+totals[m]+"</td>";}).join("")+"<td class='tc'>"+grand+"</td></tr>";
 }
 
+function populateTeamLeadFilter() {
+  // Clear existing options first, except "All Team Leads"
+  var leads = {};
+  TEAM_DATA.forEach(function(t) { if (t.lead && t.lead !== "-") leads[t.lead] = 1; });
+  var sel = document.getElementById("team-lead-filter");
+  if (!sel) return;
+  Object.keys(leads).sort().forEach(function(l) { sel.appendChild(new Option(l, l)); });
+}
+
 function rTeam() {
   var q = (document.getElementById("team-search").value || "").toLowerCase();
+  var leadF = document.getElementById("team-lead-filter").value;
   var now = new Date();
   var todayStr = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+  var allTeamMembersData = []; // To store processed data for export
 
   // Online status based on activity recorded TODAY in the full dataset
   var activeToday = new Set(allRows.filter(function(r) { return r.date === todayStr; }).map(function(r) { return r.trainer; }));
@@ -908,19 +935,15 @@ function rTeam() {
   var allSheetNames = Object.keys(lastTimes);
   var filteredSheetNames = Object.keys(trainerDates);
 
-  // Filter trainers based on search query
+  // Filter trainers based on search query and lead
   var filteredTrainers = TEAM_DATA.filter(function(t) {
-    return (
-      !q ||
-      t.name.toLowerCase().includes(q) ||
-      t.city.toLowerCase().includes(q) ||
-      t.desig.toLowerCase().includes(q) ||
-      t.email.toLowerCase().includes(q)
-    );
+    var sM = !q || t.name.toLowerCase().includes(q) || t.city.toLowerCase().includes(q) || t.desig.toLowerCase().includes(q) || t.email.toLowerCase().includes(q);
+    var lM = !leadF || t.lead === leadF;
+    return sM && lM;
   });
 
   // Generate table rows
-  document.getElementById("team-body").innerHTML = filteredTrainers.map(function(t) {
+  var teamRows = filteredTrainers.map(function(t) {
     var tk = normalizeTrainerName(t.name); // Normalize TEAM_DATA name for lookup
 
     // Find best match in all sheet data (for Status and Last Active)
@@ -968,6 +991,7 @@ function rTeam() {
       rowStyle = "background:var(--red2);";
       rowTitle = "No activity records found";
     }
+    allTeamMembersData.push({t:t, wDays:wDays, npDays:npDays, lastActiveStr:lastActiveStr, statusBadge:statusBadge, leadCell:leadCell});
 
     return (
       "<tr style='" + rowStyle + "' title='" + rowTitle + "'>" +
@@ -986,7 +1010,11 @@ function rTeam() {
       "<td class='tc'>" + statusBadge + "</td>" +
       "</tr>"
     );
-  }).join("") || '<tr><td colspan="13" class="empty">No team members found</td></tr>';
+  });
+
+  currentTeamInfoData = allTeamMembersData; // Store for export
+
+  document.getElementById("team-body").innerHTML = teamRows.join("") || '<tr><td colspan="13" class="empty">No team members found</td></tr>';
 }
 
 function exportLeaderboard(){
@@ -1021,10 +1049,191 @@ function exportLeaderboard(){
   XLSX.writeFile(wb,"Top_Performers_"+stamp+".xlsx");
 }
 
+function exportTrainerDetails() {
+  if (!currentTrainerDetailsData || currentTrainerDetailsData.length === 0) {
+    alert("No trainer details to export.");
+    return;
+  }
+
+  var wsData = [
+    ["#", "Trainer", "Total", "Done", "Closed", "Re-schedule", "Not Related", "Physical", "Re-training", "OFS", "Virtual", "Other", "Days Active", "Avg/Day", "Done %"]
+  ];
+
+  var gT=0,gD=0,gC=0,gR=0,gN=0,gP=0,gRe=0,gO=0,gV=0,gOt=0;
+
+  currentTrainerDetailsData.forEach(function(t, i) {
+    var d = t.d;
+    gT+=d.total;gD+=d.done;gC+=d.close;gR+=d.resch;gN+=d.notrel;gP+=d.phys;gRe+=d.retrain;gO+=d.ofs;gV+=d.virt;gOt+=d.other;
+    wsData.push([
+      i + 1, t.n, d.total, d.done, d.close, d.resch, d.notrel, d.phys, d.retrain, d.ofs, d.virt, d.other, t.days, t.avg, t.pct + "%"
+    ]);
+  });
+
+  wsData.push([
+    "", "Grand Total", gT, gD, gC, gR, gN, gP, gRe, gO, gV, gOt, "", "", pct(gD, gT)
+  ]);
+
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"] = [{wch:4},{wch:20},{wch:8},{wch:8},{wch:8},{wch:12},{wch:12},{wch:10},{wch:12},{wch:8},{wch:8},{wch:8},{wch:12},{wch:10},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, ws, "Trainer Details");
+  var now = new Date();
+  var stamp = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+  XLSX.writeFile(wb, "Trainer_Details_" + stamp + ".xlsx");
+}
+
+function exportVirtualTrainers() {
+  if (!currentVirtualTrainersData || currentVirtualTrainersData.length === 0) {
+    alert("No virtual call trainer data to export.");
+    return;
+  }
+
+  var wsData = [
+    ["#", "Trainer", "Virtual Total", "Done", "Other", "Languages", "Done %"]
+  ];
+
+  var gvt=0, gvd=0;
+
+  currentVirtualTrainersData.forEach(function(t, i) {
+    var d = t.data;
+    var dp = d.total ? Math.round(d.done / d.total * 100) : 0;
+    var tl = Object.keys(d.langs).sort(function(a,b){return d.langs[b]-d.langs[a];}).slice(0,2).join(", ")||"–";
+    gvt += d.total;
+    gvd += d.done;
+    wsData.push([
+      i + 1, t.name, d.total, d.done, (d.total - d.done), tl, dp + "%"
+    ]);
+  });
+
+  wsData.push([
+    "", "Total", gvt, gvd, (gvt - gvd), "", pct(gvd, gvt)
+  ]);
+
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"] = [{wch:4},{wch:20},{wch:14},{wch:8},{wch:8},{wch:20},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, ws, "Virtual Calls by Trainer");
+  var now = new Date();
+  var stamp = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+  XLSX.writeFile(wb, "Virtual_Calls_by_Trainer_" + stamp + ".xlsx");
+}
+
+function exportCityDetails() {
+  var map = {};
+  filteredRows.forEach(function(r){var c=r.city||"(Unknown)";if(!map[c])map[c]={total:0,done:0,virt:0,phys:0,trainers:{}};map[c].total++;if(matches(r.status,"Done"))map[c].done++;if(matches(r.mode,"Virtual"))map[c].virt++;if(contains(r.mode,"Physical"))map[c].phys++;if(r.trainer)map[c].trainers[r.trainer]=1;});
+  var sorted = Object.keys(map).sort(function(a,b){return map[b].total-map[a].total;});
+
+  if (!sorted || sorted.length === 0) {
+    alert("No city details to export.");
+    return;
+  }
+
+  var wsData = [
+    ["#", "City", "Total", "Done", "Virtual", "Physical", "Trainers", "Done %"]
+  ];
+
+  var gT=0,gD=0,gV=0,gP=0;
+
+  sorted.forEach(function(city, i) {
+    var d = map[city];
+    var dp = d.total ? Math.round(d.done / d.total * 100) : 0;
+    gT+=d.total;gD+=d.done;gV+=d.virt;gP+=d.phys;
+    wsData.push([
+      i + 1, city, d.total, d.done, d.virt, d.phys, Object.keys(d.trainers).length, dp + "%"
+    ]);
+  });
+
+  wsData.push([
+    "", "Total", gT, gD, gV, gP, "", pct(gD, gT)
+  ]);
+
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"] = [{wch:4},{wch:20},{wch:8},{wch:8},{wch:8},{wch:8},{wch:10},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, ws, "City-wise Breakdown");
+  var now = new Date();
+  var stamp = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+  XLSX.writeFile(wb, "City_Breakdown_" + stamp + ".xlsx");
+}
+
+function exportMatrix() {
+  var mk=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
+  var map={},totals={},grand=0;mk.forEach(function(m){totals[m]=0;});
+  filteredRows.forEach(function(r){var k=r.trainer||"(Unknown)";if(!map[k]){map[k]={};mk.forEach(function(m){map[k][m]=0;});}var mm=mk.find(function(m){return matches(m,r.mode);});if(mm)map[k][mm]++;});
+  var rows=Object.keys(map).sort(function(a,b){return mk.reduce(function(s,m){return s+map[b][m];},0)-mk.reduce(function(s,m){return s+map[a][m];},0);});
+
+  if (!rows || rows.length === 0) {
+    alert("No matrix data to export.");
+    return;
+  }
+
+  var wsData = [
+    ["Trainer"].concat(mk).concat(["Total"])
+  ];
+
+  rows.forEach(function(name) {
+    var rt = mk.reduce(function(s,m){return s+map[name][m];},0);
+    grand += rt;
+    var rowData = [name];
+    mk.forEach(function(m){
+      rowData.push(map[name][m] || 0);
+      totals[m] += map[name][m];
+    });
+    rowData.push(rt);
+    wsData.push(rowData);
+  });
+
+  wsData.push(["Grand Total"].concat(mk.map(function(m){return totals[m];})).concat([grand]));
+
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"] = [{wch:20}].concat(mk.map(function(){return {wch:14};})).concat([{wch:8}]);
+  XLSX.utils.book_append_sheet(wb, ws, "Trainer Mode Matrix");
+  var now = new Date();
+  var stamp = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+  XLSX.writeFile(wb, "Trainer_Mode_Matrix_" + stamp + ".xlsx");
+}
+
+function exportTeamInfo() {
+  if (!currentTeamInfoData || currentTeamInfoData.length === 0) {
+    alert("No team members to export.");
+    return;
+  }
+
+  var wsData = [
+    ["Sr No", "Emp Full Name", "City", "State", "Languages", "Zone", "Email ID", "Designation", "Team Lead", "Working Days", "Not Present", "Last Active", "Status"]
+  ];
+
+  currentTeamInfoData.forEach(function(item) {
+    var t = item.t;
+    // Extract plain text from HTML for leadCell and statusBadge
+    var leadText = item.leadCell.replace(/<[^>]*>?/gm, '');
+    var statusText = item.statusBadge.replace(/<[^>]*>?/gm, '');
+
+    wsData.push([
+      t.id, t.name, t.city, t.state, t.lang, t.zone, t.email, t.desig, leadText,
+      (t.name === "Jadav Parth Alkeshklumar" || t.name === "Patel Karp Kamleshbhai" ? "-" : item.wDays),
+      (t.name === "Jadav Parth Alkeshklumar" || t.name === "Patel Karp Kamleshbhai" ? "-" : item.npDays),
+      item.lastActiveStr, statusText
+    ]);
+  });
+
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"] = [
+    {wch:6},{wch:25},{wch:15},{wch:15},{wch:20},{wch:10},{wch:30},{wch:30},{wch:25},{wch:15},{wch:15},{wch:15},{wch:10}
+  ];
+  XLSX.utils.book_append_sheet(wb, ws, "Team Info");
+  var now = new Date();
+  var stamp = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+  XLSX.writeFile(wb, "Team_Info_" + stamp + ".xlsx");
+}
+
 window.addEventListener("DOMContentLoaded",function(){
   var now=new Date(),y=now.getFullYear(),mo=("0"+(now.getMonth()+1)).slice(-2),d=("0"+now.getDate()).slice(-2);
   document.getElementById("f-from").value=y+"-"+mo+"-01";
   document.getElementById("f-to").value=y+"-"+mo+"-"+d;
+  populateTeamLeadFilter();
   loadData().then(function(){
     document.getElementById("loader").style.display="none";
     document.getElementById("content").style.display="flex";
