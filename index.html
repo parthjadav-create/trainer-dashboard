@@ -148,14 +148,21 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .f-select option{background:var(--card3);}
 .date-range{
   display:flex;align-items:center;gap:6px;background:var(--card3);
-  border:1px solid var(--border);border-radius:7px;padding:4px 10px;transition:border-color .15s;
+  border:1px solid var(--border);border-radius:7px;padding:0 10px;transition:all .15s;
+  height: 32px;
 }
-.date-range:focus-within{border-color:#e53935;}
-.date-range span{font-size:11px;color:var(--text2);}
+.date-range:hover{border-color:var(--border2);}
+.date-range:focus-within{border-color:#e53935;background-color:var(--bg3);}
+.date-range span{font-size:10px;color:var(--text2);font-weight:700;}
 .date-range input[type=date]{
   background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;
-  font-size:12px;outline:none;cursor:pointer;padding:3px 0;color-scheme:dark;
+  font-size:12px;outline:none;cursor:pointer;color-scheme:dark;
+  width: 95px;
 }
+.date-range input[type=date]::-webkit-calendar-picker-indicator{
+  opacity:0.5;cursor:pointer;transition:opacity .15s;
+}
+.date-range input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1;}
 .ap-btn{background:#b71c1c;color:#fff;border:1px solid rgba(229,57,53,0.4);padding:7px 18px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .ap-btn:hover{background:#e53935;}
 .rs-btn{background:transparent;color:var(--text2);border:1px solid var(--border);padding:7px 14px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
@@ -327,7 +334,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 </aside>
 
 <div class="main" id="main">
-  <div class="topbar">
+  <div class="topbar">  
     <div class="topbar-left">
       <button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
       <div>
@@ -351,6 +358,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="fg">
         <label>Date Range</label>
         <div class="date-range">
+          <span style="font-size:12px;margin-right:2px;">📅</span>
           <input type="date" id="f-from"/><span>→</span><input type="date" id="f-to"/>
         </div>
       </div>
