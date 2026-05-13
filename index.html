@@ -556,6 +556,10 @@ var SC={"Done":"#3fb950","Close":"#f85149","Re-schedule":"#bc8cff","Not related 
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",city2:"",status:"",mode:"",lang:""};
 var curTab="overview";
 
+function normalizeTrainerName(name) {
+  return (name || "").toLowerCase().trim();
+}
+
 /* ── SIDEBAR TOGGLE ── */
 function toggleSidebar(){
   var sb=document.getElementById('sidebar');
@@ -640,7 +644,7 @@ function parseRows(raw){
     var tsObj = new Date(tsRaw);
     if(isNaN(tsObj.getTime())) tsObj = new Date(d.replace(/-/g,'/') + " 00:00:00");
 
-    return{date:d,ts:isNaN(tsObj.getTime())?null:tsObj,trainer:g(COL.trainer),city:g(COL.city)||g(COL.city2),status:g(COL.status),mode:g(COL.mode),lang:g(COL.lang)};
+    return{date:d,ts:isNaN(tsObj.getTime())?null:tsObj,trainer:normalizeTrainerName(g(COL.trainer)),city:g(COL.city)||g(COL.city2),status:g(COL.status),mode:g(COL.mode),lang:g(COL.lang)};
   }).filter(function(r){return r.trainer||r.date;});
 }
 
@@ -781,7 +785,7 @@ function rCityDetail(){
 function buildTrainerMap(){
   var map={};
   filteredRows.forEach(function(r){
-    var k=r.trainer||"(Unknown)";
+    var k=r.trainer||"(Unknown)"; // r.trainer is already normalized
     if(!map[k])map[k]={total:0,done:0,close:0,resch:0,notrel:0,phys:0,retrain:0,ofs:0,virt:0,other:0,dates:{},langs:{}};
     map[k].total++;
     if(matches(r.status,"Done"))map[k].done++;
@@ -801,8 +805,8 @@ function buildTrainerMap(){
 function renderTrainerDetail(){
   var map=buildTrainerMap();
   var q=(document.getElementById("trainer-search").value||"").toLowerCase();
-  var sortBy=gv("td-sort");
-  var arr=Object.keys(map).filter(function(n){return !q||n.toLowerCase().indexOf(q)!==-1;}).map(function(n){var d=map[n],dy=Object.keys(d.dates).length||1;return{n:n,d:d,days:dy,avg:(d.done/dy).toFixed(1),pct:d.total?Math.round(d.done/d.total*100):0};});
+  var sortBy=gv("td-sort"); // n is already normalized trainer name
+  var arr=Object.keys(map).filter(function(n){return !q||n.includes(q);}).map(function(n){var d=map[n],dy=Object.keys(d.dates).length||1;return{n:n,d:d,days:dy,avg:(d.done/dy).toFixed(1),pct:d.total?Math.round(d.done/d.total*100):0};});
   arr.sort(function(a,b){if(sortBy==="total")return b.d.total-a.d.total;if(sortBy==="avg")return parseFloat(b.avg)-parseFloat(a.avg);if(sortBy==="name")return a.n.localeCompare(b.n);return b.d.done-a.d.done;});
   document.getElementById("trainer-count-label").textContent=arr.length+" trainers";
   var gT=0,gD=0,gC=0,gR=0,gN=0,gP=0,gRe=0,gO=0,gV=0,gOt=0;
@@ -849,13 +853,13 @@ function rTeam() {
   var todayStr = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
 
   // Online status based on activity recorded TODAY in the full dataset
-  var activeToday = new Set(allRows.filter(function(r) { return r.date === todayStr; }).map(function(r) { return (r.trainer||"").toLowerCase().trim(); }));
+  var activeToday = new Set(allRows.filter(function(r) { return r.date === todayStr; }).map(function(r) { return r.trainer; }));
 
   // Find latest activity time for each trainer
   var lastTimes = {};
   allRows.forEach(function(r) {
     if (!r.trainer || !r.ts) return;
-    var tk = r.trainer.toLowerCase().trim();
+    var tk = r.trainer; // r.trainer is already normalized
     var dt = r.ts;
     if (!lastTimes[tk] || dt > lastTimes[tk]) {
       lastTimes[tk] = dt;
@@ -880,7 +884,7 @@ function rTeam() {
   var trainerDates = {};
   filteredRows.forEach(function(r) {
     if (!r.trainer) return;
-    var tk = r.trainer.toLowerCase().trim();
+    var tk = r.trainer; // r.trainer is already normalized
     if (!trainerDates[tk]) trainerDates[tk] = new Set();
     trainerDates[tk].add(r.date);
   });
@@ -898,7 +902,7 @@ function rTeam() {
 
   // Generate table rows
   document.getElementById("team-body").innerHTML = filteredTrainers.map(function(t) {
-    var tk = (t.name || "").toLowerCase().trim();
+    var tk = normalizeTrainerName(t.name); // Normalize TEAM_DATA name for lookup
     var isOnline = activeToday.has(tk);
     var statusBadge = isOnline
       ? '<span class="badge badge-g">Online</span>'
@@ -910,7 +914,7 @@ function rTeam() {
     var leadCell = t.lead || "-";
     // Only make the regional leads (Parth and Karp) clickable to send an email
     if (leadCell === "Jadav Parth Alkeshklumar" || leadCell === "Patel Karp Kamleshbhai") {
-      var leadObj = TEAM_DATA.find(function(m) { return m.name === leadCell; });
+      var leadObj = TEAM_DATA.find(function(m) { return normalizeTrainerName(m.name) === normalizeTrainerName(leadCell); });
       if (leadObj) {
         leadCell = "<a href='mailto:" + leadObj.email + "' style='color:var(--blue);text-decoration:none;'>" + leadCell + "</a>";
       }
