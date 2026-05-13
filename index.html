@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -500,7 +500,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div style="overflow-x:auto;">
           <table class="tbl">
             <thead>
-              <tr><th>Sr No</th><th>Emp Full Name</th><th>City</th><th>State</th><th>Languages</th><th>Zone</th><th>Email ID</th><th>Designation</th><th class="tc">Working Days</th><th class="tc">Not Present</th><th class="tc">Last Active</th><th class="tc">Status</th></tr>
+              <tr><th>Sr No</th><th>Emp Full Name</th><th>City</th><th>State</th><th>Languages</th><th>Zone</th><th>Email ID</th><th>Designation</th><th>Team Lead</th><th class="tc">Working Days</th><th class="tc">Not Present</th><th class="tc">Last Active</th><th class="tc">Status</th></tr>
             </thead>
             <tbody id="team-body"></tbody>
           </table>
@@ -517,41 +517,41 @@ var TARGET_PER_DAY=2.5;
 var MODES=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
 var COLORS=["#3fb950","#58a6ff","#bc8cff","#ffa657","#f85149","#39d353","#e3b341","#79c0ff","#d2a8ff","#ffb628"];
 var TEAM_DATA = [
-  {id:1, name:"Jadav Parth Alkeshklumar", city:"Ahmedabad", state:"Gujarat", lang:"-", zone:"-", email:"parth.jadav@petpooja.com", desig:"North-West-central Regional Team Lead"},
-  {id:2, name:"Patel Karp Kamleshbhai", city:"Ahmedabad", state:"Gujarat", lang:"-", zone:"-", email:"karp.patel@petpooja.com", desig:"South-East Regional Team Lead"},
-  {id:3, name:"Noman Ahmed Khan", city:"Lucknow", state:"Uttar Pradesh", lang:"Hindi / English", zone:"North", email:"noman.khan@petpooja.com", desig:"North Zone Team Lead"},
-  {id:4, name:"Antareksh Chandrakant Kakariya", city:"Mumbai / Palghar", state:"Maharashtra", lang:"Hindi / English / Marathi / Gujarati", zone:"West", email:"antareksh.kakariya@petpooja.com", desig:"West Zone Team Lead"},
-  {id:5, name:"Santhoshkumar R", city:"Chennai", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"santhosh.kumar@petpooja.com", desig:"Sr. Executive"},
-  {id:6, name:"Deepak Patel", city:"Bengaluru", state:"Karnataka", lang:"Hindi / English", zone:"South", email:"deepak.patel@petpooja.com", desig:"South Zone Team Lead"},
-  {id:7, name:"Prabhu V", city:"Bengaluru", state:"Karnataka", lang:"Kannada / English", zone:"South", email:"prabhu.v@petpooja.com", desig:"Sr. Executive"},
-  {id:8, name:"Nihal KA", city:"Cochin / Ernakulam", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nihal.ka@petpooja.com", desig:"Trainer"},
-  {id:9, name:"Sadikul Mallick", city:"Kolkata / Howrah", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"sadikul.mallick@petpooja.com", desig:"Sr. Executive"},
-  {id:10, name:"Arpit Dubey", city:"Indore / Ujjain / Dewas", state:"Madhya Pradesh", lang:"Hindi / English", zone:"Central", email:"arpit.dubey@petpooja.com", desig:"Sr. Executive"},
-  {id:11, name:"Dastagir Alam", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"dastagir.alam@petpooja.com", desig:"Trainer"},
-  {id:12, name:"Shahidali Shaban Shaikh", city:"Navi Mumbai / Thane", state:"Maharashtra", lang:"Hindi / English / Marathi", zone:"West", email:"shahidali.shaikh@petpooja.com", desig:"Sr. Executive"},
-  {id:13, name:"Pillamarapu Raghu Ram", city:"Hyderabad / Secundarabad", state:"Telangana", lang:"English / Telugu", zone:"South", email:"raghu.pillamarapu@petpooja.com", desig:"Trainer"},
-  {id:14, name:"Mudunuri Laxmi Sai Ramraju", city:"Hyderabad", state:"Telangana", lang:"Telugu / English", zone:"South", email:"laxmisai.mudunuri@petpooja.com", desig:"Trainer"},
-  {id:15, name:"Vijay Kumar Mahto", city:"Kolkata", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"vijay.mahto@petpooja.com", desig:"Trainer"},
-  {id:16, name:"Vignesh", city:"Coimbatore", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"vignesh.tn@petpooja.com", desig:"Trainer"},
-  {id:17, name:"Devendra Prasad", city:"Bhopal", state:"Madhya Pradesh", lang:"Hindi / English", zone:"Central", email:"devendra.prasad@petpooja.com", desig:"Trainer"},
-  {id:18, name:"Ankit Kumar Das", city:"Bhubaneswar / Cuttack / Puri", state:"Odisha", lang:"Odia / Hindi / English", zone:"East", email:"ankit.das@petpooja.com", desig:"Trainer"},
-  {id:19, name:"Abdul Rehman", city:"Noida / Ghaziabad / Greater Noida", state:"Uttar Pradesh", lang:"Hindi / English", zone:"North", email:"abdul.rehman@petpooja.com", desig:"Trainer"},
-  {id:20, name:"Mohammed Vasim", city:"Vijayawada", state:"Andhra Pradesh", lang:"Telugu / English / Hindi", zone:"South", email:"vasim.mohammed@petpooja.com", desig:"Trainer"},
-  {id:21, name:"Neeraj S Kumar", city:"Thiruvananthapuram", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"neeraj.kumar1@petpooja.com", desig:"Trainer"},
-  {id:22, name:"Gautam M", city:"Chandigarh / Mohali / Ambala", state:"Punjab", lang:"Punjabi / Hindi / English", zone:"North", email:"gautam.m@petpooja.com", desig:"Trainer"},
-  {id:23, name:"Vamja Aakash Pravin", city:"Surat / Bharuch", state:"Gujarat", lang:"Gujarati / Hindi / English", zone:"West", email:"aakash.vamja@petpooja.com", desig:"Trainer"},
-  {id:24, name:"Shubhashish", city:"Jaipur", state:"Rajasthan", lang:"Hindi / English", zone:"North", email:"shubhashish.rai@petpooja.com", desig:"Trainer"},
-  {id:25, name:"Manoj Singh", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"manoj.singh@petpooja.com", desig:"Trainer"},
-  {id:26, name:"Sharath S", city:"Bengaluru", state:"Karnataka", lang:"Kannada / English", zone:"South", email:"sharath.s@petpooja.com", desig:"Trainer"},
-  {id:27, name:"Keyur Hemant Kadu", city:"Mumbai", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"keyur.kadu@petpooja.com", desig:"Trainer"},
-  {id:28, name:"Kunal P Arsekar", city:"North Goa", state:"Goa", lang:"Hindi / English", zone:"West", email:"kunal.arsekar@petpooja.com", desig:"Trainer"},
-  {id:29, name:"Nibhun T", city:"Kozhikode (Calicut) / Malappuram", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nibhun.t@petpooja.com", desig:"Trainer"},
-  {id:30, name:"Krunal Manoharrao Mahulkar", city:"Nagpur / Wardha", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"krunal.mahulkar@petpooja.com", desig:"Trainer"},
-  {id:31, name:"Aniket Ashok Shirfule", city:"Pune", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"aniket.shirfule@petpooja.com", desig:"Trainer"},
-  {id:32, name:"Prakhar Tiwari", city:"Gurugram / Faridabad", state:"Haryana", lang:"Hindi / English", zone:"North", email:"prakhar.tiwari@petpooja.com", desig:"Trainer"},
-  {id:33, name:"Prabuddha Sidharth Gaikwad", city:"Pune", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"prabuddha.gaikwad@petpooja.com", desig:"Trainer"},
-  {id:34, name:"Vikrant Joon", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"vikrant.joon@petpooja.com", desig:"Trainer"},
-  {id:35, name:"Kasbati Mohd Mosin", city:"Mumbai", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"mohd.kasbati@petpooja.com", desig:"Trainer"}
+  {id:1, name:"Jadav Parth Alkeshklumar", city:"Ahmedabad", state:"Gujarat", lang:"-", zone:"-", email:"parth.jadav@petpooja.com", desig:"North-West-central Regional Team Lead", lead:"-"},
+  {id:2, name:"Patel Karp Kamleshbhai", city:"Ahmedabad", state:"Gujarat", lang:"-", zone:"-", email:"karp.patel@petpooja.com", desig:"South-East Regional Team Lead", lead:"-"},
+  {id:3, name:"Noman Ahmed Khan", city:"Lucknow", state:"Uttar Pradesh", lang:"Hindi / English", zone:"North", email:"noman.khan@petpooja.com", desig:"North Zone Team Lead", lead:"Jadav Parth Alkeshklumar"},
+  {id:4, name:"Antareksh Chandrakant Kakariya", city:"Mumbai / Palghar", state:"Maharashtra", lang:"Hindi / English / Marathi / Gujarati", zone:"West", email:"antareksh.kakariya@petpooja.com", desig:"West Zone Team Lead", lead:"Patel Karp Kamleshbhai"},
+  {id:5, name:"Santhoshkumar R", city:"Chennai", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"santhosh.kumar@petpooja.com", desig:"Sr. Executive", lead:"Deepak Patel"},
+  {id:6, name:"Deepak Patel", city:"Bengaluru", state:"Karnataka", lang:"Hindi / English", zone:"South", email:"deepak.patel@petpooja.com", desig:"South Zone Team Lead", lead:"Patel Karp Kamleshbhai"},
+  {id:7, name:"Prabhu V", city:"Bengaluru", state:"Karnataka", lang:"Kannada / English", zone:"South", email:"prabhu.v@petpooja.com", desig:"Sr. Executive", lead:"Deepak Patel"},
+  {id:8, name:"Nihal KA", city:"Cochin / Ernakulam", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nihal.ka@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:9, name:"Sadikul Mallick", city:"Kolkata / Howrah", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"sadikul.mallick@petpooja.com", desig:"Sr. Executive", lead:"Jadav Parth Alkeshklumar"},
+  {id:10, name:"Arpit Dubey", city:"Indore / Ujjain / Dewas", state:"Madhya Pradesh", lang:"Hindi / English", zone:"Central", email:"arpit.dubey@petpooja.com", desig:"Sr. Executive", lead:"Jadav Parth Alkeshklumar"},
+  {id:11, name:"Dastagir Alam", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"dastagir.alam@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
+  {id:12, name:"Shahidali Shaban Shaikh", city:"Navi Mumbai / Thane", state:"Maharashtra", lang:"Hindi / English / Marathi", zone:"West", email:"shahidali.shaikh@petpooja.com", desig:"Sr. Executive", lead:"Antareksh Chandrakant Kakariya"},
+  {id:13, name:"Pillamarapu Raghu Ram", city:"Hyderabad / Secundarabad", state:"Telangana", lang:"English / Telugu", zone:"South", email:"raghu.pillamarapu@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:14, name:"Mudunuri Laxmi Sai Ramraju", city:"Hyderabad", state:"Telangana", lang:"Telugu / English", zone:"South", email:"laxmisai.mudunuri@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:15, name:"Vijay Kumar Mahto", city:"Kolkata", state:"West Bengal", lang:"Bengali / Hindi / English", zone:"East", email:"vijay.mahto@petpooja.com", desig:"Trainer", lead:"Sadikul Mallick"},
+  {id:16, name:"Vignesh", city:"Coimbatore", state:"Tamil Nadu", lang:"Tamil / English", zone:"South", email:"vignesh.tn@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:17, name:"Devendra Prasad", city:"Bhopal", state:"Madhya Pradesh", lang:"Hindi / English", zone:"Central", email:"devendra.prasad@petpooja.com", desig:"Trainer", lead:"Jadav Parth Alkeshklumar"},
+  {id:18, name:"Ankit Kumar Das", city:"Bhubaneswar / Cuttack / Puri", state:"Odisha", lang:"Odia / Hindi / English", zone:"East", email:"ankit.das@petpooja.com", desig:"Trainer", lead:"Sadikul Mallick"},
+  {id:19, name:"Abdul Rehman", city:"Noida / Ghaziabad / Greater Noida", state:"Uttar Pradesh", lang:"Hindi / English", zone:"North", email:"abdul.rehman@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
+  {id:20, name:"Mohammed Vasim", city:"Vijayawada", state:"Andhra Pradesh", lang:"Telugu / English / Hindi", zone:"South", email:"vasim.mohammed@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:21, name:"Neeraj S Kumar", city:"Thiruvananthapuram", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"neeraj.kumar1@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:22, name:"Gautam M", city:"Chandigarh / Mohali / Ambala", state:"Punjab", lang:"Punjabi / Hindi / English", zone:"North", email:"gautam.m@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
+  {id:23, name:"Vamja Aakash Pravin", city:"Surat / Bharuch", state:"Gujarat", lang:"Gujarati / Hindi / English", zone:"West", email:"aakash.vamja@petpooja.com", desig:"Trainer", lead:"Antareksh Chandrakant Kakariya"},
+  {id:24, name:"Shubhashish", city:"Jaipur", state:"Rajasthan", lang:"Hindi / English", zone:"North", email:"shubhashish.rai@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
+  {id:25, name:"Manoj Singh", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"manoj.singh@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
+  {id:26, name:"Sharath S", city:"Bengaluru", state:"Karnataka", lang:"Kannada / English", zone:"South", email:"sharath.s@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:27, name:"Keyur Hemant Kadu", city:"Mumbai", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"keyur.kadu@petpooja.com", desig:"Trainer", lead:"Antareksh Chandrakant Kakariya"},
+  {id:28, name:"Kunal P Arsekar", city:"North Goa", state:"Goa", lang:"Hindi / English", zone:"West", email:"kunal.arsekar@petpooja.com", desig:"Trainer", lead:"Antareksh Chandrakant Kakariya"},
+  {id:29, name:"Nibhun T", city:"Kozhikode (Calicut) / Malappuram", state:"Kerala", lang:"Malayalam / English", zone:"South", email:"nibhun.t@petpooja.com", desig:"Trainer", lead:"Deepak Patel"},
+  {id:30, name:"Krunal Manoharrao Mahulkar", city:"Nagpur / Wardha", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"krunal.mahulkar@petpooja.com", desig:"Trainer", lead:"Antareksh Chandrakant Kakariya"},
+  {id:31, name:"Aniket Ashok Shirfule", city:"Pune", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"aniket.shirfule@petpooja.com", desig:"Trainer", lead:"Antareksh Chandrakant Kakariya"},
+  {id:32, name:"Prakhar Tiwari", city:"Gurugram / Faridabad", state:"Haryana", lang:"Hindi / English", zone:"North", email:"prakhar.tiwari@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
+  {id:33, name:"Prabuddha Sidharth Gaikwad", city:"Pune", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"prabuddha.gaikwad@petpooja.com", desig:"Trainer", lead:"Antareksh Chandrakant Kakariya"},
+  {id:34, name:"Vikrant Joon", city:"Delhi", state:"Delhi", lang:"Hindi / English", zone:"North", email:"vikrant.joon@petpooja.com", desig:"Trainer", lead:"Noman Ahmed Khan"},
+  {id:35, name:"Kasbati Mohd Mosin", city:"Mumbai", state:"Maharashtra", lang:"Marathi / Hindi / English", zone:"West", email:"mohd.kasbati@petpooja.com", desig:"Trainer", lead:"Antareksh Chandrakant Kakariya"}
 ];
 var SC={"Done":"#3fb950","Close":"#f85149","Re-schedule":"#bc8cff","Not related to inventory/Done by someone":"#58a6ff","Tech concern":"#ffa657","Need other languge / Physical visit":"#39d353"};
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",city2:"",status:"",mode:"",lang:""};
@@ -902,6 +902,15 @@ function rTeam() {
     var wDays = trainerDates[t.name] ? trainerDates[t.name].size : 0;
     var npDays = Math.max(0, runningDays - wDays);
 
+    var leadCell = t.lead || "-";
+    // Only make the regional leads (Parth and Karp) clickable to send an email
+    if (leadCell === "Jadav Parth Alkeshklumar" || leadCell === "Patel Karp Kamleshbhai") {
+      var leadObj = TEAM_DATA.find(function(m) { return m.name === leadCell; });
+      if (leadObj) {
+        leadCell = "<a href='mailto:" + leadObj.email + "' style='color:var(--blue);text-decoration:none;'>" + leadCell + "</a>";
+      }
+    }
+
     var lt = lastTimes[t.name];
     var lastActiveStr = "-";
     if (lt) {
@@ -924,13 +933,14 @@ function rTeam() {
       "<td>" + t.zone + "</td>" +
       "<td><a href='mailto:" + t.email + "' style='color:var(--blue);text-decoration:none;'>" + t.email + "</a></td>" +
       "<td style='color:var(--text2);'>" + t.desig + "</td>" +
+      "<td>" + leadCell + "</td>" +
       "<td class='tc' style='color:var(--green);font-weight:700;'>" + (t.name === "Jadav Parth Alkeshklumar" || t.name === "Patel Karp Kamleshbhai" ? "-" : wDays) + "</td>" +
       "<td class='tc' style='color:var(--red);font-weight:700;'>" + (t.name === "Jadav Parth Alkeshklumar" || t.name === "Patel Karp Kamleshbhai" ? "-" : npDays) + "</td>" +
       "<td class='tc' style='color:var(--text2);font-size:11px;'>" + lastActiveStr + "</td>" +
       "<td class='tc'>" + statusBadge + "</td>" +
       "</tr>"
     );
-  }).join("") || '<tr><td colspan="12" class="empty">No team members found</td></tr>';
+  }).join("") || '<tr><td colspan="13" class="empty">No team members found</td></tr>';
 }
 
 function exportLeaderboard(){
