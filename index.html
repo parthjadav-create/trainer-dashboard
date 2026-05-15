@@ -338,7 +338,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="nav" onclick="showTab('trainers')"><span class="nav-ic">👥</span><span>Trainers</span></div>
   <div class="nav" onclick="showTab('virtual')"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
   <div class="nav" onclick="showTab('cities')"><span class="nav-ic">🏙️</span><span>Cities</span></div>
-  <div class="nav" onclick="showTab('ofs')"><span class="nav-ic">🚗</span><span>OFS Performance</span></div>
+  <div class="nav" onclick="showTab('ofs')"><span class="nav-ic">🚗</span><span>Out of Station Visits</span></div>
   <div class="nav" onclick="showTab('weekly')"><span class="nav-ic">📅</span><span>KPI of the Week</span></div>
   <div class="sb-sec">Reports</div>
   <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
@@ -390,7 +390,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="tab" id="tab-trainers" onclick="showTab('trainers')">Trainer Details</div>
     <div class="tab" id="tab-virtual" onclick="showTab('virtual')">Virtual Calls</div>
     <div class="tab" id="tab-cities" onclick="showTab('cities')">Cities</div>
-    <div class="tab" id="tab-ofs" onclick="showTab('ofs')">🚗 OFS Performance</div>
+    <div class="tab" id="tab-ofs" onclick="showTab('ofs')">🚗 Out of Station Visits</div>
     <div class="tab" id="tab-weekly" onclick="showTab('weekly')">KPI of the Week</div>
     <div class="tab" id="tab-matrix" onclick="showTab('matrix')">Mode Matrix</div>
     <div class="tab" id="tab-team" onclick="showTab('team')" style="display:none;">Team Info</div>
@@ -507,13 +507,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="ofs-note">
         <div class="ofs-note-icon">ℹ️</div>
         <div class="ofs-note-body">
-          <div class="ofs-note-title">Out of Station (OFS) Visit — Counting Rules</div>
+          <div class="ofs-note-title">Out of Station Visit — Counting Rules</div>
           <div class="ofs-note-list">
             <div class="ofs-note-item">An <strong>Out of Station Visit</strong> is counted when a trainer travels to a city different from their base city (city on record).</div>
             <div class="ofs-note-item">The round-trip distance must be <strong>more than 100 km</strong> to qualify as an Out of Station visit.</div>
-            <div class="ofs-note-item">Each OFS visit with status <strong>"Done"</strong> is credited as <strong>2 visits</strong> toward the trainer's daily done count (to account for travel effort).</div>
-            <div class="ofs-note-item">The <strong>Target</strong> in this view is set at <strong>3.0 visits per working day</strong> (adjusted for OFS credit).</div>
-            <div class="ofs-note-item">The <strong>OFS Done</strong> column shows raw count of Out of Station visits completed. The <strong>Effective Done</strong> column reflects the count after the 2× OFS credit is applied.</div>
+            <div class="ofs-note-item">Each Out of Station visit with status <strong>"Done"</strong> is credited as <strong>2 visits</strong> toward the trainer's daily done count (to account for travel effort).</div>
+            <div class="ofs-note-item">The <strong>Target</strong> in this view is set at <strong>3.0 visits per working day</strong> (adjusted for Out of Station credit).</div>
+            <div class="ofs-note-item">The <strong>Out of Station Done</strong> column shows raw count of Out of Station visits completed. The <strong>Effective Done</strong> column reflects the count after the 2× Out of Station credit is applied.</div>
           </div>
         </div>
       </div>
@@ -524,7 +524,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <!-- Main table -->
       <div class="card">
         <div class="ch">
-          <div class="ct"><div class="ci" style="background:var(--orange2);">🚗</div>OFS Performance — Top Performers (Target: 3.0/day)</div>
+          <div class="ct"><div class="ci" style="background:var(--orange2);">🚗</div>Out of Station Visits — Top Performers (Target: 3.0/day)</div>
           <div style="display:flex;align-items:center;gap:8px;">
             <button class="export-btn" onclick="exportOFS()">⬇ Export Excel</button>
           </div>
@@ -537,8 +537,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
                 <th>Trainer</th>
                 <th class="tc">Total Tickets</th>
                 <th class="tc">Raw Done</th>
-                <th class="tc">OFS Visits</th>
-                <th class="tc">OFS Done</th>
+                <th class="tc">Out of Station Visits</th>
+                <th class="tc">Out of Station Done</th>
                 <th class="tc">Effective Done<br><span style="font-size:9px;font-weight:400;color:var(--text2);">(OFS×2 credited)</span></th>
                 <th class="tc">Working Days</th>
                 <th class="tc">Target<br><span style="font-size:9px;font-weight:400;color:var(--text2);">(3.0/day)</span></th>
@@ -949,8 +949,8 @@ function rOFS(){
   var metTarget=arr.filter(function(t){return t.effDone>=t.target;}).length;
   document.getElementById("ofs-kpi").innerHTML=[
     {l:"Active Trainers",v:totTrainers,c:"#bc8cff"},
-    {l:"Total OFS Visits",v:totOFS,c:"#ffa657"},
-    {l:"OFS Done",v:totOFSDone,c:"#3fb950"},
+    {l:"Total Out of Station Visits",v:totOFS,c:"#ffa657"},
+    {l:"Out of Station Done",v:totOFSDone,c:"#3fb950"},
     {l:"Target Met (3/day)",v:metTarget,c:"#58a6ff"}
   ].map(function(k){return '<div class="virt-stat"><div class="v" style="color:'+k.c+';">'+k.v+'</div><div class="l">'+k.l+'</div></div>';}).join("");
 
