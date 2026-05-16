@@ -176,6 +176,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .view.on{display:flex;flex-direction:column;gap:16px;}
 
 .kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:12px;}
 .kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
 .kpi-ic{font-size:18px;line-height:1;}
 .kpi-v{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;line-height:1;margin-bottom:3px;}
@@ -321,6 +322,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .alert-w{background:rgba(255,166,87,0.1);border:1px solid rgba(255,166,87,0.3);color:var(--orange);}
 
 @media(max-width:1400px){.kpi-grid{grid-template-columns:repeat(4,1fr);}.g3{grid-template-columns:1fr 1fr;}}
+@media(max-width:1400px){.g3{grid-template-columns:1fr 1fr;}}
 @media(max-width:1100px){
   .sidebar{width:220px;}
   .sidebar.collapsed{width:0;}
@@ -679,6 +681,38 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         </div>
 
         <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">📊</div>KPI Visibility</div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Total Tickets</label>
+            <input type="checkbox" id="set-kpi-total" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Done</label>
+            <input type="checkbox" id="set-kpi-done" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Closed</label>
+            <input type="checkbox" id="set-kpi-closed" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Re-scheduled</label>
+            <input type="checkbox" id="set-kpi-resch" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Not Related</label>
+            <input type="checkbox" id="set-kpi-notrel" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Virtual Calls</label>
+            <input type="checkbox" id="set-kpi-virt" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Active Trainers</label>
+            <input type="checkbox" id="set-kpi-active" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+        </div>
+
+        <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🎨</div>Visual Theme</div>
           <div class="settings-group">
             <label>Interface Theme</label>
@@ -959,8 +993,21 @@ function rKPI(){
     {l:"Not Related",v:notrel,p:pct(notrel,tot),dc:"#ffa657",ic:"🔁",fill:pn(notrel,tot),bd:"badge-o"},
     {l:"Virtual Calls",v:virt,p:pct(virt,tot),dc:"#58a6ff",ic:"💻",fill:pn(virt,tot),bd:"badge-b"},
     {l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"},
+    {id:'total', l:"Total Tickets",v:tot,p:"100%",dc:"#8b949e",ic:"🎫",fill:100,bd:"badge-n"},
+    {id:'done', l:"Done",v:done,p:dr+"%",dc:"#3fb950",ic:"✅",fill:pn(done,tot),bd:"badge-g"},
+    {id:'closed', l:"Closed",v:close,p:pct(close,tot),dc:"#f85149",ic:"❌",fill:pn(close,tot),bd:"badge-r"},
+    {id:'resch', l:"Re-scheduled",v:resch,p:pct(resch,tot),dc:"#bc8cff",ic:"🔄",fill:pn(resch,tot),bd:"badge-p"},
+    {id:'notrel', l:"Not Related",v:notrel,p:pct(notrel,tot),dc:"#ffa657",ic:"🔁",fill:pn(notrel,tot),bd:"badge-o"},
+    {id:'virt', l:"Virtual Calls",v:virt,p:pct(virt,tot),dc:"#58a6ff",ic:"💻",fill:pn(virt,tot),bd:"badge-b"},
+    {id:'active', l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"},
   ];
   document.getElementById("kpi-grid").innerHTML=kpis.map(function(k){
+  
+  var activeKpis = kpis.filter(function(k){
+    return localStorage.getItem('kpi_' + k.id) !== 'false';
+  });
+
+  document.getElementById("kpi-grid").innerHTML=activeKpis.map(function(k){
     return '<div class="kpi"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';
   }).join("");
 }
@@ -1156,6 +1203,10 @@ function initSettings() {
   document.getElementById('set-show-matrix').checked = localStorage.getItem('show_matrix') !== 'false';
   applyTabVisibility();
 
+  ['total', 'done', 'closed', 'resch', 'notrel', 'virt', 'active'].forEach(k => {
+    document.getElementById('set-kpi-' + k).checked = localStorage.getItem('kpi_' + k) !== 'false';
+  });
+
   var interval = localStorage.getItem('sync_interval') || "60000";
   document.getElementById('set-sync-interval').value = interval;
   var theme = localStorage.getItem('theme') || "default";
@@ -1195,6 +1246,9 @@ function saveSettings() {
   localStorage.setItem('show_ofs', document.getElementById('set-show-ofs').checked);
   localStorage.setItem('show_weekly', document.getElementById('set-show-weekly').checked);
   localStorage.setItem('show_matrix', document.getElementById('set-show-matrix').checked);
+  ['total', 'done', 'closed', 'resch', 'notrel', 'virt', 'active'].forEach(k => {
+    localStorage.setItem('kpi_' + k, document.getElementById('set-kpi-' + k).checked);
+  });
   localStorage.setItem('sync_interval', interval);
   localStorage.setItem('theme', theme);
   localStorage.setItem('accent_green', green);
