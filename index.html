@@ -288,6 +288,18 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .ofs-note-item::before{content:'›';color:var(--blue);font-weight:700;flex-shrink:0;margin-top:1px;}
 .ofs-note-item strong{color:var(--orange);font-weight:700;}
 
+/* ── SETTINGS STYLES ── */
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:20px;}
+.settings-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.settings-group{margin-bottom:15px;display:flex;flex-direction:column;gap:8px;}
+.settings-group label{font-size:12px;font-weight:600;color:var(--text3);}
+.settings-group input, .settings-group select{
+  background:var(--card3);border:1px solid var(--border);color:var(--text);
+  padding:8px 12px;border-radius:6px;outline:none;font-family:inherit;
+}
+.settings-group input:focus{border-color:var(--red);}
+.settings-info{font-size:11px;color:var(--text2);line-height:1.4;}
+
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
 .loader-logo{width:180px;height:auto;filter:brightness(0) invert(1);animation:loader-pulse 1.5s ease-in-out infinite;}
 @keyframes loader-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(.97);}}
@@ -342,7 +354,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="nav" onclick="showTab('weekly')"><span class="nav-ic">📅</span><span>KPI of the Week</span></div>
   <div class="sb-sec">Reports</div>
   <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
-  <div class="nav"><span class="nav-ic">⚙️</span><span>Settings</span></div>
+  <div class="nav" onclick="showTab('settings')"><span class="nav-ic">⚙️</span><span>Settings</span></div>
   <div class="sb-bot">
     <div class="u-card" onclick="showTab('team')" style="cursor:pointer;">
       <div class="u-av">A</div>
@@ -393,6 +405,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="tab" id="tab-ofs" onclick="showTab('ofs')">🚗 Out of Station Visits</div>
     <div class="tab" id="tab-weekly" onclick="showTab('weekly')">KPI of the Week</div>
     <div class="tab" id="tab-matrix" onclick="showTab('matrix')">Mode Matrix</div>
+    <div class="tab" id="tab-settings" onclick="showTab('settings')">Settings</div>
     <div class="tab" id="tab-team" onclick="showTab('team')" style="display:none;">Team Info</div>
   </div>
 
@@ -581,6 +594,46 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
     </div>
 
+    <!-- SETTINGS -->
+    <div class="view" id="view-settings">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">🎯</div>Performance Targets</div>
+          <div class="settings-group">
+            <label>Standard Daily Target (Visits)</label>
+            <input type="number" id="set-target-std" step="0.1" value="2.5" onchange="saveSettings()">
+            <div class="settings-info">The minimum visits expected per working day for standard physical/virtual calls.</div>
+          </div>
+          <div class="settings-group">
+            <label>Out of Station Daily Target (Visits)</label>
+            <input type="number" id="set-target-ofs" step="0.1" value="3.0" onchange="saveSettings()">
+            <div class="settings-info">The target specifically applied to the Out of Station performance view.</div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔄</div>Data Synchronization</div>
+          <div class="settings-group">
+            <label>Auto-Refresh Interval</label>
+            <select id="set-sync-interval" onchange="saveSettings()">
+              <option value="0">Manual Only</option>
+              <option value="60000">Every 1 Minute</option>
+              <option value="300000">Every 5 Minutes</option>
+              <option value="600000">Every 10 Minutes</option>
+            </select>
+            <div class="settings-info">Determines how often the dashboard pulls fresh data from the Google Sheet.</div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">💾</div>Browser Storage</div>
+          <div class="settings-group">
+            <button class="rs-btn" style="width:100%; border-color:var(--red); color:var(--red);" onclick="resetToDefaults()">Reset to Default Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- MATRIX -->
     <div class="view" id="view-matrix">
       <div class="card">
@@ -626,8 +679,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 
 <script>
 var API="https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d9YbiYeJgkBmcigxAMCN7_B64Z8264K04bVzSZg/exec";
-var TARGET_PER_DAY=2.5;
-var OFS_TARGET_PER_DAY=3.0;
+var TARGET_PER_DAY=parseFloat(localStorage.getItem('target_std')) || 2.5;
+var OFS_TARGET_PER_DAY=parseFloat(localStorage.getItem('target_ofs')) || 3.0;
+var syncTimer=null;
 var MODES=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
 var COLORS=["#3fb950","#58a6ff","#bc8cff","#ffa657","#f85149","#39d353","#e3b341","#79c0ff","#d2a8ff","#ffb628"];
 var TEAM_DATA = [
@@ -988,6 +1042,41 @@ function rOFS(){
     +"</tr>";
 }
 
+function initSettings() {
+  document.getElementById('set-target-std').value = TARGET_PER_DAY;
+  document.getElementById('set-target-ofs').value = OFS_TARGET_PER_DAY;
+  var interval = localStorage.getItem('sync_interval') || "60000";
+  document.getElementById('set-sync-interval').value = interval;
+  startSync(parseInt(interval));
+}
+
+function saveSettings() {
+  TARGET_PER_DAY = parseFloat(document.getElementById('set-target-std').value) || 2.5;
+  OFS_TARGET_PER_DAY = parseFloat(document.getElementById('set-target-ofs').value) || 3.0;
+  var interval = document.getElementById('set-sync-interval').value;
+
+  localStorage.setItem('target_std', TARGET_PER_DAY);
+  localStorage.setItem('target_ofs', OFS_TARGET_PER_DAY);
+  localStorage.setItem('sync_interval', interval);
+
+  startSync(parseInt(interval));
+  render(); // Refresh all views with new targets
+}
+
+function startSync(ms) {
+  if(syncTimer) clearInterval(syncTimer);
+  if(ms > 0) syncTimer = setInterval(loadData, ms);
+}
+
+function resetToDefaults() {
+  localStorage.clear();
+  TARGET_PER_DAY = 2.5;
+  OFS_TARGET_PER_DAY = 3.0;
+  initSettings();
+  render();
+  alert("Settings reset to defaults.");
+}
+
 function exportOFS(){
   if(!currentOFSData||currentOFSData.length===0){alert("No OFS data to export.");return;}
   var wsData=[["#","Trainer Name","Total Tickets","Raw Done","OFS Visits","OFS Done","Effective Done (OFS×2)","Working Days","Target (3.0/day)","Eff. Avg/Day","Status"]];
@@ -1274,11 +1363,11 @@ window.addEventListener("DOMContentLoaded",function(){
   document.getElementById("f-from").value=y+"-"+mo+"-01";
   document.getElementById("f-to").value=y+"-"+mo+"-"+d;
   populateTeamLeadFilter();
+  initSettings();
   loadData().then(function(){
     document.getElementById("loader").style.display="none";
     document.getElementById("content").style.display="flex";
     document.getElementById("content").style.flexDirection="column";
-    setInterval(loadData,60000);
   }).catch(function(){
     document.getElementById("loader").style.display="none";
     document.getElementById("content").style.display="flex";
