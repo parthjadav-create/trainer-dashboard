@@ -256,9 +256,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .search-icon{position:absolute;left:10px;color:var(--text2);font-size:12px;}
 .empty{text-align:center;padding:30px;color:var(--text2);font-size:12px;}
 
-.tgt-hit{color:#3fb950;font-weight:700;}
-.tgt-miss{color:#f85149;font-weight:700;}
-.tgt-close{color:#ffa657;font-weight:700;}
+.tgt-hit{color:var(--green);font-weight:700;}
+.tgt-miss{color:var(--red);font-weight:700;}
+.tgt-close{color:var(--orange);font-weight:700;}
 
 .export-btn{
   display:inline-flex;align-items:center;gap:6px;
@@ -632,6 +632,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <option value="light">Light Mode</option>
             </select>
             <div class="settings-info">Choose a color scheme that suits your workspace environment.</div>
+          </div>
+          <div class="settings-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div>
+              <label>Success Accent</label>
+              <input type="color" id="set-color-green" onchange="saveSettings()" style="height:32px; width:100%; border:none; padding:0; background:none; cursor:pointer;">
+            </div>
+            <div>
+              <label>Danger Accent</label>
+              <input type="color" id="set-color-red" onchange="saveSettings()" style="height:32px; width:100%; border:none; padding:0; background:none; cursor:pointer;">
+            </div>
           </div>
         </div>
 
@@ -1073,7 +1083,12 @@ function initSettings() {
   document.getElementById('set-sync-interval').value = interval;
   var theme = localStorage.getItem('theme') || "default";
   document.getElementById('set-theme').value = theme;
+  var g = localStorage.getItem('accent_green') || "#3fb950";
+  var r = localStorage.getItem('accent_red') || "#f85149";
+  document.getElementById('set-color-green').value = g;
+  document.getElementById('set-color-red').value = r;
   applyTheme(theme);
+  applyAccents(g, r);
   startSync(parseInt(interval));
 }
 
@@ -1082,13 +1097,18 @@ function saveSettings() {
   OFS_TARGET_PER_DAY = parseFloat(document.getElementById('set-target-ofs').value) || 3.0;
   var interval = document.getElementById('set-sync-interval').value;
   var theme = document.getElementById('set-theme').value;
+  var green = document.getElementById('set-color-green').value;
+  var red = document.getElementById('set-color-red').value;
 
   localStorage.setItem('target_std', TARGET_PER_DAY);
   localStorage.setItem('target_ofs', OFS_TARGET_PER_DAY);
   localStorage.setItem('sync_interval', interval);
   localStorage.setItem('theme', theme);
+  localStorage.setItem('accent_green', green);
+  localStorage.setItem('accent_red', red);
 
   applyTheme(theme);
+  applyAccents(green, red);
   startSync(parseInt(interval));
   render(); // Refresh all views with new targets
 }
@@ -1096,6 +1116,24 @@ function saveSettings() {
 function applyTheme(theme) {
   if(theme === 'default') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', theme);
+}
+
+function applyAccents(g, r) {
+  var root = document.documentElement;
+  root.style.setProperty('--green', g);
+  root.style.setProperty('--red', r);
+  if(typeof SC !== 'undefined'){ SC["Done"] = g; SC["Close"] = r; }
+  if(typeof COLORS !== 'undefined'){ COLORS[0] = g; COLORS[4] = r; }
+  var hex2rgb = function(hex) {
+    var c = hex.substring(1);
+    var rgb = parseInt(c, 16);
+    var rVal = (rgb >> 16) & 0xff;
+    var gVal = (rgb >> 8) & 0xff;
+    var bVal = (rgb >> 0) & 0xff;
+    return rVal + "," + gVal + "," + bVal;
+  };
+  root.style.setProperty('--green3', 'rgba(' + hex2rgb(g) + ',0.1)');
+  root.style.setProperty('--red2', 'rgba(' + hex2rgb(r) + ',0.1)');
 }
 
 function startSync(ms) {
@@ -1108,6 +1146,7 @@ function resetToDefaults() {
   TARGET_PER_DAY = 2.5;
   OFS_TARGET_PER_DAY = 3.0;
   applyTheme('default');
+  applyAccents("#3fb950", "#f85149");
   initSettings();
   render();
   alert("Settings reset to defaults.");
