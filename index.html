@@ -366,9 +366,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
   <div class="nav" onclick="showTab('settings')"><span class="nav-ic">⚙️</span><span>Settings</span></div>
   <div class="sb-bot">
-    <div class="u-card" onclick="showTab('team')" style="cursor:pointer;">
+    <div class="u-card" onclick="showTab('team')" style="cursor:pointer;" id="user-profile-card">
       <div class="u-av">A</div>
-      <div><div class="u-nm">Peoples Behind the Vision</div><div class="u-rl">Team Information</div></div>
+      <div><div class="u-nm" id="side-user-name">Admin</div><div class="u-rl" id="side-user-role">Manager</div></div>
     </div>
   </div>
 </aside>
@@ -378,8 +378,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="topbar-left">
       <button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
       <div>
-        <div class="pg-title">OnSite OpsVision Dashboard</div>
-        <div class="pg-sub">Petpooja · Trainer Productivity & Performance Tracker</div>
+        <div class="pg-title" id="top-dash-title">OnSite OpsVision Dashboard</div>
+        <div class="pg-sub" id="top-dash-sub">Petpooja · Trainer Productivity & Performance Tracker</div>
       </div>
     </div>
     <div class="tb-right">
@@ -608,6 +608,39 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="view" id="view-settings">
       <div class="settings-grid">
         <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔗</div>Source Data</div>
+          <div class="settings-group">
+            <label>Google Apps Script API URL</label>
+            <input type="text" id="set-api-url" placeholder="https://script.google.com/macros/s/..." onchange="saveSettings()">
+            <div class="settings-info">The endpoint URL for your Google Sheet data. Changing this will trigger a reload.</div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🏢</div>Dashboard Identity</div>
+          <div class="settings-group">
+            <label>Main Title</label>
+            <input type="text" id="set-dash-title" placeholder="OnSite OpsVision Dashboard" onchange="saveSettings()">
+          </div>
+          <div class="settings-group">
+            <label>Sub-title / Description</label>
+            <input type="text" id="set-dash-sub" placeholder="Petpooja · Trainer Productivity..." onchange="saveSettings()">
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--green3);">👤</div>User Profile</div>
+          <div class="settings-group">
+            <label>Display Name</label>
+            <input type="text" id="set-user-name" placeholder="Admin" onchange="saveSettings()">
+          </div>
+          <div class="settings-group">
+            <label>Designation / Role</label>
+            <input type="text" id="set-user-role" placeholder="Manager" onchange="saveSettings()">
+          </div>
+        </div>
+
+        <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">🎯</div>Performance Targets</div>
           <div class="settings-group">
             <label>Standard Daily Target (Visits)</label>
@@ -712,7 +745,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 </div>
 
 <script>
-var API="https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d9YbiYeJgkBmcigxAMCN7_B64Z8264K04bVzSZg/exec";
+var DEFAULT_API="https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d9YbiYeJgkBmcigxAMCN7_B64Z8264K04bVzSZg/exec";
+var API=localStorage.getItem('api_url') || DEFAULT_API;
 var TARGET_PER_DAY=parseFloat(localStorage.getItem('target_std')) || 2.5;
 var OFS_TARGET_PER_DAY=parseFloat(localStorage.getItem('target_ofs')) || 3.0;
 var syncTimer=null;
@@ -1079,6 +1113,18 @@ function rOFS(){
 function initSettings() {
   document.getElementById('set-target-std').value = TARGET_PER_DAY;
   document.getElementById('set-target-ofs').value = OFS_TARGET_PER_DAY;
+  document.getElementById('set-api-url').value = API;
+  
+  var dTitle = localStorage.getItem('dash_title') || "OnSite OpsVision Dashboard";
+  var dSub = localStorage.getItem('dash_sub') || "Petpooja · Trainer Productivity & Performance Tracker";
+  var uName = localStorage.getItem('user_name') || "Admin";
+  var uRole = localStorage.getItem('user_role') || "Manager";
+
+  document.getElementById('set-dash-title').value = dTitle;
+  document.getElementById('set-dash-sub').value = dSub;
+  document.getElementById('set-user-name').value = uName;
+  document.getElementById('set-user-role').value = uRole;
+
   var interval = localStorage.getItem('sync_interval') || "60000";
   document.getElementById('set-sync-interval').value = interval;
   var theme = localStorage.getItem('theme') || "default";
@@ -1095,6 +1141,12 @@ function initSettings() {
 function saveSettings() {
   TARGET_PER_DAY = parseFloat(document.getElementById('set-target-std').value) || 2.5;
   OFS_TARGET_PER_DAY = parseFloat(document.getElementById('set-target-ofs').value) || 3.0;
+  var newApi = document.getElementById('set-api-url').value || DEFAULT_API;
+  var dTitle = document.getElementById('set-dash-title').value || "OnSite OpsVision Dashboard";
+  var dSub = document.getElementById('set-dash-sub').value || "Petpooja · Trainer Productivity & Performance Tracker";
+  var uName = document.getElementById('set-user-name').value || "Admin";
+  var uRole = document.getElementById('set-user-role').value || "Manager";
+
   var interval = document.getElementById('set-sync-interval').value;
   var theme = document.getElementById('set-theme').value;
   var green = document.getElementById('set-color-green').value;
@@ -1102,10 +1154,26 @@ function saveSettings() {
 
   localStorage.setItem('target_std', TARGET_PER_DAY);
   localStorage.setItem('target_ofs', OFS_TARGET_PER_DAY);
+  localStorage.setItem('api_url', newApi);
+  localStorage.setItem('dash_title', dTitle);
+  localStorage.setItem('dash_sub', dSub);
+  localStorage.setItem('user_name', uName);
+  localStorage.setItem('user_role', uRole);
   localStorage.setItem('sync_interval', interval);
   localStorage.setItem('theme', theme);
   localStorage.setItem('accent_green', green);
   localStorage.setItem('accent_red', red);
+
+  // Apply dynamic labels
+  document.getElementById('top-dash-title').textContent = dTitle;
+  document.getElementById('top-dash-sub').textContent = dSub;
+  document.getElementById('side-user-name').textContent = uName;
+  document.getElementById('side-user-role').textContent = uRole;
+
+  if(API !== newApi) {
+    API = newApi;
+    loadData();
+  }
 
   applyTheme(theme);
   applyAccents(green, red);
