@@ -358,12 +358,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="sb-sec">Menu</div>
   <div class="nav on" onclick="showTab('overview')"><span class="nav-ic">📊</span><span>Overview</span><span class="nav-bd g" id="total-bd">–</span></div>
   <div class="nav" onclick="showTab('trainers')"><span class="nav-ic">👥</span><span>Trainers</span></div>
-  <div class="nav" onclick="showTab('virtual')"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
-  <div class="nav" onclick="showTab('cities')"><span class="nav-ic">🏙️</span><span>Cities</span></div>
-  <div class="nav" onclick="showTab('ofs')"><span class="nav-ic">🚗</span><span>Out of Station Visits</span></div>
-  <div class="nav" onclick="showTab('weekly')"><span class="nav-ic">📅</span><span>KPI of the Week</span></div>
+  <div class="nav" onclick="showTab('virtual')" id="sb-nav-virtual"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
+  <div class="nav" onclick="showTab('cities')" id="sb-nav-cities"><span class="nav-ic">🏙️</span><span>Cities</span></div>
+  <div class="nav" onclick="showTab('ofs')" id="sb-nav-ofs"><span class="nav-ic">🚗</span><span>Out of Station Visits</span></div>
+  <div class="nav" onclick="showTab('weekly')" id="sb-nav-weekly"><span class="nav-ic">📅</span><span>KPI of the Week</span></div>
   <div class="sb-sec">Reports</div>
-  <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
+  <div class="nav" onclick="showTab('matrix')" id="sb-nav-matrix"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
   <div class="nav" onclick="showTab('settings')"><span class="nav-ic">⚙️</span><span>Settings</span></div>
   <div class="sb-bot">
     <div class="u-card" onclick="showTab('team')" style="cursor:pointer;" id="user-profile-card">
@@ -651,6 +651,30 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             <label>Out of Station Daily Target (Visits)</label>
             <input type="number" id="set-target-ofs" step="0.1" value="3.0" onchange="saveSettings()">
             <div class="settings-info">The target specifically applied to the Out of Station performance view.</div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">👁️</div>Tab Visibility</div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Virtual Calls</label>
+            <input type="checkbox" id="set-show-virtual" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Cities</label>
+            <input type="checkbox" id="set-show-cities" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Out of Station Visits</label>
+            <input type="checkbox" id="set-show-ofs" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>KPI of the Week</label>
+            <input type="checkbox" id="set-show-weekly" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Mode Matrix</label>
+            <input type="checkbox" id="set-show-matrix" checked onchange="saveSettings()" style="width:auto;">
           </div>
         </div>
 
@@ -1125,6 +1149,13 @@ function initSettings() {
   document.getElementById('set-user-name').value = uName;
   document.getElementById('set-user-role').value = uRole;
 
+  document.getElementById('set-show-virtual').checked = localStorage.getItem('show_virtual') !== 'false';
+  document.getElementById('set-show-cities').checked = localStorage.getItem('show_cities') !== 'false';
+  document.getElementById('set-show-ofs').checked = localStorage.getItem('show_ofs') !== 'false';
+  document.getElementById('set-show-weekly').checked = localStorage.getItem('show_weekly') !== 'false';
+  document.getElementById('set-show-matrix').checked = localStorage.getItem('show_matrix') !== 'false';
+  applyTabVisibility();
+
   var interval = localStorage.getItem('sync_interval') || "60000";
   document.getElementById('set-sync-interval').value = interval;
   var theme = localStorage.getItem('theme') || "default";
@@ -1159,6 +1190,11 @@ function saveSettings() {
   localStorage.setItem('dash_sub', dSub);
   localStorage.setItem('user_name', uName);
   localStorage.setItem('user_role', uRole);
+  localStorage.setItem('show_virtual', document.getElementById('set-show-virtual').checked);
+  localStorage.setItem('show_cities', document.getElementById('set-show-cities').checked);
+  localStorage.setItem('show_ofs', document.getElementById('set-show-ofs').checked);
+  localStorage.setItem('show_weekly', document.getElementById('set-show-weekly').checked);
+  localStorage.setItem('show_matrix', document.getElementById('set-show-matrix').checked);
   localStorage.setItem('sync_interval', interval);
   localStorage.setItem('theme', theme);
   localStorage.setItem('accent_green', green);
@@ -1177,8 +1213,23 @@ function saveSettings() {
 
   applyTheme(theme);
   applyAccents(green, red);
+  applyTabVisibility();
   startSync(parseInt(interval));
   render(); // Refresh all views with new targets
+}
+
+function applyTabVisibility() {
+  const tabs = ['virtual', 'cities', 'ofs', 'weekly', 'matrix'];
+  let currentTabHidden = false;
+  tabs.forEach(t => {
+    const show = localStorage.getItem('show_' + t) !== 'false';
+    const sbEl = document.getElementById('sb-nav-' + t);
+    const topEl = document.getElementById('tab-' + t);
+    if (sbEl) sbEl.style.display = show ? 'flex' : 'none';
+    if (topEl) topEl.style.display = show ? 'block' : 'none';
+    if (curTab === t && !show) currentTabHidden = true;
+  });
+  if (currentTabHidden) showTab('overview');
 }
 
 function applyTheme(theme) {
