@@ -878,13 +878,13 @@ function toggleSidebar(){
 
 function showTab(t){
   curTab=t;
-  ["overview","trainers","virtual","cities","ofs","weekly","matrix","team"].forEach(function(n){
+  ["overview","trainers","virtual","cities","ofs","weekly","matrix","team","settings"].forEach(function(n){
     document.getElementById("view-"+n).classList.toggle("on",n===t);
     var tab=document.getElementById("tab-"+n);
     if(tab)tab.classList.toggle("on",n===t);
   });
   document.querySelectorAll(".nav").forEach(function(el){el.classList.remove("on");});
-  var nm={overview:0,trainers:1,virtual:2,cities:3,ofs:4,weekly:5,matrix:6,team:99};
+  var nm={overview:0,trainers:1,virtual:2,cities:3,ofs:4,weekly:5,matrix:6,settings:7,team:99};
   var navs=document.querySelectorAll(".nav");
   if(navs[nm[t]])navs[nm[t]].classList.add("on");
 }
