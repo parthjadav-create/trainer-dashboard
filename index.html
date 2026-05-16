@@ -300,6 +300,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .settings-group input:focus{border-color:var(--red);}
 .settings-info{font-size:11px;color:var(--text2);line-height:1.4;}
 
+/* ── THEMES ── */
+[data-theme='midnight']{--bg:#0b0e14;--bg2:#151b23;--bg3:#1c242f;--card:#151b23;--card2:#1c242f;--card3:#26303d;--border:#303c4a;--border2:#445363;}
+[data-theme='emerald']{--bg:#09120e;--bg2:#111e17;--bg3:#1a2b21;--card:#111e17;--card2:#1a2b21;--card3:#243a2f;--border:#2f4a3e;--border2:#426152;--green:#51f883;}
+[data-theme='light']{--bg:#f4f7f9;--bg2:#ffffff;--bg3:#ffffff;--card:#ffffff;--card2:#f0f3f6;--card3:#e5e9ef;--border:#d1d9e0;--border2:#afb8c1;--text:#1f2328;--text2:#656d76;--text3:#1f2328;}
+[data-theme='light'] .watermark img{filter: brightness(0) opacity(0.05);}
+[data-theme='light'] .loader-logo, [data-theme='light'] .sb-logo img{filter: brightness(0);}
+[data-theme='light'] .card, [data-theme='light'] .kpi {background:var(--bg2); border: 1px solid var(--border);}
+[data-theme='light'] .tbl th {background:#f6f8fa;}
+[data-theme='light'] .nav:hover {background:rgba(0,0,0,0.04);}
+
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
 .loader-logo{width:180px;height:auto;filter:brightness(0) invert(1);animation:loader-pulse 1.5s ease-in-out infinite;}
 @keyframes loader-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(.97);}}
@@ -608,6 +618,20 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             <label>Out of Station Daily Target (Visits)</label>
             <input type="number" id="set-target-ofs" step="0.1" value="3.0" onchange="saveSettings()">
             <div class="settings-info">The target specifically applied to the Out of Station performance view.</div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🎨</div>Visual Theme</div>
+          <div class="settings-group">
+            <label>Interface Theme</label>
+            <select id="set-theme" onchange="saveSettings()">
+              <option value="default">GitHub Dark (Default)</option>
+              <option value="midnight">Midnight Blue</option>
+              <option value="emerald">Emerald Forest</option>
+              <option value="light">Light Mode</option>
+            </select>
+            <div class="settings-info">Choose a color scheme that suits your workspace environment.</div>
           </div>
         </div>
 
@@ -1047,6 +1071,9 @@ function initSettings() {
   document.getElementById('set-target-ofs').value = OFS_TARGET_PER_DAY;
   var interval = localStorage.getItem('sync_interval') || "60000";
   document.getElementById('set-sync-interval').value = interval;
+  var theme = localStorage.getItem('theme') || "default";
+  document.getElementById('set-theme').value = theme;
+  applyTheme(theme);
   startSync(parseInt(interval));
 }
 
@@ -1054,13 +1081,21 @@ function saveSettings() {
   TARGET_PER_DAY = parseFloat(document.getElementById('set-target-std').value) || 2.5;
   OFS_TARGET_PER_DAY = parseFloat(document.getElementById('set-target-ofs').value) || 3.0;
   var interval = document.getElementById('set-sync-interval').value;
+  var theme = document.getElementById('set-theme').value;
 
   localStorage.setItem('target_std', TARGET_PER_DAY);
   localStorage.setItem('target_ofs', OFS_TARGET_PER_DAY);
   localStorage.setItem('sync_interval', interval);
+  localStorage.setItem('theme', theme);
 
+  applyTheme(theme);
   startSync(parseInt(interval));
   render(); // Refresh all views with new targets
+}
+
+function applyTheme(theme) {
+  if(theme === 'default') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', theme);
 }
 
 function startSync(ms) {
@@ -1072,6 +1107,7 @@ function resetToDefaults() {
   localStorage.clear();
   TARGET_PER_DAY = 2.5;
   OFS_TARGET_PER_DAY = 3.0;
+  applyTheme('default');
   initSettings();
   render();
   alert("Settings reset to defaults.");
