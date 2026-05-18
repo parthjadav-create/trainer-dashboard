@@ -549,44 +549,44 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </div>
 
     <!-- SETTINGS -->
-    <div class="view" id="view-settings">
+        <div class="view" id="view-settings">
       <div class="settings-grid">
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">🎯</div>Performance Targets</div>
           <div class="settings-group">
-            <label>Standard Daily Target (Visits/Day)</label>
-            <input type="number" id="set-target-std" step="0.1" min="0.1" value="2.5" onchange="saveSettings()">
-            <div class="settings-info">The minimum visits expected per working day for the Overview leaderboard.</div>
+            <label>Standard Daily Target (Visits)</label>
+            <input type="number" id="set-target-std" step="0.1" value="2.5" onchange="saveSettings()">
+            <div class="settings-info">The minimum visits expected per working day for standard physical/virtual calls.</div>
           </div>
           <div class="settings-group">
-            <label>Out of Station Daily Target (Visits/Day)</label>
-            <input type="number" id="set-target-ofs" step="0.1" min="0.1" value="3.0" onchange="saveSettings()">
-            <div class="settings-info">The target applied to the Out of Station performance view (after 2× OFS credit).</div>
+            <label>Out of Station Daily Target (Visits)</label>
+            <input type="number" id="set-target-ofs" step="0.1" value="3.0" onchange="saveSettings()">
+            <div class="settings-info">The target specifically applied to the Out of Station performance view.</div>
           </div>
         </div>
+
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔄</div>Data Synchronization</div>
           <div class="settings-group">
             <label>Auto-Refresh Interval</label>
             <select id="set-sync-interval" onchange="saveSettings()">
               <option value="0">Manual Only</option>
-              <option value="60000" selected>Every 1 Minute</option>
+              <option value="60000">Every 1 Minute</option>
               <option value="300000">Every 5 Minutes</option>
               <option value="600000">Every 10 Minutes</option>
             </select>
-            <div class="settings-info">How often the dashboard pulls fresh data from the Google Sheet.</div>
+            <div class="settings-info">Determines how often the dashboard pulls fresh data from the Google Sheet.</div>
           </div>
         </div>
+
         <div class="settings-card">
-          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">💾</div>Reset</div>
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">💾</div>Browser Storage</div>
           <div class="settings-group">
-            <div class="settings-info" style="margin-bottom:8px;">Reset all settings back to their original defaults (2.5 standard target, 3.0 OFS target, 1 minute refresh).</div>
-            <button class="rs-btn" style="width:100%;border-color:var(--red);color:var(--red);" onclick="resetToDefaults()">↺ Reset to Default Settings</button>
+            <button class="rs-btn" style="width:100%; border-color:var(--red); color:var(--red);" onclick="resetToDefaults()">Reset to Default Settings</button>
           </div>
         </div>
       </div>
     </div>
-
     <!-- MATRIX -->
     <div class="view" id="view-matrix">
       <div class="card">
