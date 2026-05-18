@@ -216,10 +216,20 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .settings-group input:focus,.settings-group select:focus{border-color:var(--red);}
 .settings-info{font-size:11px;color:var(--text2);line-height:1.4;}
 
+/* ── THEMES ── */
+[data-theme='midnight']{--bg:#0b0e14;--bg2:#151b23;--bg3:#1c242f;--card:#151b23;--card2:#1c242f;--card3:#26303d;--border:#303c4a;--border2:#445363;}
+[data-theme='emerald']{--bg:#09120e;--bg2:#111e17;--bg3:#1a2b21;--card:#111e17;--card2:#1a2b21;--card3:#243a2f;--border:#2f4a3e;--border2:#426152;--green:#51f883;}
+[data-theme='light']{--bg:#f4f7f9;--bg2:#ffffff;--bg3:#ffffff;--card:#ffffff;--card2:#f0f3f6;--card3:#e5e9ef;--border:#d1d9e0;--border2:#afb8c1;--text:#1f2328;--text2:#656d76;--text3:#1f2328;}
+[data-theme='light'] .watermark img{filter: brightness(0) opacity(0.05);}
+[data-theme='light'] .loader-logo, [data-theme='light'] .sb-logo img{filter: brightness(0);}
+[data-theme='light'] .card, [data-theme='light'] .kpi {background:var(--bg2); border: 1px solid var(--border);}
+[data-theme='light'] .tbl th {background:#f6f8fa;}
+[data-theme='light'] .nav:hover {background:rgba(0,0,0,0.04);}
+
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
 .loader-logo{width:180px;height:auto;filter:brightness(0) invert(1);animation:loader-pulse 1.5s ease-in-out infinite;}
 @keyframes loader-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(.97);}}
-.spin{width:32px;height:32px;border:2px solid var(--border);border-top-color:#e53935;border-radius:50%;animation:spin .7s linear infinite;}
+.spin{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .l-txt{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--text);}
 .l-sub{font-size:11px;color:var(--text2);}
@@ -552,41 +562,118 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="view" id="view-settings">
       <div class="settings-grid">
         <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔗</div>Source Data</div>
+          <div class="settings-group">
+            <label>Google Apps Script API URL</label>
+            <input type="text" id="set-api-url" placeholder="https://script.google.com/macros/s/..." onchange="saveSettings()">
+            <div class="settings-info">The endpoint URL for your Google Sheet data. Changing this will trigger a reload.</div>
+          </div>
+           <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🏢</div>Dashboard Identity</div>
+          <div class="settings-group">
+            <label>Main Title</label>
+            <input type="text" id="set-dash-title" placeholder="OnSite OpsVision Dashboard" onchange="saveSettings()">
+          </div>
+          <div class="settings-group">
+            <label>Sub-title / Description</label>
+            <input type="text" id="set-dash-sub" placeholder="Petpooja · Trainer Productivity..." onchange="saveSettings()">
+          </div>
+            <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--green3);">👤</div>User Profile</div>
+          <div class="settings-group">
+            <label>Display Name</label>
+            <input type="text" id="set-user-name" placeholder="Admin" onchange="saveSettings()">
+          </div>
+          <div class="settings-group">
+            <label>Designation / Role</label>
+            <input type="text" id="set-user-role" placeholder="Manager" onchange="saveSettings()">
+          </div>
+          <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">🎯</div>Performance Targets</div>
           <div class="settings-group">
-            <label>Standard Daily Target (Visits/Day)</label>
-            <input type="number" id="set-target-std" step="0.1" min="0.1" value="2.5" onchange="saveSettings()">
-            <div class="settings-info">The minimum visits expected per working day for the Overview leaderboard.</div>
+            <label>Standard Daily Target (Visits)</label>
+            <input type="number" id="set-target-std" step="0.1" value="2.5" onchange="saveSettings()">
+            <div class="settings-info">The minimum visits expected per working day for standard physical/virtual calls.</div>
           </div>
           <div class="settings-group">
-            <label>Out of Station Daily Target (Visits/Day)</label>
-            <input type="number" id="set-target-ofs" step="0.1" min="0.1" value="3.0" onchange="saveSettings()">
-            <div class="settings-info">The target applied to the Out of Station performance view (after 2× OFS credit).</div>
+            <label>Out of Station Daily Target (Visits)</label>
+            <input type="number" id="set-target-ofs" step="0.1" value="3.0" onchange="saveSettings()">
+            <div class="settings-info">The target specifically applied to the Out of Station performance view.</div>
           </div>
-        </div>
-        <div class="settings-card">
-          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔄</div>Data Synchronization</div>
-          <div class="settings-group">
-            <label>Auto-Refresh Interval</label>
-            <select id="set-sync-interval" onchange="saveSettings()">
-              <option value="0">Manual Only</option>
-              <option value="60000" selected>Every 1 Minute</option>
-              <option value="300000">Every 5 Minutes</option>
-              <option value="600000">Every 10 Minutes</option>
+           <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">👁️</div>Tab Visibility</div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Virtual Calls</label>
+            <input type="checkbox" id="set-show-virtual" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Cities</label>
+            <input type="checkbox" id="set-show-cities" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Out of Station Visits</label>
+            <input type="checkbox" id="set-show-ofs" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>KPI of the Week</label>
+            <input type="checkbox" id="set-show-weekly" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Mode Matrix</label>
+            <input type="checkbox" id="set-show-matrix" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+           <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">📊</div>KPI Visibility</div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Total Tickets</label>
+            <input type="checkbox" id="set-kpi-total" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Done</label>
+            <input type="checkbox" id="set-kpi-done" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Closed</label>
+            <input type="checkbox" id="set-kpi-closed" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Re-scheduled</label>
+            <input type="checkbox" id="set-kpi-resch" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Not Related</label>
+            <input type="checkbox" id="set-kpi-notrel" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Virtual Calls</label>
+            <input type="checkbox" id="set-kpi-virt" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label>Active Trainers</label>
+            <input type="checkbox" id="set-kpi-active" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+           <label>Interface Theme</label>
+            <select id="set-theme" onchange="saveSettings()">
+              <option value="default">GitHub Dark (Default)</option>
+              <option value="midnight">Midnight Blue</option>
+              <option value="emerald">Emerald Forest</option>
+              <option value="light">Light Mode</option>
             </select>
-            <div class="settings-info">How often the dashboard pulls fresh data from the Google Sheet.</div>
-          </div>
-        </div>
-        <div class="settings-card">
-          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">💾</div>Reset</div>
-          <div class="settings-group">
-            <div class="settings-info" style="margin-bottom:8px;">Reset all settings back to their original defaults (2.5 standard target, 3.0 OFS target, 1 minute refresh).</div>
-            <button class="rs-btn" style="width:100%;border-color:var(--red);color:var(--red);" onclick="resetToDefaults()">↺ Reset to Default Settings</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
+            <div class="settings-info">Choose a color scheme that suits your workspace environment.</div>
+            <div class="settings-group" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+            <div>
+              <label>Primary Theme</label>
+              <input type="color" id="set-color-primary" onchange="saveSettings()" style="height:32px; width:100%; border:none; padding:0; background:none; cursor:pointer;">
+            </div>
+            <div>
+              <label>Success Accent</label>
+              <input type="color" id="set-color-green" onchange="saveSettings()" style="height:32px; width:100%; border:none; padding:0; background:none; cursor:pointer;">
+            </div>
+            <div>
+              <label>Danger Accent</label>
+              <input type="color" id="set-color-red" onchange="saveSettings()" style="height:32px; width:100%; border:none; padding:0; background:none; cursor:pointer;">
+            </div>
+            
     <!-- MATRIX -->
     <div class="view" id="view-matrix">
       <div class="card">
