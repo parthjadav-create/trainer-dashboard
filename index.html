@@ -800,140 +800,32 @@ function showTab(t){
 }
 
 /* ── SETTINGS ── */
-var DEFAULT_SETTINGS = {
-  API: "https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d9YbiYeJgkBmcigxAMCN7_B64Z8264K04bVzSZG/exec",
-  TARGET_PER_DAY: 2.5,
-  OFS_TARGET_PER_DAY: 3.0,
-  SYNC_INTERVAL: "60000",
-  DASH_TITLE: "OnSite OpsVision Dashboard",
-  DASH_SUB: "Petpooja · Trainer Productivity & Performance Tracker",
-  USER_NAME: "Admin",
-  USER_ROLE: "Manager",
-  SHOW_VIRTUAL: true,
-  SHOW_CITIES: true,
-  SHOW_OFS: true,
-  SHOW_WEEKLY: true,
-  SHOW_MATRIX: true,
-  KPI_TOTAL: true,
-  KPI_DONE: true,
-  KPI_CLOSED: true,
-  KPI_RESCH: true,
-  KPI_NOTREL: true,
-  KPI_VIRT: true,
-  KPI_ACTIVE: true,
-  THEME: "default",
-  COLOR_PRIMARY: "#b71c1c", // Red from your CSS
-  COLOR_GREEN: "#3fb950",
-  COLOR_RED: "#f85149"
-};
-
 function initSettings(){
   try{
-    // Load all settings from localStorage or use defaults
-    API = localStorage.getItem('set-api-url') || DEFAULT_SETTINGS.API;
-    TARGET_PER_DAY = parseFloat(localStorage.getItem('set-target-std')) || DEFAULT_SETTINGS.TARGET_PER_DAY;
-    OFS_TARGET_PER_DAY = parseFloat(localStorage.getItem('set-target-ofs')) || DEFAULT_SETTINGS.OFS_TARGET_PER_DAY;
-    var syncInterval = localStorage.getItem('set-sync-interval') || DEFAULT_SETTINGS.SYNC_INTERVAL;
-
-    document.getElementById('set-api-url').value = API;
-    document.getElementById('set-target-std').value = TARGET_PER_DAY;
-    document.getElementById('set-target-ofs').value = OFS_TARGET_PER_DAY;
-    // Assuming there's an element for sync interval, if not, it's just internal
-    // document.getElementById('set-sync-interval').value = syncInterval;
-
-    document.getElementById('set-dash-title').value = localStorage.getItem('set-dash-title') || DEFAULT_SETTINGS.DASH_TITLE;
-    document.getElementById('set-dash-sub').value = localStorage.getItem('set-dash-sub') || DEFAULT_SETTINGS.DASH_SUB;
-    document.getElementById('set-user-name').value = localStorage.getItem('set-user-name') || DEFAULT_SETTINGS.USER_NAME;
-    document.getElementById('set-user-role').value = localStorage.getItem('set-user-role') || DEFAULT_SETTINGS.USER_ROLE;
-
-    document.getElementById('set-show-virtual').checked = (localStorage.getItem('set-show-virtual') === 'false' ? false : DEFAULT_SETTINGS.SHOW_VIRTUAL);
-    document.getElementById('set-show-cities').checked = (localStorage.getItem('set-show-cities') === 'false' ? false : DEFAULT_SETTINGS.SHOW_CITIES);
-    document.getElementById('set-show-ofs').checked = (localStorage.getItem('set-show-ofs') === 'false' ? false : DEFAULT_SETTINGS.SHOW_OFS);
-    document.getElementById('set-show-weekly').checked = (localStorage.getItem('set-show-weekly') === 'false' ? false : DEFAULT_SETTINGS.SHOW_WEEKLY);
-    document.getElementById('set-show-matrix').checked = (localStorage.getItem('set-show-matrix') === 'false' ? false : DEFAULT_SETTINGS.SHOW_MATRIX);
-
-    document.getElementById('set-kpi-total').checked = (localStorage.getItem('set-kpi-total') === 'false' ? false : DEFAULT_SETTINGS.KPI_TOTAL);
-    document.getElementById('set-kpi-done').checked = (localStorage.getItem('set-kpi-done') === 'false' ? false : DEFAULT_SETTINGS.KPI_DONE);
-    document.getElementById('set-kpi-closed').checked = (localStorage.getItem('set-kpi-closed') === 'false' ? false : DEFAULT_SETTINGS.KPI_CLOSED);
-    document.getElementById('set-kpi-resch').checked = (localStorage.getItem('set-kpi-resch') === 'false' ? false : DEFAULT_SETTINGS.KPI_RESCH);
-    document.getElementById('set-kpi-notrel').checked = (localStorage.getItem('set-kpi-notrel') === 'false' ? false : DEFAULT_SETTINGS.KPI_NOTREL);
-    document.getElementById('set-kpi-virt').checked = (localStorage.getItem('set-kpi-virt') === 'false' ? false : DEFAULT_SETTINGS.KPI_VIRT);
-    document.getElementById('set-kpi-active').checked = (localStorage.getItem('set-kpi-active') === 'false' ? false : DEFAULT_SETTINGS.KPI_ACTIVE);
-
-    document.getElementById('set-theme').value = localStorage.getItem('set-theme') || DEFAULT_SETTINGS.THEME;
-    document.getElementById('set-color-primary').value = localStorage.getItem('set-color-primary') || DEFAULT_SETTINGS.COLOR_PRIMARY;
-    document.getElementById('set-color-green').value = localStorage.getItem('set-color-green') || DEFAULT_SETTINGS.COLOR_GREEN;
-    document.getElementById('set-color-red').value = localStorage.getItem('set-color-red') || DEFAULT_SETTINGS.COLOR_RED;
-
-    applyTheme(document.getElementById('set-theme').value, document.getElementById('set-color-primary').value, document.getElementById('set-color-green').value, document.getElementById('set-color-red').value);
-    updateDashboardIdentity();
-    updateUserProfile();
-    updateTabVisibility();
-    updateKpiVisibility();
+    var std=parseFloat(localStorage.getItem('target_std'));
+    var ofs=parseFloat(localStorage.getItem('target_ofs'));
+    var interval=localStorage.getItem('sync_interval')||"60000";
+    TARGET_PER_DAY=isNaN(std)?2.5:std;
+    OFS_TARGET_PER_DAY=isNaN(ofs)?3.0:ofs;
+    document.getElementById('set-target-std').value=TARGET_PER_DAY;
+    document.getElementById('set-target-ofs').value=OFS_TARGET_PER_DAY;
+    document.getElementById('set-sync-interval').value=interval;
+    startSync(parseInt(interval));
     updateTargetLabels();
-    startSync(parseInt(syncInterval));
-  }catch(e){
-    console.error("Error initializing settings:", e);
-    startSync(parseInt(DEFAULT_SETTINGS.SYNC_INTERVAL));
-  }
+  }catch(e){startSync(60000);}
 }
 function saveSettings(){
-  var oldApi = API;
-  var oldSyncInterval = localStorage.getItem('set-sync-interval') || DEFAULT_SETTINGS.SYNC_INTERVAL;
-
-  API = document.getElementById('set-api-url').value;
-  TARGET_PER_DAY = parseFloat(document.getElementById('set-target-std').value);
-  OFS_TARGET_PER_DAY = parseFloat(document.getElementById('set-target-ofs').value);
-  var syncInterval = DEFAULT_SETTINGS.SYNC_INTERVAL; // Assuming no UI for this, using default
-
+  TARGET_PER_DAY=parseFloat(document.getElementById('set-target-std').value)||2.5;
+  OFS_TARGET_PER_DAY=parseFloat(document.getElementById('set-target-ofs').value)||3.0;
+  var interval=document.getElementById('set-sync-interval').value;
   try{
-    localStorage.setItem('set-api-url', API);
-    localStorage.setItem('set-target-std', TARGET_PER_DAY);
-    localStorage.setItem('set-target-ofs', OFS_TARGET_PER_DAY);
-    localStorage.setItem('set-sync-interval', syncInterval);
-
-    localStorage.setItem('set-dash-title', document.getElementById('set-dash-title').value);
-    localStorage.setItem('set-dash-sub', document.getElementById('set-dash-sub').value);
-    localStorage.setItem('set-user-name', document.getElementById('set-user-name').value);
-    localStorage.setItem('set-user-role', document.getElementById('set-user-role').value);
-
-    localStorage.setItem('set-show-virtual', document.getElementById('set-show-virtual').checked);
-    localStorage.setItem('set-show-cities', document.getElementById('set-show-cities').checked);
-    localStorage.setItem('set-show-ofs', document.getElementById('set-show-ofs').checked);
-    localStorage.setItem('set-show-weekly', document.getElementById('set-show-weekly').checked);
-    localStorage.setItem('set-show-matrix', document.getElementById('set-show-matrix').checked);
-
-    localStorage.setItem('set-kpi-total', document.getElementById('set-kpi-total').checked);
-    localStorage.setItem('set-kpi-done', document.getElementById('set-kpi-done').checked);
-    localStorage.setItem('set-kpi-closed', document.getElementById('set-kpi-closed').checked);
-    localStorage.setItem('set-kpi-resch', document.getElementById('set-kpi-resch').checked);
-    localStorage.setItem('set-kpi-notrel', document.getElementById('set-kpi-notrel').checked);
-    localStorage.setItem('set-kpi-virt', document.getElementById('set-kpi-virt').checked);
-    localStorage.setItem('set-kpi-active', document.getElementById('set-kpi-active').checked);
-
-    localStorage.setItem('set-theme', document.getElementById('set-theme').value);
-    localStorage.setItem('set-color-primary', document.getElementById('set-color-primary').value);
-    localStorage.setItem('set-color-green', document.getElementById('set-color-green').value);
-    localStorage.setItem('set-color-red', document.getElementById('set-color-red').value);
-  }catch(e){
-    console.error("Error saving settings:", e);
-  }
-
-  applyTheme(document.getElementById('set-theme').value, document.getElementById('set-color-primary').value, document.getElementById('set-color-green').value, document.getElementById('set-color-red').value);
-  updateDashboardIdentity();
-  updateUserProfile();
-  updateTabVisibility();
-  updateKpiVisibility();
+    localStorage.setItem('target_std',TARGET_PER_DAY);
+    localStorage.setItem('target_ofs',OFS_TARGET_PER_DAY);
+    localStorage.setItem('sync_interval',interval);
+  }catch(e){}
+  startSync(parseInt(interval));
   updateTargetLabels();
   render();
-
-  if (API !== oldApi) {
-    console.log("API URL changed, reloading data...");
-    loadData();
-  }
-  if (syncInterval !== oldSyncInterval) {
-    startSync(parseInt(syncInterval));
-  }
 }
 function updateTargetLabels(){
   var lbl=document.getElementById('lbl-std-target');
@@ -943,83 +835,19 @@ function updateTargetLabels(){
   var lbl3=document.getElementById('lbl-ofs-target2');
   if(lbl3)lbl3.textContent="("+OFS_TARGET_PER_DAY+"/day)";
 }
-
-function applyTheme(themeName, primaryColor, greenColor, redColor) {
-  document.body.setAttribute('data-theme', themeName);
-  document.documentElement.style.setProperty('--primary', primaryColor);
-  document.documentElement.style.setProperty('--green', greenColor);
-  document.documentElement.style.setProperty('--red', redColor);
-}
-
-function updateDashboardIdentity() {
-  document.querySelector('.pg-title').textContent = document.getElementById('set-dash-title').value;
-  document.querySelector('.pg-sub').textContent = document.getElementById('set-dash-sub').value;
-}
-
-function updateUserProfile() {
-  document.querySelector('.u-nm').textContent = document.getElementById('set-user-name').value;
-  document.querySelector('.u-rl').textContent = document.getElementById('set-user-role').value;
-  document.querySelector('.u-av').textContent = (document.getElementById('set-user-name').value || 'A').charAt(0).toUpperCase();
-}
-
-function updateTabVisibility() {
-  var tabs = {
-    'virtual': document.getElementById('set-show-virtual').checked,
-    'cities': document.getElementById('set-show-cities').checked,
-    'ofs': document.getElementById('set-show-ofs').checked,
-    'weekly': document.getElementById('set-show-weekly').checked,
-    'matrix': document.getElementById('set-show-matrix').checked
-  };
-
-  for (var tabId in tabs) {
-    var navElement = document.querySelector(`.nav[onclick="showTab('${tabId}')"]`);
-    var tabElement = document.getElementById(`tab-${tabId}`);
-    var viewElement = document.getElementById(`view-${tabId}`);
-
-    if (navElement) navElement.style.display = tabs[tabId] ? 'flex' : 'none';
-    if (tabElement) tabElement.style.display = tabs[tabId] ? 'block' : 'none';
-    // View elements are handled by showTab, but ensuring they are hidden if the tab is not visible
-    if (viewElement && !tabs[tabId]) viewElement.classList.remove('on');
-  }
-}
-
-function updateKpiVisibility() {
-  var kpiSettings = {
-    'set-kpi-total': 'kpi-total', // You'll need to add IDs to your KPI elements for this to work
-    'set-kpi-done': 'kpi-done',
-    'set-kpi-closed': 'kpi-closed',
-    'set-kpi-resch': 'kpi-resch',
-    'set-kpi-notrel': 'kpi-notrel',
-    'set-kpi-virt': 'kpi-virt',
-    'set-kpi-active': 'kpi-active'
-  };
-
-  // This function assumes you'll add IDs to your KPI elements in the HTML
-  // For example, <div class="kpi" id="kpi-total">...</div>
-  for (var settingId in kpiSettings) {
-    var kpiElement = document.getElementById(kpiSettings[settingId]);
-    if (kpiElement) {
-      kpiElement.style.display = document.getElementById(settingId).checked ? 'block' : 'none';
-    }
-  }
-  // Since rKPI rebuilds the grid, we need to re-render it after updating visibility settings
-  rKPI();
-}
-
 function startSync(ms){
   if(syncTimer)clearInterval(syncTimer);
   if(ms>0)syncTimer=setInterval(loadData,ms);
 }
 function resetToDefaults(){
-  try{
-    for (var key in DEFAULT_SETTINGS) {
-      localStorage.removeItem('set-' + key.toLowerCase().replace(/_/g, '-'));
-    }
-  }catch(e){
-    console.error("Error clearing local storage:", e);
-  }
-  initSettings(); // Re-initialize with defaults
-  loadData(); // Reload data in case API URL was reset
+  try{localStorage.clear();}catch(e){}
+  TARGET_PER_DAY=2.5;OFS_TARGET_PER_DAY=3.0;
+  document.getElementById('set-target-std').value=2.5;
+  document.getElementById('set-target-ofs').value=3.0;
+  document.getElementById('set-sync-interval').value="60000";
+  startSync(60000);
+  updateTargetLabels();
+  render();
   alert("Settings reset to defaults.");
 }
 
@@ -1027,7 +855,7 @@ function resetToDefaults(){
 function loadData(){
   document.getElementById("lmsg").textContent="Fetching data from Google Sheet...";
   document.getElementById("live-txt").textContent="SYNCING";
-  return fetch(API, {method:"GET",redirect:"follow"})
+  return fetch(API,{method:"GET",redirect:"follow"})
     .then(function(r){return r.text();})
     .then(function(txt){
       var js=JSON.parse(txt);
@@ -1114,22 +942,7 @@ function rKPI(){
     {l:"Virtual Calls",v:virt,p:pct(virt,tot),dc:"#58a6ff",ic:"💻",fill:pn(virt,tot),bd:"badge-b"},
     {l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"}
   ];
-
-  var kpiElements = kpis.map(function(k, index){
-    var kpiId = '';
-    // Assign IDs based on the KPI label for visibility control
-    if (k.l === "Total Tickets") kpiId = "kpi-total";
-    else if (k.l === "Done") kpiId = "kpi-done";
-    else if (k.l === "Closed") kpiId = "kpi-closed";
-    else if (k.l === "Re-scheduled") kpiId = "kpi-resch";
-    else if (k.l === "Not Related") kpiId = "kpi-notrel";
-    else if (k.l === "Virtual Calls") kpiId = "kpi-virt";
-    else if (k.l === "Active Trainers") kpiId = "kpi-active";
-
-    return '<div class="kpi" id="' + kpiId + '"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';
-  }).join("");
-  document.getElementById("kpi-grid").innerHTML = kpiElements;
-  updateKpiVisibility(); // Apply visibility after rendering
+  document.getElementById("kpi-grid").innerHTML=kpis.map(function(k){return '<div class="kpi"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';}).join("");
 }
 
 function rTrend(){
@@ -1545,10 +1358,10 @@ function exportTeamInfo(){
 /* ── INIT ── */
 window.addEventListener("DOMContentLoaded",function(){
   var now=new Date(),y=now.getFullYear(),mo=("0"+(now.getMonth()+1)).slice(-2),d=("0"+now.getDate()).slice(-2);
-  document.getElementById("f-from").value = localStorage.getItem('filter-from-date') || (y+"-"+mo+"-01");
-  document.getElementById("f-to").value = localStorage.getItem('filter-to-date') || (y+"-"+mo+"-"+d);
+  document.getElementById("f-from").value=y+"-"+mo+"-01";
+  document.getElementById("f-to").value=y+"-"+mo+"-"+d;
   populateTeamLeadFilter();
-  initSettings(); // Initialize all settings first
+  initSettings();
   loadData().then(function(){
     document.getElementById("loader").style.display="none";
     document.getElementById("content").style.display="flex";
