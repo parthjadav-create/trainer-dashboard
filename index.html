@@ -1371,108 +1371,24 @@ function resetToDefaults(){
   initSettings();render();alert("Settings reset to defaults.");
 }
  
-/* ── FAST DATA LOADING ──
-   Strategy:
-   1. Show cached data instantly (no waiting)
-   2. Fetch fresh data in background with 20s timeout
-   3. Auto-retry up to 3 times on failure/timeout
-   4. Save fresh data back to cache on success
-──────────────────────────────────────────── */
-
-var CACHE_KEY='pp_data_cache';
-var CACHE_TS_KEY='pp_data_cache_ts';
-var FETCH_TIMEOUT=20000; // 20 seconds max per attempt
-var MAX_RETRIES=3;
-
-/* Apply a dataset (parsed rows) to the dashboard */
-function applyData(rows){
-  allRows=rows;
-  document.getElementById("total-bd").textContent=allRows.length.toLocaleString();
-  populateFilters();applyFilters();
-}
-
-/* Load cached data instantly and show UI, then fetch fresh in background */
 function loadData(){
-  var cached=null;
-  try{
-    var raw=localStorage.getItem(CACHE_KEY);
-    if(raw)cached=JSON.parse(raw);
-  }catch(e){cached=null;}
-
-  if(cached&&cached.length){
-    /* ── Instant: render from cache right away ── */
-    applyData(parseRows(cached));
-    var ts=localStorage.getItem(CACHE_TS_KEY);
-    var ago=ts?Math.round((Date.now()-parseInt(ts))/60000)+'m ago':'cached';
-    document.getElementById("live-txt").textContent="CACHED";
-    document.getElementById("sync-txt").textContent="Cache: "+ago+" · Updating…";
-  } else {
-    /* No cache yet — show loading state */
-    document.getElementById("live-txt").textContent="LOADING";
-    document.getElementById("sync-txt").textContent="Fetching first load…";
-  }
-
-  /* ── Background: fetch fresh data with timeout + retry ── */
-  return fetchWithRetry(API,MAX_RETRIES);
-}
-
-/* Fetch with AbortController timeout, retry on failure */
-function fetchWithRetry(url,retriesLeft){
-  var controller=new AbortController();
-  var timer=setTimeout(function(){controller.abort();},FETCH_TIMEOUT);
-
-  /* Cache-bust to avoid stale redirects */
-  var bustUrl=url+(url.indexOf('?')>=0?'&':'?')+'_t='+Date.now();
-
+  document.getElementById("lmsg").textContent="Fetching data from Google Sheet...";
   document.getElementById("live-txt").textContent="SYNCING";
-
-  return fetch(bustUrl,{method:"GET",redirect:"follow",signal:controller.signal})
-    .then(function(r){
-      clearTimeout(timer);
-      return r.text();
-    })
+  return fetch(API,{method:"GET",redirect:"follow"})
+    .then(function(r){return r.text();})
     .then(function(txt){
       var js=JSON.parse(txt);
       if(js.status==="error")throw new Error(js.message);
-      if(!js.data||!js.data.length)throw new Error("No data returned");
-
-      /* Save raw data to cache */
-      try{
-        localStorage.setItem(CACHE_KEY,JSON.stringify(js.data));
-        localStorage.setItem(CACHE_TS_KEY,String(Date.now()));
-      }catch(e){}
-
-      applyData(parseRows(js.data));
+      if(!js.data||!js.data.length)throw new Error("No data returned from sheet");
+      allRows=parseRows(js.data);
       document.getElementById("live-txt").textContent="LIVE";
       document.getElementById("sync-txt").textContent="Synced "+new Date().toLocaleTimeString();
-
-      /* Hide alert if it was showing */
-      var al=document.getElementById("alert-box");
-      if(al)al.style.display="none";
+      document.getElementById("total-bd").textContent=allRows.length.toLocaleString();
+      populateFilters();applyFilters();
     })
     .catch(function(e){
-      clearTimeout(timer);
-      var isTimeout=(e.name==='AbortError');
-
-      if(retriesLeft>0){
-        /* Retry after a short delay */
-        var attempt=MAX_RETRIES-retriesLeft+1;
-        document.getElementById("live-txt").textContent="RETRY "+attempt+"/"+MAX_RETRIES;
-        document.getElementById("sync-txt").textContent=(isTimeout?"Timeout":"Error")+", retrying…";
-        return new Promise(function(resolve){setTimeout(resolve,2000);})
-          .then(function(){return fetchWithRetry(url,retriesLeft-1);});
-      } else {
-        /* All retries exhausted — show error but keep cached data visible */
-        document.getElementById("live-txt").textContent="ERROR";
-        document.getElementById("sync-txt").textContent=isTimeout?"Request timed out — using cache":"Error: "+e.message;
-        var al=document.getElementById("alert-box");
-        if(al){
-          al.textContent=isTimeout
-            ?"⚠️ Could not fetch fresh data (timeout after "+Math.round(FETCH_TIMEOUT/1000)+"s × "+MAX_RETRIES+" attempts). Showing cached data. Check your Apps Script URL in Settings."
-            :"⚠️ Could not load data: "+e.message+(allRows.length?" Showing cached data.":" No cache available.");
-          al.style.display="block";
-        }
-      }
+      var al=document.getElementById("alert-box");al.textContent="Could not load data: "+e.message;al.style.display="block";
+      document.getElementById("live-txt").textContent="ERROR";
     });
 }
  
@@ -1555,6 +1471,7 @@ var totalDays=Object.keys(uniqueDates).length || 1;
 
 
 /* TOTAL VISITS DONE AVERAGE — only "Done" status counted */
+
 var avgVisitPerDay=(done/totalDays).toFixed(1);
 
 
@@ -2298,30 +2215,15 @@ window.addEventListener("DOMContentLoaded",function(){
   document.getElementById("f-to").value=y+"-"+mo+"-"+d;
   populateTeamLeadFilter();
   initSettings();
-
-  /* Check if we have cached data to show instantly */
-  var hasCachedData=false;
-  try{var raw=localStorage.getItem(CACHE_KEY);hasCachedData=!!(raw&&JSON.parse(raw).length);}catch(e){}
-
-  if(hasCachedData){
-    /* ── Show UI instantly, load cache, fetch fresh in background ── */
+  loadData().then(function(){
     document.getElementById("loader").style.display="none";
     document.getElementById("content").style.display="flex";
     document.getElementById("content").style.flexDirection="column";
-    loadData(); /* non-blocking */
-  } else {
-    /* ── First ever load — show loader until first fetch completes ── */
-    document.getElementById("lmsg").textContent="First load — fetching data…";
-    loadData().then(function(){
-      document.getElementById("loader").style.display="none";
-      document.getElementById("content").style.display="flex";
-      document.getElementById("content").style.flexDirection="column";
-    }).catch(function(){
-      document.getElementById("loader").style.display="none";
-      document.getElementById("content").style.display="flex";
-      document.getElementById("content").style.flexDirection="column";
-    });
-  }
+  }).catch(function(){
+    document.getElementById("loader").style.display="none";
+    document.getElementById("content").style.display="flex";
+    document.getElementById("content").style.flexDirection="column";
+  });
 });
 </script>
 </body>
