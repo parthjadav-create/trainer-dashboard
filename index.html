@@ -1460,14 +1460,31 @@ var activeKpis=kpis.filter(function(k,i){
 var uniqueDates={};
 
 filteredRows.forEach(function(r){
+
    if(r.date){
       uniqueDates[r.date]=1;
    }
+
 });
 
 var totalDays=Object.keys(uniqueDates).length || 1;
 
+
+/* TOTAL VISITS DONE AVERAGE */
+
 var avgVisitPerDay=(tot/totalDays).toFixed(1);
+
+
+/* TOTAL TICKETS RECEIVED */
+
+var totalReceived=filteredRows.length;
+
+
+/* RECEIVED TICKETS AVERAGE */
+
+var avgTicketReceivedPerDay=
+(totalReceived/totalDays).toFixed(1);
+
 
 var kpiHTML=activeKpis.map(function(k){
 
@@ -1476,7 +1493,9 @@ var kpiHTML=activeKpis.map(function(k){
       +'<div class="kpi-ic">'+k.ic+'</div>'
       +'<span class="badge '+k.bd+'">'+k.p+'</span>'
       +'</div>'
-      +'<div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div>'
+      +'<div class="kpi-v" style="color:'+k.dc+'">'
+      +k.v.toLocaleString()
+      +'</div>'
       +'<div class="kpi-l">'+k.l+'</div>'
       +'<div class="kpi-bar">'
       +'<div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div>'
@@ -1485,16 +1504,41 @@ var kpiHTML=activeKpis.map(function(k){
 
 }).join("");
 
+
+
+/* AVG VISITS PER DAY KPI */
+
 kpiHTML +=
    '<div class="kpi">'
    +'<div class="kpi-top">'
    +'<div class="kpi-ic">📅</div>'
    +'<span class="badge badge-b">'+totalDays+' Days</span>'
    +'</div>'
-   +'<div class="kpi-v" style="color:#58a6ff">'+avgVisitPerDay+'</div>'
+   +'<div class="kpi-v" style="color:#58a6ff">'
+   +avgVisitPerDay+
+   '</div>'
    +'<div class="kpi-l">Avg Visits / Day</div>'
    +'<div class="kpi-bar">'
    +'<div class="kpi-fill" style="width:100%;background:#58a6ff"></div>'
+   +'</div>'
+   +'</div>';
+
+
+
+/* AVG RECEIVED TICKETS PER DAY KPI */
+
+kpiHTML +=
+   '<div class="kpi">'
+   +'<div class="kpi-top">'
+   +'<div class="kpi-ic">📨</div>'
+   +'<span class="badge badge-o">'+totalDays+' Days</span>'
+   +'</div>'
+   +'<div class="kpi-v" style="color:#f39c12">'
+   +avgTicketReceivedPerDay+
+   '</div>'
+   +'<div class="kpi-l">Avg Tickets Received / Day</div>'
+   +'<div class="kpi-bar">'
+   +'<div class="kpi-fill" style="width:100%;background:#f39c12"></div>'
    +'</div>'
    +'</div>';
 
