@@ -10,6 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <style>
 :root{
   --primary:#ef5350;
@@ -1478,6 +1479,30 @@ function rLeader(){
 }
  
 function rDate(){
+  plugins: {
+  legend: {
+    labels: {
+      color: "#c9d1d9"
+    }
+  },
+  tooltip: {
+    mode: 'index',
+    intersect: false
+  },
+  datalabels: {
+    color: '#ffffff',
+    anchor: 'end',
+    align: 'bottom',
+    offset: 4,
+    font: {
+      weight: 'bold',
+      size: 10
+    },
+    formatter: function(value) {
+      return value;
+    }
+  }
+}
   var mbd={},ds={};
   filteredRows.forEach(function(r){if(!r.date)return;ds[r.date]=1;if(!mbd[r.mode])mbd[r.mode]={};mbd[r.mode][r.date]=(mbd[r.mode][r.date]||0)+1;});
   var dates=Object.keys(ds).sort();
