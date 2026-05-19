@@ -1470,9 +1470,9 @@ filteredRows.forEach(function(r){
 var totalDays=Object.keys(uniqueDates).length || 1;
 
 
-/* TOTAL VISITS DONE AVERAGE */
+/* TOTAL VISITS DONE AVERAGE — only "Done" status counted */
 
-var avgVisitPerDay=(tot/totalDays).toFixed(1);
+var avgVisitPerDay=(done/totalDays).toFixed(1);
 
 
 /* TOTAL TICKETS RECEIVED */
@@ -1518,7 +1518,7 @@ var avgReceivedCard=
    +'</div>'
    +'</div>';
 
-/* Build KPI cards and inject avg cards at position 3 & 4 (after Done, before Closed) */
+/* Build KPI cards — inject avg cards at position 3 & 4 (after Done, before Closed) */
 var kpiHTML='';
 activeKpis.forEach(function(k,i){
    var card='<div class="kpi">'
@@ -1535,7 +1535,7 @@ activeKpis.forEach(function(k,i){
       +'</div>'
       +'</div>';
    kpiHTML+=card;
-   /* After the 2nd card (index 1 = Done), insert the two avg cards */
+   /* After index 1 (Done), insert the two avg cards at positions 3 & 4 */
    if(i===1){
       kpiHTML+=avgVisitCard;
       kpiHTML+=avgReceivedCard;
