@@ -327,6 +327,84 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 @media(max-width:1400px){.kpi-grid{grid-template-columns:repeat(4,1fr);}.g3{grid-template-columns:1fr 1fr;}}
 @media(max-width:1100px){.sidebar{width:220px;}.sidebar.collapsed{width:0;}.main{margin-left:220px;}.main.sb-gone{margin-left:0;}.watermark{width:300px;}}
 @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.g2,.g3{grid-template-columns:1fr;}.content,.filterbar{padding-left:14px;padding-right:14px;}.topbar{padding-left:12px;padding-right:14px;}.watermark{width:220px;}}
+
+/* ══════════════════════════════════════
+   SETTINGS LOCK SCREEN
+══════════════════════════════════════ */
+#settings-lock-overlay{
+  position:absolute;inset:0;
+  background:rgba(13,17,23,0.97);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:500;border-radius:var(--r);
+  animation:lock-fade-in .25s ease;
+}
+@keyframes lock-fade-in{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);}}
+#view-settings{position:relative;}
+.lock-box{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:16px;padding:40px 36px;width:360px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);
+}
+.lock-icon{font-size:44px;margin-bottom:8px;animation:lock-bounce .6s ease;}
+@keyframes lock-bounce{0%,100%{transform:translateY(0);}40%{transform:translateY(-8px);}70%{transform:translateY(-3px);}}
+.lock-title{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.lock-sub{font-size:12px;color:var(--text2);margin-bottom:20px;text-align:center;line-height:1.6;}
+.lock-input-wrap{position:relative;width:100%;}
+.lock-input{
+  width:100%;background:var(--card3);border:1px solid var(--border);
+  color:var(--text);padding:11px 42px 11px 14px;border-radius:8px;
+  font-family:inherit;font-size:14px;outline:none;
+  letter-spacing:3px;transition:border-color .2s;
+}
+.lock-input:focus{border-color:var(--primary);}
+.lock-input.error{border-color:var(--red);animation:shake .35s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
+.lock-eye{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text2);cursor:pointer;
+  font-size:15px;padding:4px;transition:color .15s;
+}
+.lock-eye:hover{color:var(--text);}
+.lock-btn{
+  width:100%;margin-top:8px;
+  background:var(--primary);color:#fff;border:none;
+  padding:12px;border-radius:8px;font-family:inherit;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .15s;letter-spacing:.3px;
+}
+.lock-btn:hover{background:var(--primary-light);transform:translateY(-1px);}
+.lock-btn:active{transform:translateY(0);}
+.lock-error{font-size:11.5px;color:var(--red);min-height:16px;text-align:center;margin-top:2px;}
+.lock-attempts{font-size:11px;color:var(--text2);margin-top:4px;}
+.lock-divider{width:100%;height:1px;background:var(--border);margin:16px 0;}
+.lock-admin-hint{font-size:10.5px;color:var(--text2);text-align:center;line-height:1.6;}
+.lock-admin-hint span{color:var(--primary);font-weight:600;}
+.auth-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(63,185,80,0.1);color:var(--green);
+  border:1px solid rgba(63,185,80,0.3);
+  padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:600;
+}
+.lock-session-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.2);
+  border-radius:8px;padding:10px 16px;margin-bottom:4px;
+}
+.lock-session-left{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--green);font-weight:600;}
+.lock-out-btn{
+  background:rgba(248,81,73,0.1);color:var(--red);border:1px solid rgba(248,81,73,0.3);
+  padding:5px 14px;border-radius:6px;font-family:inherit;font-size:11.5px;
+  font-weight:600;cursor:pointer;transition:all .15s;
+}
+.lock-out-btn:hover{background:rgba(248,81,73,0.2);}
+.lock-cooldown{
+  font-size:12px;color:var(--orange);font-weight:600;
+  text-align:center;padding:10px;
+  background:rgba(255,166,87,0.08);border-radius:6px;
+  border:1px solid rgba(255,166,87,0.2);width:100%;
+}
 </style>
 </head>
 <body>
@@ -629,6 +707,47 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
  
     <!-- SETTINGS -->
     <div class="view" id="view-settings">
+
+      <!-- ══ SETTINGS LOCK OVERLAY ══ -->
+      <div id="settings-lock-overlay">
+        <div class="lock-box">
+          <div class="lock-icon">🔐</div>
+          <div class="lock-title">Settings Access</div>
+          <div class="lock-sub">This area is restricted to authorised admins only.<br>Enter your admin PIN to continue.</div>
+
+          <!-- Session bar (shown when already authenticated) -->
+          <div id="lock-session-bar" class="lock-session-bar" style="display:none;width:100%;">
+            <div class="lock-session-left">✅ <span id="lock-session-name">Admin</span> — Authenticated</div>
+            <button class="lock-out-btn" onclick="settingsLockOut()">🔒 Lock</button>
+          </div>
+
+          <!-- PIN form (shown when not authenticated) -->
+          <div id="lock-form" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div class="lock-input-wrap">
+              <input class="lock-input" type="password" id="lock-pin-input"
+                placeholder="Enter PIN"
+                maxlength="20"
+                onkeydown="if(event.key==='Enter')settingsUnlock()"
+                oninput="document.getElementById('lock-err').textContent=''"/>
+              <button class="lock-eye" onclick="toggleLockEye()" id="lock-eye-btn" title="Show/Hide">👁</button>
+            </div>
+            <div class="lock-error" id="lock-err"></div>
+            <div class="lock-attempts" id="lock-attempts-txt"></div>
+            <div id="lock-cooldown-wrap" style="display:none;width:100%;">
+              <div class="lock-cooldown" id="lock-cooldown-txt">Too many attempts. Please wait…</div>
+            </div>
+            <button class="lock-btn" onclick="settingsUnlock()">🔓 Unlock Settings</button>
+          </div>
+
+          <div class="lock-divider"></div>
+          <div class="lock-admin-hint">
+            Authorised admins: <span>Parth · Karp · Noman · Antareksh · Deepak</span><br>
+            Contact your admin if you need access.
+          </div>
+        </div>
+      </div>
+      <!-- ══ END LOCK OVERLAY ══ -->
+
       <div class="settings-grid">
  
         <!-- ── SOURCE DATA ── -->
@@ -1470,8 +1589,7 @@ filteredRows.forEach(function(r){
 var totalDays=Object.keys(uniqueDates).length || 1;
 
 
-/* TOTAL VISITS DONE AVERAGE — only "Done" status counted */
-
+/* TOTAL VISITS DONE AVERAGE - only Done status */
 var avgVisitPerDay=(done/totalDays).toFixed(1);
 
 
@@ -1486,39 +1604,25 @@ var avgTicketReceivedPerDay=
 (totalReceived/totalDays).toFixed(1);
 
 
-/* AVG VISITS PER DAY card HTML */
-var avgVisitCard=
-   '<div class="kpi">'
-   +'<div class="kpi-top">'
-   +'<div class="kpi-ic">📅</div>'
-   +'<span class="badge badge-b">'+totalDays+' Days</span>'
-   +'</div>'
-   +'<div class="kpi-v" style="color:#58a6ff">'
-   +avgVisitPerDay
-   +'</div>'
+/* AVG VISITS PER DAY card */
+var avgVisitCard='<div class="kpi">'
+   +'<div class="kpi-top"><div class="kpi-ic">📅</div>'
+   +'<span class="badge badge-b">'+totalDays+' Days</span></div>'
+   +'<div class="kpi-v" style="color:#58a6ff">'+avgVisitPerDay+'</div>'
    +'<div class="kpi-l">Avg Visits / Day</div>'
-   +'<div class="kpi-bar">'
-   +'<div class="kpi-fill" style="width:100%;background:#58a6ff"></div>'
-   +'</div>'
+   +'<div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#58a6ff"></div></div>'
    +'</div>';
 
-/* AVG RECEIVED TICKETS PER DAY card HTML */
-var avgReceivedCard=
-   '<div class="kpi">'
-   +'<div class="kpi-top">'
-   +'<div class="kpi-ic">📨</div>'
-   +'<span class="badge badge-o">'+totalDays+' Days</span>'
-   +'</div>'
-   +'<div class="kpi-v" style="color:#f39c12">'
-   +avgTicketReceivedPerDay
-   +'</div>'
+/* AVG RECEIVED TICKETS PER DAY card */
+var avgReceivedCard='<div class="kpi">'
+   +'<div class="kpi-top"><div class="kpi-ic">📨</div>'
+   +'<span class="badge badge-o">'+totalDays+' Days</span></div>'
+   +'<div class="kpi-v" style="color:#f39c12">'+avgTicketReceivedPerDay+'</div>'
    +'<div class="kpi-l">Avg Tickets Received / Day</div>'
-   +'<div class="kpi-bar">'
-   +'<div class="kpi-fill" style="width:100%;background:#f39c12"></div>'
-   +'</div>'
+   +'<div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#f39c12"></div></div>'
    +'</div>';
 
-/* Build KPI cards — inject avg cards at position 3 & 4 (after Done, before Closed) */
+/* Build KPI grid — inject avg cards at position 3 & 4 (after Done) */
 var kpiHTML='';
 activeKpis.forEach(function(k,i){
    var card='<div class="kpi">'
@@ -1526,20 +1630,14 @@ activeKpis.forEach(function(k,i){
       +'<div class="kpi-ic">'+k.ic+'</div>'
       +'<span class="badge '+k.bd+'">'+k.p+'</span>'
       +'</div>'
-      +'<div class="kpi-v" style="color:'+k.dc+'">'
-      +k.v.toLocaleString()
-      +'</div>'
+      +'<div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div>'
       +'<div class="kpi-l">'+k.l+'</div>'
       +'<div class="kpi-bar">'
       +'<div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div>'
       +'</div>'
       +'</div>';
    kpiHTML+=card;
-   /* After index 1 (Done), insert the two avg cards at positions 3 & 4 */
-   if(i===1){
-      kpiHTML+=avgVisitCard;
-      kpiHTML+=avgReceivedCard;
-   }
+   if(i===1){ kpiHTML+=avgVisitCard; kpiHTML+=avgReceivedCard; }
 });
 
 document.getElementById("kpi-grid").innerHTML=kpiHTML;
@@ -2225,6 +2323,263 @@ window.addEventListener("DOMContentLoaded",function(){
     document.getElementById("content").style.flexDirection="column";
   });
 });
+
+/* ══════════════════════════════════════════════════════════════
+   SETTINGS ACCESS CONTROL
+   - 5 admin PINs pre-configured (hashed with SHA-256)
+   - 5 wrong attempts → 5-minute cooldown
+   - Session stored in sessionStorage (clears on tab close)
+   - Lock button available inside settings once authenticated
+══════════════════════════════════════════════════════════════ */
+
+/* ── Admin roster: name + SHA-256 hash of their PIN ──
+   PINs:
+     Parth        → ParthAdmin@2024
+     Karp         → KarpSecure#99
+     Noman        → NomanAccess$1
+     Antareksh    → AntaAdmin!007
+     Deepak       → DeepakPass^88
+
+   To change a PIN: run this in browser console:
+     crypto.subtle.digest('SHA-256', new TextEncoder().encode('YourNewPIN'))
+       .then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+─────────────────────────────────────────────────────── */
+var ADMIN_PINS = [
+  { name:"Parth",     hash:"d0f0bc745cb7418f79201a5100abce8a835e7d8f116a614a6117852a92b0cfc7" },
+  { name:"Karp",      hash:"3d49d8eeaae032230d2a6addfbcad3ae7d6475c46da52f9e678ee7fb91e61430" },
+  { name:"Noman",     hash:"91a990d97671ccfea4c569bd2d33dc048c18730c0be5f95a87f921c06ca2f76b" },
+  { name:"Antareksh", hash:"afe785c9505fa1244f86faa47cc495c7d4b04177c4001054d984422a3295790b" },
+  { name:"Deepak",    hash:"a30ef9a72f329f0359b360b5681782c24318facabcce216626872bd5caccb37c" }
+];
+
+var SETTINGS_SESSION_KEY = 'pp_settings_auth';
+var SETTINGS_AUTH_NAME   = 'pp_settings_name';
+var LOCK_MAX_ATTEMPTS    = 5;
+var LOCK_COOLDOWN_MS     = 5 * 60 * 1000; // 5 minutes
+var LOCK_ATTEMPTS_KEY    = 'pp_lock_attempts';
+var LOCK_COOLDOWN_KEY    = 'pp_lock_until';
+
+/* ── Hash a string with SHA-256, return hex ── */
+function sha256hex(str) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+    .then(function(buf){
+      return Array.from(new Uint8Array(buf))
+        .map(function(b){return b.toString(16).padStart(2,'0');})
+        .join('');
+    });
+}
+
+/* ── Check if currently authenticated ── */
+function isSettingsAuthenticated() {
+  return sessionStorage.getItem(SETTINGS_SESSION_KEY) === '1';
+}
+
+/* ── Get authenticated admin name ── */
+function getAuthName() {
+  return sessionStorage.getItem(SETTINGS_AUTH_NAME) || 'Admin';
+}
+
+/* ── Show/hide the lock overlay based on auth state ── */
+function refreshLockOverlay() {
+  var overlay = document.getElementById('settings-lock-overlay');
+  if (!overlay) return;
+
+  if (isSettingsAuthenticated()) {
+    /* Authenticated — hide overlay */
+    overlay.style.display = 'none';
+    /* Show session bar in the lock box (for lock-out button in settings) */
+    var bar = document.getElementById('lock-session-bar');
+    if (bar) { bar.style.display = 'flex'; }
+    var form = document.getElementById('lock-form');
+    if (form) form.style.display = 'none';
+    var nameEl = document.getElementById('lock-session-name');
+    if (nameEl) nameEl.textContent = getAuthName();
+  } else {
+    /* Not authenticated — show overlay */
+    overlay.style.display = 'flex';
+    var bar = document.getElementById('lock-session-bar');
+    if (bar) bar.style.display = 'none';
+    var form = document.getElementById('lock-form');
+    if (form) form.style.display = 'flex';
+    /* Check cooldown */
+    updateCooldownUI();
+  }
+}
+
+/* ── Cooldown logic ── */
+function getLockAttempts() {
+  return parseInt(localStorage.getItem(LOCK_ATTEMPTS_KEY) || '0');
+}
+function getLockUntil() {
+  return parseInt(localStorage.getItem(LOCK_COOLDOWN_KEY) || '0');
+}
+function isInCooldown() {
+  return Date.now() < getLockUntil();
+}
+function updateCooldownUI() {
+  var until = getLockUntil();
+  var cdWrap = document.getElementById('lock-cooldown-wrap');
+  var cdTxt  = document.getElementById('lock-cooldown-txt');
+  var btn    = document.querySelector('.lock-btn');
+  var input  = document.getElementById('lock-pin-input');
+  if (!cdWrap) return;
+
+  if (isInCooldown()) {
+    cdWrap.style.display = 'block';
+    if (btn)  btn.disabled = true;
+    if (input) input.disabled = true;
+    /* Countdown timer */
+    var tick = setInterval(function(){
+      var remaining = Math.max(0, getLockUntil() - Date.now());
+      if (remaining <= 0) {
+        clearInterval(tick);
+        localStorage.setItem(LOCK_ATTEMPTS_KEY, '0');
+        localStorage.removeItem(LOCK_COOLDOWN_KEY);
+        cdWrap.style.display = 'none';
+        if (btn)  btn.disabled = false;
+        if (input) { input.disabled = false; input.focus(); }
+        document.getElementById('lock-attempts-txt').textContent = '';
+      } else {
+        var secs = Math.ceil(remaining / 1000);
+        var mins = Math.floor(secs / 60);
+        var s    = secs % 60;
+        if (cdTxt) cdTxt.textContent =
+          '🔒 Too many wrong attempts. Locked for ' +
+          mins + 'm ' + (s < 10 ? '0' : '') + s + 's';
+      }
+    }, 500);
+  } else {
+    cdWrap.style.display = 'none';
+    if (btn)  btn.disabled = false;
+    if (input) input.disabled = false;
+    var attempts = getLockAttempts();
+    var attTxt = document.getElementById('lock-attempts-txt');
+    if (attTxt) {
+      attTxt.textContent = attempts > 0
+        ? (LOCK_MAX_ATTEMPTS - attempts) + ' attempt' + (LOCK_MAX_ATTEMPTS - attempts !== 1 ? 's' : '') + ' remaining'
+        : '';
+    }
+  }
+}
+
+/* ── Attempt unlock ── */
+function settingsUnlock() {
+  if (isInCooldown()) return;
+
+  var pin = (document.getElementById('lock-pin-input').value || '').trim();
+  var errEl = document.getElementById('lock-err');
+  var input = document.getElementById('lock-pin-input');
+
+  if (!pin) {
+    errEl.textContent = 'Please enter your PIN.';
+    input.classList.add('error');
+    setTimeout(function(){ input.classList.remove('error'); }, 400);
+    return;
+  }
+
+  sha256hex(pin).then(function(hash) {
+    /* Check against all admin hashes */
+    var matched = null;
+    for (var i = 0; i < ADMIN_PINS.length; i++) {
+      if (ADMIN_PINS[i].hash === hash) { matched = ADMIN_PINS[i]; break; }
+    }
+
+    if (matched) {
+      /* ✅ Correct PIN */
+      localStorage.setItem(LOCK_ATTEMPTS_KEY, '0');
+      localStorage.removeItem(LOCK_COOLDOWN_KEY);
+      sessionStorage.setItem(SETTINGS_SESSION_KEY, '1');
+      sessionStorage.setItem(SETTINGS_AUTH_NAME, matched.name);
+      document.getElementById('lock-pin-input').value = '';
+      refreshLockOverlay();
+    } else {
+      /* ❌ Wrong PIN */
+      var attempts = getLockAttempts() + 1;
+      localStorage.setItem(LOCK_ATTEMPTS_KEY, String(attempts));
+      input.classList.add('error');
+      setTimeout(function(){ input.classList.remove('error'); }, 400);
+      input.value = '';
+
+      if (attempts >= LOCK_MAX_ATTEMPTS) {
+        /* Trigger cooldown */
+        localStorage.setItem(LOCK_COOLDOWN_KEY, String(Date.now() + LOCK_COOLDOWN_MS));
+        localStorage.setItem(LOCK_ATTEMPTS_KEY, '0');
+        errEl.textContent = '';
+        updateCooldownUI();
+      } else {
+        var left = LOCK_MAX_ATTEMPTS - attempts;
+        errEl.textContent = '❌ Wrong PIN — ' + left + ' attempt' + (left !== 1 ? 's' : '') + ' left';
+        var attTxt = document.getElementById('lock-attempts-txt');
+        if (attTxt) attTxt.textContent = left + ' attempt' + (left !== 1 ? 's' : '') + ' remaining';
+      }
+    }
+  });
+}
+
+/* ── Lock out (sign out of settings) ── */
+function settingsLockOut() {
+  sessionStorage.removeItem(SETTINGS_SESSION_KEY);
+  sessionStorage.removeItem(SETTINGS_AUTH_NAME);
+  refreshLockOverlay();
+  /* Clear the PIN input */
+  var inp = document.getElementById('lock-pin-input');
+  if (inp) { inp.value = ''; inp.disabled = false; }
+  var err = document.getElementById('lock-err');
+  if (err) err.textContent = '';
+}
+
+/* ── Toggle PIN visibility ── */
+function toggleLockEye() {
+  var inp = document.getElementById('lock-pin-input');
+  var btn = document.getElementById('lock-eye-btn');
+  if (!inp) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    inp.style.letterSpacing = '0';
+    if (btn) btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    inp.style.letterSpacing = '3px';
+    if (btn) btn.textContent = '👁';
+  }
+}
+
+/* ── Guard saveSettings — block if not authenticated ── */
+var _origSaveSettings = saveSettings;
+saveSettings = function() {
+  if (!isSettingsAuthenticated()) {
+    refreshLockOverlay();
+    return;
+  }
+  _origSaveSettings();
+};
+
+/* ── Guard resetToDefaults ── */
+var _origResetToDefaults = resetToDefaults;
+resetToDefaults = function() {
+  if (!isSettingsAuthenticated()) {
+    refreshLockOverlay();
+    return;
+  }
+  _origResetToDefaults();
+};
+
+/* ── Intercept showTab to trigger lock overlay when navigating to settings ── */
+var _origShowTab = showTab;
+showTab = function(t) {
+  _origShowTab(t);
+  if (t === 'settings') {
+    /* Small delay so the view is visible before overlay renders */
+    setTimeout(refreshLockOverlay, 30);
+  }
+};
+
+/* ── Init: check session on page load ── */
+document.addEventListener('DOMContentLoaded', function(){
+  /* Refresh overlay state after everything loads */
+  setTimeout(refreshLockOverlay, 100);
+});
+
 </script>
 </body>
 </html>
