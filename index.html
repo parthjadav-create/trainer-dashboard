@@ -7,6 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
   --primary:#ef5350;
@@ -211,6 +214,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .tgt-close{color:#ffa657;font-weight:700;}
 .export-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(63,185,80,0.12);color:#3fb950;border:1px solid rgba(63,185,80,0.35);padding:5px 13px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .export-btn:hover{background:rgba(63,185,80,0.22);border-color:rgba(63,185,80,0.6);}
+.pdf-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(248,81,73,0.12);color:#f85149;border:1px solid rgba(248,81,73,0.35);padding:5px 13px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pdf-btn:hover{background:rgba(248,81,73,0.22);border-color:rgba(248,81,73,0.6);}
+.snap-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(88,166,255,0.12);color:#58a6ff;border:1px solid rgba(88,166,255,0.35);padding:5px 13px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.snap-btn:hover{background:rgba(88,166,255,0.22);border-color:rgba(88,166,255,0.6);}
+.btn-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 
 /* OFS INFO NOTE */
 .ofs-note{background:linear-gradient(135deg,rgba(88,166,255,0.08),rgba(188,140,255,0.06));border:1px solid rgba(88,166,255,0.25);border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;}
@@ -332,6 +340,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 
     <!-- OVERVIEW -->
     <div class="view on" id="view-overview">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;color:var(--text2);">Key Performance Indicators</span>
+        <div class="btn-group">
+          <button class="snap-btn" onclick="snapSection('view-overview','Overview_KPI')">📸 Screenshot</button>
+          <button class="pdf-btn" onclick="exportOverviewPDF()">⬇ PDF Export</button>
+        </div>
+      </div>
       <div class="kpi-grid" id="kpi-grid"></div>
       <div class="g2">
         <div class="card">
@@ -345,6 +360,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <span style="font-size:10px;color:var(--text2);">Target: <span id="lbl-std-target" style="color:#ffa657;font-weight:700;">2.5/day</span></span>
               <span class="cm" id="trainer-m">–</span>
               <button class="export-btn" onclick="exportLeaderboard()">⬇ Export Excel</button>
+              <button class="pdf-btn" onclick="exportTablePDF('lb-body',['#','Trainer','Total','Done','Working Days','Target','Avg/Day'],'Top Performers')">⬇ PDF</button>
             </div>
           </div>
           <div class="st">
@@ -376,6 +392,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         </select>
         <span class="cm" id="trainer-count-label">–</span>
       </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+        <div class="btn-group">
+          <button class="snap-btn" onclick="snapSection('view-trainers','Trainer_Details')">📸 Screenshot</button>
+          <button class="pdf-btn" onclick="exportTrainerDetailPDF()">⬇ PDF Export</button>
+        </div>
+      </div>
       <div class="card">
         <div style="overflow-x:auto;">
           <table class="tbl">
@@ -389,6 +411,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 
     <!-- VIRTUAL CALLS -->
     <div class="view" id="view-virtual">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+        <div class="btn-group">
+          <button class="snap-btn" onclick="snapSection('view-virtual','Virtual_Calls')">📸 Screenshot</button>
+          <button class="pdf-btn" onclick="exportVirtualPDF()">⬇ PDF Export</button>
+        </div>
+      </div>
       <div class="virt-grid" id="virt-kpi"></div>
       <div class="g2">
         <div class="card">
@@ -407,6 +435,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 
     <!-- CITIES -->
     <div class="view" id="view-cities">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+        <div class="btn-group">
+          <button class="snap-btn" onclick="snapSection('view-cities','Cities')">📸 Screenshot</button>
+          <button class="pdf-btn" onclick="exportCitiesPDF()">⬇ PDF Export</button>
+        </div>
+      </div>
       <div class="card">
         <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">🏙️</div>Training Volume by City</div><span class="cm" id="city-count">–</span></div>
         <div class="cb cscroll"><div class="cbars" id="city-bars"></div></div>
@@ -441,7 +475,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="card">
         <div class="ch">
           <div class="ct"><div class="ci" style="background:var(--orange2);">🚗</div>Out of Station — Top Performers (Target: <span id="lbl-ofs-target">3.0</span>/day)</div>
-          <button class="export-btn" onclick="exportOFS()">⬇ Export Excel</button>
+          <div class="btn-group">
+            <button class="snap-btn" onclick="snapSection('view-ofs','OFS_Performance')">📸 Screenshot</button>
+            <button class="pdf-btn" onclick="exportOFSPDF()">⬇ PDF</button>
+            <button class="export-btn" onclick="exportOFS()">⬇ Excel</button>
+          </div>
         </div>
         <div style="overflow-x:auto;">
           <table class="tbl">
@@ -475,7 +513,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           </div>
           <button class="rs-btn" onclick="resetWeeklyFilter()" style="margin-top:16px;">Current Week</button>
         </div>
-        <button class="export-btn" onclick="exportWeekly()">⬇ Export Weekly Excel</button>
+        <div class="btn-group">
+          <button class="snap-btn" onclick="snapWeeklyFull()">📸 Full Screenshot</button>
+          <button class="pdf-btn" onclick="exportWeeklyPDF()">⬇ PDF Export</button>
+          <button class="export-btn" onclick="exportWeekly()">⬇ Excel</button>
+        </div>
       </div>
 
       <!-- Summary Header Bar -->
@@ -724,6 +766,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 
     <!-- MATRIX -->
     <div class="view" id="view-matrix">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+        <div class="btn-group">
+          <button class="snap-btn" onclick="snapSection('view-matrix','Mode_Matrix')">📸 Screenshot</button>
+          <button class="pdf-btn" onclick="exportMatrixPDF()">⬇ PDF Export</button>
+        </div>
+      </div>
       <div class="card">
         <div class="ch"><div class="ct"><div class="ci" style="background:var(--purple2);">📊</div>Trainer × Training Mode Matrix</div></div>
         <div style="overflow-x:auto;">
@@ -745,7 +793,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="team-search" placeholder="Search team members..." oninput="rTeam()"/></div>
           </div>
         </div>
-        <div style="display:flex;justify-content:flex-end;padding:0 18px 10px;"><button class="export-btn" onclick="exportTeamInfo()">⬇ Export Excel</button></div>
+        <div style="display:flex;justify-content:flex-end;padding:0 18px 10px;">
+          <div class="btn-group">
+            <button class="snap-btn" onclick="snapSection('view-team','Team_Info')">📸 Screenshot</button>
+            <button class="pdf-btn" onclick="exportTeamPDF()">⬇ PDF</button>
+            <button class="export-btn" onclick="exportTeamInfo()">⬇ Excel</button>
+          </div>
+        </div>
         <div style="overflow-x:auto;">
           <table class="tbl">
             <thead><tr><th>Sr No</th><th>Emp Full Name</th><th>City</th><th>State</th><th>Languages</th><th>Zone</th><th>Email ID</th><th>Designation</th><th>Team Lead</th><th class="tc">Working Days</th><th class="tc">Not Present</th><th class="tc">Last Active</th><th class="tc">Status</th></tr></thead>
@@ -1508,6 +1562,267 @@ function exportTeamInfo(){
   XLSX.utils.book_append_sheet(wb,ws,"Team Info");
   var now=new Date(),stamp=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);
   XLSX.writeFile(wb,"Team_Info_"+stamp+".xlsx");
+}
+
+/* ══════════════════════════════════════════
+   PDF & SCREENSHOT UTILITIES
+   ══════════════════════════════════════════ */
+
+/* ── Stamp: today date string ── */
+function stampNow(){
+  var n=new Date();
+  return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)+"-"+("0"+n.getDate()).slice(-2);
+}
+
+/* ── Generic: snapshot any section to PNG download ── */
+function snapSection(viewId,filename){
+  var el=document.getElementById(viewId);
+  if(!el){alert("View not found.");return;}
+  var btn=event&&event.target?event.target:null;
+  if(btn)btn.textContent="⏳ Capturing...";
+  html2canvas(el,{
+    backgroundColor:"#0d1117",
+    scale:2,
+    useCORS:true,
+    allowTaint:true,
+    scrollX:0,scrollY:0,
+    width:el.scrollWidth,
+    height:el.scrollHeight
+  }).then(function(canvas){
+    var link=document.createElement('a');
+    link.download=filename+"_"+stampNow()+".png";
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    if(btn)btn.textContent="📸 Screenshot";
+  }).catch(function(e){
+    alert("Screenshot failed: "+e.message);
+    if(btn)btn.textContent="📸 Screenshot";
+  });
+}
+
+/* ── WEEKLY FULL SCREENSHOT: captures all 4 bands + summary ── */
+function snapWeeklyFull(){
+  var el=document.getElementById('view-weekly');
+  if(!el){alert("Weekly view not found.");return;}
+  var btn=event&&event.target?event.target:null;
+  if(btn)btn.textContent="⏳ Capturing...";
+  // Temporarily expand all scrollable tables
+  var scrollDivs=el.querySelectorAll('[style*="overflow-x:auto"]');
+  var origStyles=[];
+  scrollDivs.forEach(function(d,i){
+    origStyles[i]=d.style.overflow;
+    d.style.overflow='visible';
+  });
+  html2canvas(el,{
+    backgroundColor:"#0d1117",
+    scale:2,
+    useCORS:true,
+    allowTaint:true,
+    scrollX:0,scrollY:0,
+    width:el.scrollWidth,
+    height:el.scrollHeight
+  }).then(function(canvas){
+    scrollDivs.forEach(function(d,i){d.style.overflow=origStyles[i]||'';});
+    var link=document.createElement('a');
+    link.download="Weekly_KPI_Full_"+stampNow()+".png";
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    if(btn)btn.textContent="📸 Full Screenshot";
+  }).catch(function(e){
+    scrollDivs.forEach(function(d,i){d.style.overflow=origStyles[i]||'';});
+    alert("Screenshot failed: "+e.message);
+    if(btn)btn.textContent="📸 Full Screenshot";
+  });
+}
+
+/* ── Helper: get PDF page title ── */
+function pdfHeader(doc,title){
+  var dTitle=localStorage.getItem('dash_title')||"OnSite OpsVision Dashboard";
+  doc.setFontSize(14);doc.setTextColor(239,83,80);
+  doc.text(dTitle,14,16);
+  doc.setFontSize(10);doc.setTextColor(139,148,158);
+  doc.text(title+" — Generated: "+stampNow(),14,23);
+}
+
+/* ── Helper: build autoTable from a tbody/tfoot ── */
+function getTableData(tbodyId,tfootId){
+  var rows=[];
+  document.getElementById(tbodyId).querySelectorAll('tr').forEach(function(tr){
+    var row=[];
+    tr.querySelectorAll('td').forEach(function(td){row.push(td.innerText.trim());});
+    if(row.length)rows.push(row);
+  });
+  var foot=[];
+  if(tfootId){
+    document.getElementById(tfootId).querySelectorAll('tr').forEach(function(tr){
+      var row=[];
+      tr.querySelectorAll('td').forEach(function(td){row.push(td.innerText.trim());});
+      if(row.length)foot.push(row);
+    });
+  }
+  return{body:rows,foot:foot};
+}
+
+/* ── OVERVIEW PDF: KPI cards + Leaderboard ── */
+function exportOverviewPDF(){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,"Overview — KPI & Top Performers");
+  // KPI cards as a summary table
+  var kpiRows=[];
+  document.getElementById('kpi-grid').querySelectorAll('.kpi').forEach(function(card){
+    var label=card.querySelector('.kpi-l')?card.querySelector('.kpi-l').innerText:'';
+    var value=card.querySelector('.kpi-v')?card.querySelector('.kpi-v').innerText:'';
+    var pct=card.querySelector('.badge')?card.querySelector('.badge').innerText:'';
+    kpiRows.push([label,value,pct]);
+  });
+  doc.autoTable({startY:28,head:[['KPI Metric','Value','%']],body:kpiRows,theme:'grid',
+    headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:9},
+    bodyStyles:{fontSize:9},columnStyles:{0:{cellWidth:70},1:{cellWidth:30,halign:'center'},2:{cellWidth:30,halign:'center'}},
+    margin:{left:14,right:14}});
+  var y=doc.lastAutoTable.finalY+6;
+  doc.setFontSize(10);doc.setTextColor(239,83,80);doc.text("Top Performers",14,y);
+  var td=getTableData('lb-body',null);
+  doc.autoTable({startY:y+3,head:[['#','Trainer','Total','Done','Working Days','Target','Avg/Day']],body:td.body,theme:'striped',
+    headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:8},
+    bodyStyles:{fontSize:8},
+    columnStyles:{0:{cellWidth:10},1:{cellWidth:55},2:{cellWidth:18,halign:'center'},3:{cellWidth:18,halign:'center'},4:{cellWidth:28,halign:'center'},5:{cellWidth:20,halign:'center'},6:{cellWidth:25,halign:'center'}},
+    margin:{left:14,right:14}});
+  doc.save("Overview_"+stampNow()+".pdf");
+}
+
+/* ── exportTablePDF: generic single-table PDF ── */
+function exportTablePDF(tbodyId,headers,title){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,title);
+  var td=getTableData(tbodyId,null);
+  doc.autoTable({startY:28,head:[headers],body:td.body,theme:'striped',
+    headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:8},
+    bodyStyles:{fontSize:8},margin:{left:14,right:14}});
+  doc.save(title.replace(/\s+/g,'_')+"_"+stampNow()+".pdf");
+}
+
+/* ── TRAINER DETAIL PDF ── */
+function exportTrainerDetailPDF(){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,"Trainer Details");
+  var td=getTableData('trainer-detail-body','trainer-detail-foot');
+  var heads=[['#','Trainer','Total','Done','Closed','Re-sch','Not Rel','Physical','Re-train','OFS','Virtual','Other','Days','Avg/Day','Done%']];
+  doc.autoTable({startY:28,head:heads,body:td.body,foot:td.foot,theme:'striped',
+    headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:7},
+    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},
+    bodyStyles:{fontSize:7},margin:{left:8,right:8}});
+  doc.save("Trainer_Details_"+stampNow()+".pdf");
+}
+
+/* ── VIRTUAL CALLS PDF ── */
+function exportVirtualPDF(){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,"Virtual Calls");
+  var td=getTableData('virt-trainer-body','virt-trainer-foot');
+  doc.autoTable({startY:28,head:[['#','Trainer','Virtual Total','Done','Other','Languages','Done%']],body:td.body,foot:td.foot,theme:'striped',
+    headStyles:{fillColor:[88,166,255],textColor:255,fontStyle:'bold',fontSize:8},
+    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},
+    bodyStyles:{fontSize:8},margin:{left:14,right:14}});
+  doc.save("Virtual_Calls_"+stampNow()+".pdf");
+}
+
+/* ── CITIES PDF ── */
+function exportCitiesPDF(){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,"City-wise Breakdown");
+  var td=getTableData('city-detail-body','city-detail-foot');
+  doc.autoTable({startY:28,head:[['#','City','Total','Done','Virtual','Physical','Trainers','Done%']],body:td.body,foot:td.foot,theme:'striped',
+    headStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},
+    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},
+    bodyStyles:{fontSize:8},margin:{left:14,right:14}});
+  doc.save("Cities_"+stampNow()+".pdf");
+}
+
+/* ── OFS PDF ── */
+function exportOFSPDF(){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,"Out of Station Performance (Target: "+OFS_TARGET_PER_DAY+"/day)");
+  var td=getTableData('ofs-body','ofs-foot');
+  doc.autoTable({startY:28,head:[['#','Trainer','Total','Raw Done','OFS Visits','OFS Done','Eff.Done','Days','Target','Eff.Avg','Status']],body:td.body,foot:td.foot,theme:'striped',
+    headStyles:{fillColor:[255,166,87],textColor:[30,30,30],fontStyle:'bold',fontSize:7},
+    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},
+    bodyStyles:{fontSize:7},margin:{left:8,right:8}});
+  doc.save("OFS_Performance_"+stampNow()+".pdf");
+}
+
+/* ── MATRIX PDF ── */
+function exportMatrixPDF(){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,"Trainer × Training Mode Matrix");
+  var td=getTableData('mx-body','mx-foot');
+  doc.autoTable({startY:28,head:[['Trainer','Phys.Visit','Phys.Retrain','Out of Station','OFS Support','Virtual','Incomplete','Feedback','Total']],body:td.body,foot:td.foot,theme:'striped',
+    headStyles:{fillColor:[188,140,255],textColor:255,fontStyle:'bold',fontSize:7},
+    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},
+    bodyStyles:{fontSize:7},margin:{left:8,right:8}});
+  doc.save("Mode_Matrix_"+stampNow()+".pdf");
+}
+
+/* ── TEAM PDF ── */
+function exportTeamPDF(){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,"Petpooja Training Team");
+  var td=getTableData('team-body',null);
+  doc.autoTable({startY:28,head:[['Sr','Name','City','State','Languages','Zone','Email','Designation','Team Lead','W.Days','Absent','Last Active','Status']],body:td.body,theme:'striped',
+    headStyles:{fillColor:[88,166,255],textColor:255,fontStyle:'bold',fontSize:6},
+    bodyStyles:{fontSize:6},margin:{left:5,right:5}});
+  doc.save("Team_Info_"+stampNow()+".pdf");
+}
+
+/* ── WEEKLY KPI PDF — all 4 bands on separate sections ── */
+function exportWeeklyPDF(){
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdfHeader(doc,"Weekly KPI — Ratio Bifurcation");
+  var bands=[
+    {id:'weekly-body-100',foot:'weekly-foot-100',label:'🏆 100% ACHIEVED',color:[27,94,32],tColor:255},
+    {id:'weekly-body-90',foot:'weekly-foot-90',label:'✅ 90% to <100% ACHIEVED',color:[26,35,126],tColor:255},
+    {id:'weekly-body-80',foot:'weekly-foot-80',label:'⚠️ 80% to <90% ACHIEVED',color:[230,81,0],tColor:255},
+    {id:'weekly-body-below',foot:'weekly-foot-below',label:'❌ BELOW 80% ACHIEVED',color:[183,28,28],tColor:255}
+  ];
+  // Summary bar
+  var summaryEl=document.getElementById('weekly-summary-bar');
+  if(summaryEl){
+    doc.setFontSize(8);doc.setTextColor(100,100,100);
+    doc.text(summaryEl.innerText.replace(/\|/g,'  |  '),14,27);
+  }
+  var startY=33;
+  var heads=[['Sr.','Trainer Name','Days Worked','Normal Visits','Outstation (×2)','Weighted Achieved','Target','Ach %']];
+  bands.forEach(function(band,idx){
+    var td=getTableData(band.id,band.foot);
+    var titleEl=document.getElementById(band.id.replace('body','title'));
+    var label=titleEl?titleEl.innerText:band.label;
+    if(idx>0){doc.addPage();startY=20;pdfHeader(doc,"Weekly KPI — Ratio Bifurcation (cont.)");}
+    doc.setFontSize(10);doc.setTextColor(band.color[0],band.color[1],band.color[2]);
+    doc.text(label,14,startY);
+    doc.autoTable({
+      startY:startY+4,
+      head:heads,
+      body:td.body,
+      foot:td.foot,
+      theme:'striped',
+      headStyles:{fillColor:band.color,textColor:band.tColor,fontStyle:'bold',fontSize:8},
+      footStyles:{fillColor:[45,51,59],textColor:[200,200,200],fontStyle:'bold',fontSize:8},
+      bodyStyles:{fontSize:8,textColor:[30,30,30]},
+      margin:{left:14,right:14},
+      didParseCell:function(data){
+        if(data.section==='body'&&data.column.index===7){
+          var txt=data.cell.raw||'';
+          var pct=parseFloat(txt);
+          if(pct>=100)data.cell.styles.textColor=[27,94,32];
+          else if(pct>=90)data.cell.styles.textColor=[26,35,126];
+          else if(pct>=80)data.cell.styles.textColor=[230,81,0];
+          else data.cell.styles.textColor=[183,28,28];
+          data.cell.styles.fontStyle='bold';
+        }
+      }
+    });
+    startY=doc.lastAutoTable.finalY+8;
+  });
+  doc.save("Weekly_KPI_PDF_"+stampNow()+".pdf");
 }
 
 /* ── INIT ── */
