@@ -1451,10 +1451,55 @@ function rKPI(){
     {l:"Virtual Calls",v:virt,p:pct(virt,tot),dc:"#58a6ff",ic:"💻",fill:pn(virt,tot),bd:"badge-b"},
     {l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"}
   ];
-  var kpiIds=['total','done','closed','resch','notrel','virt','active'];
-  var activeKpis=kpis.filter(function(k,i){return localStorage.getItem('kpi_'+kpiIds[i])!=='false';});
-  document.getElementById("kpi-grid").innerHTML=activeKpis.map(function(k){return '<div class="kpi"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';}).join("");
-}
+var kpiIds=['total','done','closed','resch','notrel','virt','active'];
+
+var activeKpis=kpis.filter(function(k,i){
+   return localStorage.getItem('kpi_'+kpiIds[i])!=='false';
+});
+
+var uniqueDates={};
+
+filteredRows.forEach(function(r){
+   if(r.date){
+      uniqueDates[r.date]=1;
+   }
+});
+
+var totalDays=Object.keys(uniqueDates).length || 1;
+
+var avgVisitPerDay=(tot/totalDays).toFixed(1);
+
+var kpiHTML=activeKpis.map(function(k){
+
+   return '<div class="kpi">'
+      +'<div class="kpi-top">'
+      +'<div class="kpi-ic">'+k.ic+'</div>'
+      +'<span class="badge '+k.bd+'">'+k.p+'</span>'
+      +'</div>'
+      +'<div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div>'
+      +'<div class="kpi-l">'+k.l+'</div>'
+      +'<div class="kpi-bar">'
+      +'<div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div>'
+      +'</div>'
+      +'</div>';
+
+}).join("");
+
+kpiHTML +=
+   '<div class="kpi">'
+   +'<div class="kpi-top">'
+   +'<div class="kpi-ic">📅</div>'
+   +'<span class="badge badge-b">'+totalDays+' Days</span>'
+   +'</div>'
+   +'<div class="kpi-v" style="color:#58a6ff">'+avgVisitPerDay+'</div>'
+   +'<div class="kpi-l">Avg Visits / Day</div>'
+   +'<div class="kpi-bar">'
+   +'<div class="kpi-fill" style="width:100%;background:#58a6ff"></div>'
+   +'</div>'
+   +'</div>';
+
+document.getElementById("kpi-grid").innerHTML=kpiHTML;
+  }
  
 function getChartTension(){var cs=localStorage.getItem('chart_style')||'smooth';if(cs==='linear')return 0;if(cs==='stepped')return 0;return 0.4;}
 function getChartStepped(){return(localStorage.getItem('chart_style')||'smooth')==='stepped';}
