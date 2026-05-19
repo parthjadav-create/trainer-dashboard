@@ -423,7 +423,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <button class="pdf-btn" onclick="exportOverviewPDF()">⬇ PDF Export</button>
         </div>
       </div>
-      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card">
+  <div class="kpi-title">Avg Visits / Day</div>
+  <div class="kpi-value" id="avgVisitPerDay">0</div>
+</div>
+      </div>
       <div class="g2">
         <div class="card">
           <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">📈</div>Daily Training Volume</div><span class="cm" id="trend-m">–</span></div>
