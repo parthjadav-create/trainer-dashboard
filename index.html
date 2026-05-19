@@ -1486,9 +1486,42 @@ var avgTicketReceivedPerDay=
 (totalReceived/totalDays).toFixed(1);
 
 
-var kpiHTML=activeKpis.map(function(k){
+/* AVG VISITS PER DAY card HTML */
+var avgVisitCard=
+   '<div class="kpi">'
+   +'<div class="kpi-top">'
+   +'<div class="kpi-ic">📅</div>'
+   +'<span class="badge badge-b">'+totalDays+' Days</span>'
+   +'</div>'
+   +'<div class="kpi-v" style="color:#58a6ff">'
+   +avgVisitPerDay
+   +'</div>'
+   +'<div class="kpi-l">Avg Visits / Day</div>'
+   +'<div class="kpi-bar">'
+   +'<div class="kpi-fill" style="width:100%;background:#58a6ff"></div>'
+   +'</div>'
+   +'</div>';
 
-   return '<div class="kpi">'
+/* AVG RECEIVED TICKETS PER DAY card HTML */
+var avgReceivedCard=
+   '<div class="kpi">'
+   +'<div class="kpi-top">'
+   +'<div class="kpi-ic">📨</div>'
+   +'<span class="badge badge-o">'+totalDays+' Days</span>'
+   +'</div>'
+   +'<div class="kpi-v" style="color:#f39c12">'
+   +avgTicketReceivedPerDay
+   +'</div>'
+   +'<div class="kpi-l">Avg Tickets Received / Day</div>'
+   +'<div class="kpi-bar">'
+   +'<div class="kpi-fill" style="width:100%;background:#f39c12"></div>'
+   +'</div>'
+   +'</div>';
+
+/* Build KPI cards and inject avg cards at position 3 & 4 (after Done, before Closed) */
+var kpiHTML='';
+activeKpis.forEach(function(k,i){
+   var card='<div class="kpi">'
       +'<div class="kpi-top">'
       +'<div class="kpi-ic">'+k.ic+'</div>'
       +'<span class="badge '+k.bd+'">'+k.p+'</span>'
@@ -1501,46 +1534,13 @@ var kpiHTML=activeKpis.map(function(k){
       +'<div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div>'
       +'</div>'
       +'</div>';
-
-}).join("");
-
-
-
-/* AVG VISITS PER DAY KPI */
-
-kpiHTML +=
-   '<div class="kpi">'
-   +'<div class="kpi-top">'
-   +'<div class="kpi-ic">📅</div>'
-   +'<span class="badge badge-b">'+totalDays+' Days</span>'
-   +'</div>'
-   +'<div class="kpi-v" style="color:#58a6ff">'
-   +avgVisitPerDay+
-   '</div>'
-   +'<div class="kpi-l">Avg Visits / Day</div>'
-   +'<div class="kpi-bar">'
-   +'<div class="kpi-fill" style="width:100%;background:#58a6ff"></div>'
-   +'</div>'
-   +'</div>';
-
-
-
-/* AVG RECEIVED TICKETS PER DAY KPI */
-
-kpiHTML +=
-   '<div class="kpi">'
-   +'<div class="kpi-top">'
-   +'<div class="kpi-ic">📨</div>'
-   +'<span class="badge badge-o">'+totalDays+' Days</span>'
-   +'</div>'
-   +'<div class="kpi-v" style="color:#f39c12">'
-   +avgTicketReceivedPerDay+
-   '</div>'
-   +'<div class="kpi-l">Avg Tickets Received / Day</div>'
-   +'<div class="kpi-bar">'
-   +'<div class="kpi-fill" style="width:100%;background:#f39c12"></div>'
-   +'</div>'
-   +'</div>';
+   kpiHTML+=card;
+   /* After the 2nd card (index 1 = Done), insert the two avg cards */
+   if(i===1){
+      kpiHTML+=avgVisitCard;
+      kpiHTML+=avgReceivedCard;
+   }
+});
 
 document.getElementById("kpi-grid").innerHTML=kpiHTML;
   }
