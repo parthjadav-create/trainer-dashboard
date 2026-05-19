@@ -1479,38 +1479,118 @@ function rLeader(){
 }
  
 function rDate(){
-  plugins: {
-  legend: {
-    labels: {
-      color: "#c9d1d9"
-    }
-  },
-  tooltip: {
-    mode: 'index',
-    intersect: false
-  },
-  datalabels: {
-    color: '#ffffff',
-    anchor: 'end',
-    align: 'bottom',
-    offset: 4,
-    font: {
-      weight: 'bold',
-      size: 10
-    },
-    formatter: function(value) {
-      return value;
-    }
-  }
-}
   var mbd={},ds={};
-  filteredRows.forEach(function(r){if(!r.date)return;ds[r.date]=1;if(!mbd[r.mode])mbd[r.mode]={};mbd[r.mode][r.date]=(mbd[r.mode][r.date]||0)+1;});
+
+  filteredRows.forEach(function(r){
+    if(!r.date)return;
+    ds[r.date]=1;
+
+    if(!mbd[r.mode]) mbd[r.mode]={};
+
+    mbd[r.mode][r.date]=(mbd[r.mode][r.date]||0)+1;
+  });
+
   var dates=Object.keys(ds).sort();
-  var am=MODES.filter(function(m){return filteredRows.some(function(r){return r.mode===m;});});
-  var ds2=am.map(function(mode,i){return{label:mode,data:dates.map(function(d){return mbd[mode]?mbd[mode][d]||0:0;}),borderColor:COLORS[i],backgroundColor:COLORS[i]+"22",borderWidth:2,pointRadius:2,tension:getChartTension(),stepped:getChartStepped(),fill:false};});
-  if(charts.d)charts.d.destroy();
+
+  var am=MODES.filter(function(m){
+    return filteredRows.some(function(r){
+      return r.mode===m;
+    });
+  });
+
+  var ds2=am.map(function(mode,i){
+    return {
+      label:mode,
+      data:dates.map(function(d){
+        return mbd[mode] ? mbd[mode][d] || 0 : 0;
+      }),
+      borderColor:COLORS[i],
+      backgroundColor:COLORS[i]+"22",
+      borderWidth:2,
+      pointRadius:3,
+      pointBackgroundColor:COLORS[i],
+      tension:getChartTension(),
+      stepped:getChartStepped(),
+      fill:false
+    };
+  });
+
+  if(charts.d) charts.d.destroy();
+
   var ctx=document.getElementById("dateChart").getContext("2d");
-  charts.d=new Chart(ctx,{type:"line",data:{labels:dates.map(function(d){return d.slice(5);}),datasets:ds2},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#8b949e",font:{size:9},boxWidth:8,padding:10}}},scales:{x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9},maxTicksLimit:20}},y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9}}}}}});
+
+  charts.d=new Chart(ctx,{
+    type:"line",
+
+    data:{
+      labels:dates.map(function(d){
+        return d.slice(5);
+      }),
+      datasets:ds2
+    },
+
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+
+      plugins:{
+        legend:{
+          labels:{
+            color:"#8b949e",
+            font:{size:9},
+            boxWidth:8,
+            padding:10
+          }
+        },
+
+        tooltip:{
+          mode:'index',
+          intersect:false
+        },
+
+        datalabels:{
+          color:'#ffffff',
+          anchor:'end',
+          align:'bottom',
+          offset:4,
+
+          font:{
+            weight:'bold',
+            size:10
+          },
+
+          formatter:function(value){
+            return value > 0 ? value : '';
+          }
+        }
+      },
+
+      scales:{
+        x:{
+          grid:{
+            color:"rgba(255,255,255,0.04)"
+          },
+          ticks:{
+            color:"#8b949e",
+            font:{size:9},
+            maxTicksLimit:20
+          }
+        },
+
+        y:{
+          grid:{
+            color:"rgba(255,255,255,0.04)"
+          },
+          ticks:{
+            color:"#8b949e",
+            font:{size:9}
+          }
+        }
+      }
+    },
+
+    plugins:[ChartDataLabels]
+  });
 }
  
 function rMode(){
