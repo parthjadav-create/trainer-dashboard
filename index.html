@@ -9,6 +9,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
+  --primary:#ef5350;
+  --primary-dark:#b71c1c;
+  --primary-light:#ff6b6b;
+  --primary-rgb:239,83,80;
   --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;
   --card:#1c2128;--card2:#21262d;--card3:#2d333b;
   --border:#30363d;--border2:#444c56;
@@ -20,6 +24,16 @@
   --text:#e6edf3;--text2:#8b949e;--text3:#c9d1d9;
   --r:10px;
 }
+
+/* ── THEMES ── */
+[data-theme='midnight']{--bg:#0b0e14;--bg2:#151b23;--bg3:#1c242f;--card:#151b23;--card2:#1c242f;--card3:#26303d;--border:#303c4a;--border2:#445363;}
+[data-theme='emerald']{--bg:#09120e;--bg2:#111e17;--bg3:#1a2b21;--card:#111e17;--card2:#1a2b21;--card3:#243a2f;--border:#2f4a3e;--border2:#426152;--green:#51f883;}
+[data-theme='light']{--bg:#f4f7f9;--bg2:#ffffff;--bg3:#ffffff;--card:#ffffff;--card2:#f0f3f6;--card3:#e5e9ef;--border:#d1d9e0;--border2:#afb8c1;--text:#1f2328;--text2:#656d76;--text3:#1f2328;}
+[data-theme='light'] .watermark img{filter:brightness(0) opacity(0.05);}
+[data-theme='light'] .loader-logo,[data-theme='light'] .sb-logo img{filter:brightness(0);}
+[data-theme='light'] .card,[data-theme='light'] .kpi{background:var(--bg2);border:1px solid var(--border);}
+[data-theme='light'] .tbl th{background:#f6f8fa;}
+[data-theme='light'] .nav:hover{background:rgba(0,0,0,0.04);}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;display:flex;min-height:100vh;overflow-x:hidden;}
 
@@ -112,7 +126,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .view{display:none;}
 .view.on{display:flex;flex-direction:column;gap:16px;}
 
-.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
 .kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
 .kpi-ic{font-size:18px;line-height:1;}
 .kpi-v{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;line-height:1;margin-bottom:3px;}
@@ -252,17 +266,17 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="sb-sec">Menu</div>
   <div class="nav on" onclick="showTab('overview')"><span class="nav-ic">📊</span><span>Overview</span><span class="nav-bd g" id="total-bd">–</span></div>
   <div class="nav" onclick="showTab('trainers')"><span class="nav-ic">👥</span><span>Trainers</span></div>
-  <div class="nav" onclick="showTab('virtual')"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
-  <div class="nav" onclick="showTab('cities')"><span class="nav-ic">🏙️</span><span>Cities</span></div>
-  <div class="nav" onclick="showTab('ofs')"><span class="nav-ic">🚗</span><span>Out of Station Visits</span></div>
-  <div class="nav" onclick="showTab('weekly')"><span class="nav-ic">📅</span><span>KPI of the Week</span></div>
+  <div class="nav" onclick="showTab('virtual')" id="sb-nav-virtual"><span class="nav-ic">💻</span><span>Virtual Calls</span></div>
+  <div class="nav" onclick="showTab('cities')" id="sb-nav-cities"><span class="nav-ic">🏙️</span><span>Cities</span></div>
+  <div class="nav" onclick="showTab('ofs')" id="sb-nav-ofs"><span class="nav-ic">🚗</span><span>Out of Station Visits</span></div>
+  <div class="nav" onclick="showTab('weekly')" id="sb-nav-weekly"><span class="nav-ic">📅</span><span>KPI of the Week</span></div>
   <div class="sb-sec">Reports</div>
-  <div class="nav" onclick="showTab('matrix')"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
+  <div class="nav" onclick="showTab('matrix')" id="sb-nav-matrix"><span class="nav-ic">📊</span><span>Mode Matrix</span></div>
   <div class="nav" onclick="showTab('settings')"><span class="nav-ic">⚙️</span><span>Settings</span></div>
   <div class="sb-bot">
-    <div class="u-card" onclick="showTab('team')" style="cursor:pointer;">
+    <div class="u-card" onclick="showTab('team')" style="cursor:pointer;" id="user-profile-card">
       <div class="u-av">A</div>
-      <div><div class="u-nm">Peoples Behind the Vision</div><div class="u-rl">Team Information</div></div>
+      <div><div class="u-nm" id="side-user-name">Peoples Behind the Vision</div><div class="u-rl" id="side-user-role">Team Information</div></div>
     </div>
   </div>
 </aside>
@@ -272,8 +286,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="topbar-left">
       <button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
       <div>
-        <div class="pg-title">OnSite OpsVision Dashboard</div>
-        <div class="pg-sub">Petpooja · Trainer Productivity & Performance Tracker</div>
+        <div class="pg-title" id="top-dash-title">OnSite OpsVision Dashboard</div>
+        <div class="pg-sub" id="top-dash-sub">Petpooja · Trainer Productivity & Performance Tracker</div>
       </div>
     </div>
     <div class="tb-right">
@@ -551,6 +565,40 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <!-- SETTINGS -->
     <div class="view" id="view-settings">
       <div class="settings-grid">
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔗</div>Source Data</div>
+          <div class="settings-group">
+            <label>Google Apps Script API URL</label>
+            <input type="text" id="set-api-url" placeholder="https://script.google.com/macros/s/..." onchange="saveSettings()">
+            <div class="settings-info">The endpoint URL for your Google Sheet data. Changing this will trigger a reload.</div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🏢</div>Dashboard Identity</div>
+          <div class="settings-group">
+            <label>Main Title</label>
+            <input type="text" id="set-dash-title" placeholder="OnSite OpsVision Dashboard" onchange="saveSettings()">
+          </div>
+          <div class="settings-group">
+            <label>Sub-title / Description</label>
+            <input type="text" id="set-dash-sub" placeholder="Petpooja · Trainer Productivity..." onchange="saveSettings()">
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--green3);">👤</div>User Profile</div>
+          <div class="settings-group">
+            <label>Display Name</label>
+            <input type="text" id="set-user-name" placeholder="Admin" onchange="saveSettings()">
+          </div>
+          <div class="settings-group">
+            <label>Designation / Role</label>
+            <input type="text" id="set-user-role" placeholder="Manager" onchange="saveSettings()">
+          </div>
+        </div>
+
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">🎯</div>Performance Targets</div>
           <div class="settings-group">
@@ -564,6 +612,91 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             <div class="settings-info">The target applied to the Out of Station performance view (after 2× OFS credit).</div>
           </div>
         </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">👁️</div>Tab Visibility</div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Virtual Calls</label>
+            <input type="checkbox" id="set-show-virtual" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Cities</label>
+            <input type="checkbox" id="set-show-cities" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Out of Station Visits</label>
+            <input type="checkbox" id="set-show-ofs" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>KPI of the Week</label>
+            <input type="checkbox" id="set-show-weekly" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Mode Matrix</label>
+            <input type="checkbox" id="set-show-matrix" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">📊</div>KPI Visibility</div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Total Tickets</label>
+            <input type="checkbox" id="set-kpi-total" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Done</label>
+            <input type="checkbox" id="set-kpi-done" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Closed</label>
+            <input type="checkbox" id="set-kpi-closed" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Re-scheduled</label>
+            <input type="checkbox" id="set-kpi-resch" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Not Related</label>
+            <input type="checkbox" id="set-kpi-notrel" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Virtual Calls KPI</label>
+            <input type="checkbox" id="set-kpi-virt" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+            <label>Active Trainers</label>
+            <input type="checkbox" id="set-kpi-active" checked onchange="saveSettings()" style="width:auto;">
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🎨</div>Visual Theme</div>
+          <div class="settings-group">
+            <label>Interface Theme</label>
+            <select id="set-theme" onchange="saveSettings()">
+              <option value="default">GitHub Dark (Default)</option>
+              <option value="midnight">Midnight Blue</option>
+              <option value="emerald">Emerald Forest</option>
+              <option value="light">Light Mode</option>
+            </select>
+            <div class="settings-info">Choose a color scheme that suits your workspace environment.</div>
+          </div>
+          <div class="settings-group" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+            <div>
+              <label>Primary Color</label>
+              <input type="color" id="set-color-primary" value="#ef5350" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;">
+            </div>
+            <div>
+              <label>Success Accent</label>
+              <input type="color" id="set-color-green" value="#3fb950" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;">
+            </div>
+            <div>
+              <label>Danger Accent</label>
+              <input type="color" id="set-color-red" value="#f85149" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;">
+            </div>
+          </div>
+        </div>
+
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔄</div>Data Synchronization</div>
           <div class="settings-group">
@@ -577,13 +710,15 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             <div class="settings-info">How often the dashboard pulls fresh data from the Google Sheet.</div>
           </div>
         </div>
+
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">💾</div>Reset</div>
           <div class="settings-group">
-            <div class="settings-info" style="margin-bottom:8px;">Reset all settings back to their original defaults (2.5 standard target, 3.0 OFS target, 1 minute refresh).</div>
+            <div class="settings-info" style="margin-bottom:8px;">Reset all settings back to their original defaults (2.5 standard target, 3.0 OFS target, GitHub Dark theme, 1 minute refresh).</div>
             <button class="rs-btn" style="width:100%;border-color:var(--red);color:var(--red);" onclick="resetToDefaults()">↺ Reset to Default Settings</button>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -624,9 +759,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 </div><!-- /main -->
 
 <script>
-var API="https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d9YbiYeJgkBmcigxAMCN7_B64Z8264K04bVzSZg/exec";
-var TARGET_PER_DAY=2.5;
-var OFS_TARGET_PER_DAY=3.0;
+var DEFAULT_API="https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d9YbiYeJgkBmcigxAMCN7_B64Z8264K04bVzSZg/exec";
+var API=localStorage.getItem('api_url')||DEFAULT_API;
+var TARGET_PER_DAY=parseFloat(localStorage.getItem('target_std'))||2.5;
+var OFS_TARGET_PER_DAY=parseFloat(localStorage.getItem('target_ofs'))||3.0;
 var syncTimer=null;
 var MODES=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
 var COLORS=["#3fb950","#58a6ff","#bc8cff","#ffa657","#f85149","#39d353","#e3b341","#79c0ff","#d2a8ff","#ffb628"];
@@ -723,6 +859,34 @@ function initSettings(){
     document.getElementById('set-target-std').value=TARGET_PER_DAY;
     document.getElementById('set-target-ofs').value=OFS_TARGET_PER_DAY;
     document.getElementById('set-sync-interval').value=interval;
+    document.getElementById('set-api-url').value=API;
+    var dTitle=localStorage.getItem('dash_title')||"OnSite OpsVision Dashboard";
+    var dSub=localStorage.getItem('dash_sub')||"Petpooja · Trainer Productivity & Performance Tracker";
+    var uName=localStorage.getItem('user_name')||"Peoples Behind the Vision";
+    var uRole=localStorage.getItem('user_role')||"Team Information";
+    document.getElementById('set-dash-title').value=dTitle;
+    document.getElementById('set-dash-sub').value=dSub;
+    document.getElementById('set-user-name').value=uName;
+    document.getElementById('set-user-role').value=uRole;
+    document.getElementById('set-show-virtual').checked=localStorage.getItem('show_virtual')!=='false';
+    document.getElementById('set-show-cities').checked=localStorage.getItem('show_cities')!=='false';
+    document.getElementById('set-show-ofs').checked=localStorage.getItem('show_ofs')!=='false';
+    document.getElementById('set-show-weekly').checked=localStorage.getItem('show_weekly')!=='false';
+    document.getElementById('set-show-matrix').checked=localStorage.getItem('show_matrix')!=='false';
+    ['total','done','closed','resch','notrel','virt','active'].forEach(function(k){
+      document.getElementById('set-kpi-'+k).checked=localStorage.getItem('kpi_'+k)!=='false';
+    });
+    var theme=localStorage.getItem('theme')||"default";
+    document.getElementById('set-theme').value=theme;
+    var p=localStorage.getItem('accent_primary')||"#ef5350";
+    var g=localStorage.getItem('accent_green')||"#3fb950";
+    var r=localStorage.getItem('accent_red')||"#f85149";
+    document.getElementById('set-color-primary').value=p;
+    document.getElementById('set-color-green').value=g;
+    document.getElementById('set-color-red').value=r;
+    applyTheme(theme);
+    applyAccents(g,r,p);
+    applyTabVisibility();
     startSync(parseInt(interval));
     updateTargetLabels();
   }catch(e){startSync(60000);}
@@ -730,12 +894,50 @@ function initSettings(){
 function saveSettings(){
   TARGET_PER_DAY=parseFloat(document.getElementById('set-target-std').value)||2.5;
   OFS_TARGET_PER_DAY=parseFloat(document.getElementById('set-target-ofs').value)||3.0;
+  var newApi=document.getElementById('set-api-url').value||DEFAULT_API;
+  var dTitle=document.getElementById('set-dash-title').value||"OnSite OpsVision Dashboard";
+  var dSub=document.getElementById('set-dash-sub').value||"Petpooja · Trainer Productivity & Performance Tracker";
+  var uName=document.getElementById('set-user-name').value||"Peoples Behind the Vision";
+  var uRole=document.getElementById('set-user-role').value||"Team Information";
   var interval=document.getElementById('set-sync-interval').value;
+  var theme=document.getElementById('set-theme').value;
+  var green=document.getElementById('set-color-green').value;
+  var red=document.getElementById('set-color-red').value;
+  var primary=document.getElementById('set-color-primary').value;
   try{
     localStorage.setItem('target_std',TARGET_PER_DAY);
     localStorage.setItem('target_ofs',OFS_TARGET_PER_DAY);
+    localStorage.setItem('api_url',newApi);
+    localStorage.setItem('dash_title',dTitle);
+    localStorage.setItem('dash_sub',dSub);
+    localStorage.setItem('user_name',uName);
+    localStorage.setItem('user_role',uRole);
+    localStorage.setItem('show_virtual',document.getElementById('set-show-virtual').checked);
+    localStorage.setItem('show_cities',document.getElementById('set-show-cities').checked);
+    localStorage.setItem('show_ofs',document.getElementById('set-show-ofs').checked);
+    localStorage.setItem('show_weekly',document.getElementById('set-show-weekly').checked);
+    localStorage.setItem('show_matrix',document.getElementById('set-show-matrix').checked);
+    ['total','done','closed','resch','notrel','virt','active'].forEach(function(k){
+      localStorage.setItem('kpi_'+k,document.getElementById('set-kpi-'+k).checked);
+    });
     localStorage.setItem('sync_interval',interval);
+    localStorage.setItem('theme',theme);
+    localStorage.setItem('accent_primary',primary);
+    localStorage.setItem('accent_green',green);
+    localStorage.setItem('accent_red',red);
   }catch(e){}
+  var titleEl=document.getElementById('top-dash-title');
+  if(titleEl)titleEl.textContent=dTitle;
+  var subEl=document.getElementById('top-dash-sub');
+  if(subEl)subEl.textContent=dSub;
+  var nameEl=document.getElementById('side-user-name');
+  if(nameEl)nameEl.textContent=uName;
+  var roleEl=document.getElementById('side-user-role');
+  if(roleEl)roleEl.textContent=uRole;
+  if(API!==newApi){API=newApi;loadData();}
+  applyTheme(theme);
+  applyAccents(green,red,primary);
+  applyTabVisibility();
   startSync(parseInt(interval));
   updateTargetLabels();
   render();
@@ -748,6 +950,46 @@ function updateTargetLabels(){
   var lbl3=document.getElementById('lbl-ofs-target2');
   if(lbl3)lbl3.textContent="("+OFS_TARGET_PER_DAY+"/day)";
 }
+function applyTabVisibility(){
+  var tabs=['virtual','cities','ofs','weekly','matrix'];
+  var currentTabHidden=false;
+  tabs.forEach(function(t){
+    var show=localStorage.getItem('show_'+t)!=='false';
+    var sbEl=document.getElementById('sb-nav-'+t);
+    var topEl=document.getElementById('tab-'+t);
+    if(sbEl)sbEl.style.display=show?'flex':'none';
+    if(topEl)topEl.style.display=show?'block':'none';
+    if(curTab===t&&!show)currentTabHidden=true;
+  });
+  if(currentTabHidden)showTab('overview');
+}
+function applyTheme(theme){
+  if(theme==='default')document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme',theme);
+}
+function applyAccents(g,r,p){
+  var root=document.documentElement;
+  root.style.setProperty('--green',g);
+  root.style.setProperty('--red',r);
+  root.style.setProperty('--primary',p);
+  if(typeof SC!=='undefined'){SC["Done"]=g;SC["Close"]=r;}
+  if(typeof COLORS!=='undefined'){COLORS[0]=g;COLORS[4]=r;}
+  var hex2rgb=function(hex){
+    var c=hex.substring(1);
+    if(c.length===3)c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+    var rgb=parseInt(c,16);
+    return ((rgb>>16)&0xff)+","+((rgb>>8)&0xff)+","+(rgb&0xff);
+  };
+  root.style.setProperty('--primary-rgb',hex2rgb(p));
+  root.style.setProperty('--green3','rgba('+hex2rgb(g)+',0.1)');
+  root.style.setProperty('--red2','rgba('+hex2rgb(r)+',0.1)');
+  var pInt=parseInt(p.substring(1),16);
+  var rv=(pInt>>16)&0xff,gv=(pInt>>8)&0xff,bv=pInt&0xff;
+  var pDark="#"+(((Math.max(0,rv-40)<<16)|(Math.max(0,gv-40)<<8)|Math.max(0,bv-40)).toString(16).padStart(6,'0'));
+  var pLight="#"+(((Math.min(255,rv+40)<<16)|(Math.min(255,gv+40)<<8)|Math.min(255,bv+40)).toString(16).padStart(6,'0'));
+  root.style.setProperty('--primary-dark',pDark);
+  root.style.setProperty('--primary-light',pLight);
+}
 function startSync(ms){
   if(syncTimer)clearInterval(syncTimer);
   if(ms>0)syncTimer=setInterval(loadData,ms);
@@ -755,11 +997,9 @@ function startSync(ms){
 function resetToDefaults(){
   try{localStorage.clear();}catch(e){}
   TARGET_PER_DAY=2.5;OFS_TARGET_PER_DAY=3.0;
-  document.getElementById('set-target-std').value=2.5;
-  document.getElementById('set-target-ofs').value=3.0;
-  document.getElementById('set-sync-interval').value="60000";
-  startSync(60000);
-  updateTargetLabels();
+  applyTheme('default');
+  applyAccents("#3fb950","#f85149","#ef5350");
+  initSettings();
   render();
   alert("Settings reset to defaults.");
 }
@@ -855,7 +1095,9 @@ function rKPI(){
     {l:"Virtual Calls",v:virt,p:pct(virt,tot),dc:"#58a6ff",ic:"💻",fill:pn(virt,tot),bd:"badge-b"},
     {l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"}
   ];
-  document.getElementById("kpi-grid").innerHTML=kpis.map(function(k){return '<div class="kpi"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';}).join("");
+  var kpiIds=['total','done','closed','resch','notrel','virt','active'];
+  var activeKpis=kpis.filter(function(k,i){return localStorage.getItem('kpi_'+kpiIds[i])!=='false';});
+  document.getElementById("kpi-grid").innerHTML=activeKpis.map(function(k){return '<div class="kpi"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';}).join("");
 }
 
 function rTrend(){
@@ -1288,4 +1530,3 @@ window.addEventListener("DOMContentLoaded",function(){
 </script>
 </body>
 </html>
-
