@@ -29,7 +29,6 @@
   --r:10px;
 }
  
-/* ── ORIGINAL THEMES ── */
 [data-theme='midnight']{--bg:#0b0e14;--bg2:#151b23;--bg3:#1c242f;--card:#151b23;--card2:#1c242f;--card3:#26303d;--border:#303c4a;--border2:#445363;}
 [data-theme='emerald']{--bg:#09120e;--bg2:#111e17;--bg3:#1a2b21;--card:#111e17;--card2:#1a2b21;--card3:#243a2f;--border:#2f4a3e;--border2:#426152;--green:#51f883;}
 [data-theme='light']{--bg:#f4f7f9;--bg2:#ffffff;--bg3:#ffffff;--card:#ffffff;--card2:#f0f3f6;--card3:#e5e9ef;--border:#d1d9e0;--border2:#afb8c1;--text:#1f2328;--text2:#656d76;--text3:#1f2328;}
@@ -38,8 +37,6 @@
 [data-theme='light'] .card,[data-theme='light'] .kpi{background:var(--bg2);border:1px solid var(--border);}
 [data-theme='light'] .tbl th{background:#f6f8fa;}
 [data-theme='light'] .nav:hover{background:rgba(0,0,0,0.04);}
- 
-/* ── NEW THEMES ── */
 [data-theme='rose']{--bg:#110810;--bg2:#1a0e18;--bg3:#231424;--card:#1a0e18;--card2:#231424;--card3:#2e1a2e;--border:#3d2040;--border2:#5a3060;--primary:#e91e8c;--primary-dark:#880e4f;--primary-light:#f06292;--primary-rgb:233,30,140;--green:#f06292;--green3:rgba(233,30,140,0.1);}
 [data-theme='ocean']{--bg:#040d1a;--bg2:#071428;--bg3:#0c1f3a;--card:#071428;--card2:#0c1f3a;--card3:#122645;--border:#1a3a5c;--border2:#235080;--primary:#00b4d8;--primary-dark:#0077b6;--primary-light:#48cae4;--primary-rgb:0,180,216;}
 [data-theme='sunset']{--bg:#0f0a03;--bg2:#1a1205;--bg3:#221a09;--card:#1a1205;--card2:#221a09;--card3:#2e2310;--border:#3d3010;--border2:#5a4520;--primary:#ff6b35;--primary-dark:#cc4400;--primary-light:#ff8c5a;--primary-rgb:255,107,53;}
@@ -47,7 +44,6 @@
 [data-theme='slate']{--bg:#0a0c10;--bg2:#111520;--bg3:#181d2e;--card:#111520;--card2:#181d2e;--card3:#1f2640;--border:#2a3050;--border2:#384068;--primary:#7c8cf8;--primary-dark:#4c5ef0;--primary-light:#a5b0ff;--primary-rgb:124,140,248;}
 [data-theme='copper']{--bg:#0d0905;--bg2:#191108;--bg3:#22180d;--card:#191108;--card2:#22180d;--card3:#2d2010;--border:#402c14;--border2:#5a3e1a;--primary:#cd7c3a;--primary-dark:#9b5020;--primary-light:#e09a60;--primary-rgb:205,124,58;}
  
-/* ── COMPACT MODE ── */
 body.compact .nav{padding:6px 12px;margin:1px 8px;}
 body.compact .kpi-v{font-size:20px;}
 body.compact .content{padding:12px 16px;gap:10px;}
@@ -57,15 +53,9 @@ body.compact .topbar{height:48px;}
 body.compact .filterbar{padding:8px 24px;}
 body.compact .ch{padding:10px 14px 8px;}
 body.compact .cb{padding:10px 14px;}
- 
-/* ── ANIMATIONS DISABLED ── */
 body.no-anim *{animation:none!important;transition:none!important;}
- 
-/* ── TABLE DENSITY ── */
 body.tbl-comfortable .tbl td,body.tbl-comfortable .tbl th{padding:13px 16px;}
 body.tbl-compact .tbl td,body.tbl-compact .tbl th{padding:5px 8px;font-size:11px;}
- 
-/* ── MINI SIDEBAR ── */
 .sidebar.mini-mode{width:56px;}
 .sidebar.mini-mode .sb-sec,.sidebar.mini-mode .nav span:not(.nav-ic),.sidebar.mini-mode .nav-bd,.sidebar.mini-mode .sb-logo img,.sidebar.mini-mode .u-nm,.sidebar.mini-mode .u-rl{display:none;}
 .sidebar.mini-mode .nav{justify-content:center;padding:10px 0;}
@@ -74,38 +64,28 @@ body.tbl-compact .tbl td,body.tbl-compact .tbl th{padding:5px 8px;font-size:11px
 .sidebar.mini-mode .u-card{justify-content:center;padding:8px 0;}
 .main.sb-mini{margin-left:56px;}
 .sidebar.mini-mode .nav:hover::after{content:attr(data-label);position:absolute;left:60px;top:50%;transform:translateY(-50%);background:var(--card3);color:var(--text);font-size:12px;font-weight:500;white-space:nowrap;padding:5px 12px;border-radius:7px;border:1px solid var(--border2);z-index:999;pointer-events:none;}
- 
-/* ── FONT CLASSES ── */
 body.font-sora,body.font-sora .kpi-v{font-family:'Sora',sans-serif!important;}
 body.font-outfit,body.font-outfit .kpi-v{font-family:'Outfit',sans-serif!important;}
 body.font-nunito,body.font-nunito .kpi-v{font-family:'Nunito',sans-serif!important;}
 body.font-jakarta,body.font-jakarta .kpi-v{font-family:'Plus Jakarta Sans',sans-serif!important;}
 body.font-lexend,body.font-lexend .kpi-v{font-family:'Lexend',sans-serif!important;}
 body.font-mono,body.font-mono .kpi-v{font-family:'IBM Plex Mono',monospace!important;}
- 
-/* ── TOGGLE SWITCH ── */
 .toggle-sw{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;}
 .toggle-sw input{opacity:0;width:0;height:0;}
 .toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--card3);border-radius:22px;border:1px solid var(--border2);transition:.3s;}
 .toggle-slider:before{position:absolute;content:"";height:16px;width:16px;left:2px;bottom:2px;background:var(--text2);border-radius:50%;transition:.3s;}
 .toggle-sw input:checked+.toggle-slider{background:var(--primary);border-color:var(--primary);}
 .toggle-sw input:checked+.toggle-slider:before{transform:translateX(18px);background:#fff;}
- 
-/* ── SETTINGS ROW ── */
 .set-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
 .set-row:last-child{border-bottom:none;}
 .set-row-left{display:flex;flex-direction:column;gap:2px;flex:1;margin-right:12px;}
 .set-row-label{font-size:12px;font-weight:600;color:var(--text3);}
 .set-row-desc{font-size:10.5px;color:var(--text2);line-height:1.4;}
- 
-/* ── THEME SWATCHES ── */
 .theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px;}
 .theme-swatch{border-radius:8px;height:48px;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:4px 7px;}
 .theme-swatch.active{border-color:var(--primary)!important;box-shadow:0 0 0 1px var(--primary);}
 .theme-swatch span{font-size:9.5px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9);white-space:nowrap;}
 .theme-swatch:hover{transform:scale(1.05);}
- 
-/* ── FONT PREVIEW GRID ── */
 .font-preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
 .font-opt{border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .2s;background:var(--card3);}
 .font-opt:hover{border-color:var(--border2);background:var(--bg3);}
@@ -115,55 +95,29 @@ body.font-mono,body.font-mono .kpi-v{font-family:'IBM Plex Mono',monospace!impor
  
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;display:flex;min-height:100vh;overflow-x:hidden;}
- 
-.watermark{
-  position:fixed;top:50%;left:50%;
-  transform:translate(-50%,-50%);width:520px;
-  pointer-events:none;z-index:0;
-  animation:wm-breathe 6s ease-in-out infinite;
-}
+.watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:520px;pointer-events:none;z-index:0;animation:wm-breathe 6s ease-in-out infinite;}
 .watermark img{width:100%;height:auto;filter:brightness(0) invert(1) opacity(0.10);}
-@keyframes wm-breathe{
-  0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1);}
-  50%{opacity:.7;transform:translate(-50%,-50%) scale(1.04);}
-}
- 
-.sidebar{
-  width:220px;min-height:100vh;background:var(--bg2);
-  display:flex;flex-direction:column;
-  position:fixed;left:0;top:0;bottom:0;z-index:200;
-  border-right:1px solid var(--border);flex-shrink:0;
-  transition:width .3s cubic-bezier(.4,0,.2,1);overflow:hidden;
-}
+@keyframes wm-breathe{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1);}50%{opacity:.7;transform:translate(-50%,-50%) scale(1.04);}}
+.sidebar{width:220px;min-height:100vh;background:var(--bg2);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:200;border-right:1px solid var(--border);flex-shrink:0;transition:width .3s cubic-bezier(.4,0,.2,1);overflow:hidden;}
 .sidebar.collapsed{width:0;border-right:none;}
 .sb-logo{padding:16px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sb-logo img{width:158px;height:auto;display:block;filter:brightness(0) invert(1);}
 .sb-sec{padding:16px 18px 5px;font-size:9.5px;font-weight:600;letter-spacing:1px;color:var(--text2);text-transform:uppercase;white-space:nowrap;}
- 
-.nav{
-  display:flex;align-items:center;gap:9px;
-  padding:9px 12px;margin:2px 8px;border-radius:8px;
-  color:var(--text2);font-size:12.5px;font-weight:500;
-  cursor:pointer;transition:all .15s;position:relative;
-  border:1px solid transparent;white-space:nowrap;overflow:hidden;
-}
+.nav{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:2px 8px;border-radius:8px;color:var(--text2);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;position:relative;border:1px solid transparent;white-space:nowrap;overflow:hidden;}
 .nav:hover{background:rgba(255,255,255,0.05);color:var(--text);border-color:rgba(255,255,255,0.06);}
 .nav.on{background:linear-gradient(135deg,rgba(183,28,28,0.18),rgba(229,57,53,0.08));color:var(--primary);font-weight:600;border-color:rgba(229,57,53,0.25);}
 .nav.on::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--primary),var(--primary-dark));}
 .nav-ic{width:22px;text-align:center;font-size:13px;flex-shrink:0;}
 .nav-bd{margin-left:auto;background:var(--card3);color:var(--text2);font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;}
 .nav-bd.g{background:rgba(229,57,53,0.12);color:var(--primary);}
- 
 .sb-bot{margin-top:auto;padding:12px;border-top:1px solid var(--border);flex-shrink:0;}
 .u-card{display:flex;align-items:center;gap:9px;padding:8px;border-radius:8px;background:var(--card3);}
 .u-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#e53935,#b71c1c);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
 .u-nm{font-size:12px;font-weight:600;color:var(--text);}
 .u-rl{font-size:10px;color:var(--text2);}
- 
 .main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1;transition:margin-left .3s cubic-bezier(.4,0,.2,1);min-width:0;}
 .main.sb-gone{margin-left:0;}
 .main.sb-mini{margin-left:56px;}
- 
 .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px 0 16px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:12px;}
 .topbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
 .sb-toggle{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--text2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
@@ -177,7 +131,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .tb-btn{background:#b71c1c;color:#fff;border:1px solid rgba(229,57,53,0.4);padding:7px 16px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
 .tb-btn:hover{background:#e53935;}
 #sync-txt{font-size:11px;color:var(--text2);}
- 
 .filterbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;}
 .filter-grid{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
 .fg{display:flex;flex-direction:column;gap:4px;}
@@ -196,16 +149,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .ap-btn:hover{background:#e53935;}
 .rs-btn{background:transparent;color:var(--text2);border:1px solid var(--border);padding:7px 14px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .rs-btn:hover{border-color:var(--border2);color:var(--text);}
- 
 .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);padding:0 24px;overflow-x:auto;}
 .tab{padding:12px 18px;font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap;}
 .tab:hover{color:var(--text);}
 .tab.on{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
- 
 .content{padding:20px 24px;display:flex;flex-direction:column;gap:16px;min-width:0;}
 .view{display:none;}
 .view.on{display:flex;flex-direction:column;gap:16px;}
- 
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
 .kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
 .kpi-ic{font-size:18px;line-height:1;}
@@ -214,7 +164,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .kpi-bar{height:2px;background:var(--card3);border-radius:2px;margin-top:8px;overflow:hidden;}
 .kpi-fill{height:100%;border-radius:2px;transition:width 1.2s ease;}
 .kpi{background:rgba(28,33,40,0.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:var(--r);border:1px solid var(--border);padding:14px 16px;}
- 
 .card{background:rgba(28,33,40,0.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:var(--r);border:1px solid var(--border);}
 .ch{padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
 .ct{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px;}
@@ -223,7 +172,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .cb{padding:14px 18px;}
 .g2{display:grid;grid-template-columns:2fr 1fr;gap:14px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
- 
 .tbl{width:100%;border-collapse:collapse;font-size:12px;}
 .tbl th{padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);border-bottom:1px solid var(--border);background:rgba(22,27,34,0.5);white-space:nowrap;}
 .tbl td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);white-space:nowrap;color:var(--text3);}
@@ -238,7 +186,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .rnk.g{background:linear-gradient(135deg,#ffd700,#ffb300);color:#000;}
 .rnk.s{background:linear-gradient(135deg,#b0bec5,#78909c);color:#fff;}
 .rnk.b{background:linear-gradient(135deg,#a1887f,#795548);color:#fff;}
- 
 .hbars{display:flex;flex-direction:column;gap:8px;}
 .hbar{display:flex;align-items:center;gap:8px;}
 .hl{width:170px;flex-shrink:0;text-align:right;font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -296,7 +243,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .snap-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(88,166,255,0.12);color:#58a6ff;border:1px solid rgba(88,166,255,0.35);padding:5px 13px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .snap-btn:hover{background:rgba(88,166,255,0.22);border-color:rgba(88,166,255,0.6);}
 .btn-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
- 
 .ofs-note{background:linear-gradient(135deg,rgba(88,166,255,0.08),rgba(188,140,255,0.06));border:1px solid rgba(88,166,255,0.25);border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;}
 .ofs-note-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
 .ofs-note-title{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px;letter-spacing:.2px;}
@@ -304,8 +250,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .ofs-note-item{font-size:11.5px;color:var(--text3);display:flex;align-items:flex-start;gap:7px;line-height:1.55;}
 .ofs-note-item::before{content:'›';color:var(--blue);font-weight:700;flex-shrink:0;margin-top:1px;}
 .ofs-note-item strong{color:var(--orange);font-weight:700;}
- 
-/* SETTINGS */
 .settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
 .settings-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:20px;}
 .settings-group{margin-bottom:15px;display:flex;flex-direction:column;gap:8px;}
@@ -313,7 +257,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .settings-group input,.settings-group select{background:var(--card3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;outline:none;font-family:inherit;font-size:12px;}
 .settings-group input:focus,.settings-group select:focus{border-color:var(--primary);}
 .settings-info{font-size:11px;color:var(--text2);line-height:1.4;}
- 
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
 .loader-logo{width:180px;height:auto;filter:brightness(0) invert(1);animation:loader-pulse 1.5s ease-in-out infinite;}
 @keyframes loader-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(.97);}}
@@ -321,59 +264,31 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 @keyframes spin{to{transform:rotate(360deg);}}
 .l-txt{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--text);}
 .l-sub{font-size:11px;color:var(--text2);}
-.alert{padding:10px 14px;border-radius:7px;font-size:12px;line-height:1.6;display:none;}
+
+/* ── CHANGE 1: Added transition to alert for smooth fade-out ── */
+.alert{padding:10px 14px;border-radius:7px;font-size:12px;line-height:1.6;display:none;transition:opacity 0.5s ease;}
 .alert-w{background:rgba(255,166,87,0.1);border:1px solid rgba(255,166,87,0.3);color:var(--orange);}
- 
+
 @media(max-width:1400px){.kpi-grid{grid-template-columns:repeat(4,1fr);}.g3{grid-template-columns:1fr 1fr;}}
 @media(max-width:1100px){.sidebar{width:220px;}.sidebar.collapsed{width:0;}.main{margin-left:220px;}.main.sb-gone{margin-left:0;}.watermark{width:300px;}}
 @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.g2,.g3{grid-template-columns:1fr;}.content,.filterbar{padding-left:14px;padding-right:14px;}.topbar{padding-left:12px;padding-right:14px;}.watermark{width:220px;}}
 
-/* ══════════════════════════════════════
-   SETTINGS LOCK SCREEN
-══════════════════════════════════════ */
-#settings-lock-overlay{
-  position:absolute;inset:0;
-  background:rgba(13,17,23,0.97);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  display:flex;align-items:center;justify-content:center;
-  z-index:500;border-radius:var(--r);
-  animation:lock-fade-in .25s ease;
-}
+#settings-lock-overlay{position:absolute;inset:0;background:rgba(13,17,23,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;z-index:500;border-radius:var(--r);animation:lock-fade-in .25s ease;}
 @keyframes lock-fade-in{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);}}
 #view-settings{position:relative;}
-.lock-box{
-  background:var(--card2);border:1px solid var(--border);
-  border-radius:16px;padding:40px 36px;width:360px;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  box-shadow:0 24px 60px rgba(0,0,0,.6);
-}
+.lock-box{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:360px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 24px 60px rgba(0,0,0,.6);}
 .lock-icon{font-size:44px;margin-bottom:8px;animation:lock-bounce .6s ease;}
 @keyframes lock-bounce{0%,100%{transform:translateY(0);}40%{transform:translateY(-8px);}70%{transform:translateY(-3px);}}
 .lock-title{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px;}
 .lock-sub{font-size:12px;color:var(--text2);margin-bottom:20px;text-align:center;line-height:1.6;}
 .lock-input-wrap{position:relative;width:100%;}
-.lock-input{
-  width:100%;background:var(--card3);border:1px solid var(--border);
-  color:var(--text);padding:11px 42px 11px 14px;border-radius:8px;
-  font-family:inherit;font-size:14px;outline:none;
-  letter-spacing:3px;transition:border-color .2s;
-}
+.lock-input{width:100%;background:var(--card3);border:1px solid var(--border);color:var(--text);padding:11px 42px 11px 14px;border-radius:8px;font-family:inherit;font-size:14px;outline:none;letter-spacing:3px;transition:border-color .2s;}
 .lock-input:focus{border-color:var(--primary);}
 .lock-input.error{border-color:var(--red);animation:shake .35s ease;}
 @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
-.lock-eye{
-  position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  background:none;border:none;color:var(--text2);cursor:pointer;
-  font-size:15px;padding:4px;transition:color .15s;
-}
+.lock-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:15px;padding:4px;transition:color .15s;}
 .lock-eye:hover{color:var(--text);}
-.lock-btn{
-  width:100%;margin-top:8px;
-  background:var(--primary);color:#fff;border:none;
-  padding:12px;border-radius:8px;font-family:inherit;
-  font-size:13px;font-weight:700;cursor:pointer;
-  transition:all .15s;letter-spacing:.3px;
-}
+.lock-btn{width:100%;margin-top:8px;background:var(--primary);color:#fff;border:none;padding:12px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.3px;}
 .lock-btn:hover{background:var(--primary-light);transform:translateY(-1px);}
 .lock-btn:active{transform:translateY(0);}
 .lock-error{font-size:11.5px;color:var(--red);min-height:16px;text-align:center;margin-top:2px;}
@@ -381,38 +296,20 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .lock-divider{width:100%;height:1px;background:var(--border);margin:16px 0;}
 .lock-admin-hint{font-size:10.5px;color:var(--text2);text-align:center;line-height:1.6;}
 .lock-admin-hint span{color:var(--primary);font-weight:600;}
-.auth-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(63,185,80,0.1);color:var(--green);
-  border:1px solid rgba(63,185,80,0.3);
-  padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:600;
-}
-.lock-session-bar{
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.2);
-  border-radius:8px;padding:10px 16px;margin-bottom:4px;
-}
+.auth-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(63,185,80,0.1);color:var(--green);border:1px solid rgba(63,185,80,0.3);padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:600;}
+.lock-session-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.2);border-radius:8px;padding:10px 16px;margin-bottom:4px;}
 .lock-session-left{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--green);font-weight:600;}
-.lock-out-btn{
-  background:rgba(248,81,73,0.1);color:var(--red);border:1px solid rgba(248,81,73,0.3);
-  padding:5px 14px;border-radius:6px;font-family:inherit;font-size:11.5px;
-  font-weight:600;cursor:pointer;transition:all .15s;
-}
+.lock-out-btn{background:rgba(248,81,73,0.1);color:var(--red);border:1px solid rgba(248,81,73,0.3);padding:5px 14px;border-radius:6px;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;}
 .lock-out-btn:hover{background:rgba(248,81,73,0.2);}
-.lock-cooldown{
-  font-size:12px;color:var(--orange);font-weight:600;
-  text-align:center;padding:10px;
-  background:rgba(255,166,87,0.08);border-radius:6px;
-  border:1px solid rgba(255,166,87,0.2);width:100%;
-}
+.lock-cooldown{font-size:12px;color:var(--orange);font-weight:600;text-align:center;padding:10px;background:rgba(255,166,87,0.08);border-radius:6px;border:1px solid rgba(255,166,87,0.2);width:100%;}
 </style>
 </head>
 <body>
- 
+
 <div class="watermark">
   <img src="https://raw.githubusercontent.com/parthjadav-create/trainer-dashboard/main/assets.png" alt=""/>
 </div>
- 
+
 <div id="loader">
   <img src="https://raw.githubusercontent.com/parthjadav-create/trainer-dashboard/main/assets.png" class="loader-logo" alt="Petpooja"/>
   <div class="spin"></div>
@@ -420,7 +317,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="l-txt">Wait We Are Preparing your real-time trainer performance dashboard.</div>
   <div class="l-sub" id="lmsg">Connecting to Google Sheet…</div>
 </div>
- 
+
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo">
     <img src="https://raw.githubusercontent.com/parthjadav-create/trainer-dashboard/main/assets.png" alt="Petpooja Inventory Trainer"/>
@@ -442,7 +339,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     </div>
   </div>
 </aside>
- 
+
 <div class="main" id="main">
   <div class="topbar">
     <div class="topbar-left">
@@ -458,7 +355,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <button class="tb-btn" onclick="loadData()">↻ Refresh</button>
     </div>
   </div>
- 
+
   <div class="filterbar">
     <div class="filter-grid">
       <div class="fg"><label>Trainer</label><select class="f-select" id="f-trainer"><option value="">All Trainers</option></select></div>
@@ -476,7 +373,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <button class="rs-btn" onclick="resetFilters()">↺ Reset</button>
     </div>
   </div>
- 
+
   <div class="tabs">
     <div class="tab on" id="tab-overview" onclick="showTab('overview')">Overview</div>
     <div class="tab" id="tab-trainers" onclick="showTab('trainers')">Trainer Details</div>
@@ -488,10 +385,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="tab" id="tab-settings" onclick="showTab('settings')">⚙️ Settings</div>
     <div class="tab" id="tab-team" onclick="showTab('team')" style="display:none;">Team Info</div>
   </div>
- 
+
   <div class="content" id="content" style="display:none;">
     <div class="alert alert-w" id="alert-box"></div>
- 
+
     <!-- OVERVIEW -->
     <div class="view on" id="view-overview">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -501,12 +398,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <button class="pdf-btn" onclick="exportOverviewPDF()">⬇ PDF Export</button>
         </div>
       </div>
-      <div class="kpi-grid" id="kpi-grid">
-        <div class="kpi-card">
-  <div class="kpi-title">Avg Visits / Day</div>
-  <div class="kpi-value" id="avgVisitPerDay">0</div>
-</div>
-      </div>
+      <div class="kpi-grid" id="kpi-grid"></div>
       <div class="g2">
         <div class="card">
           <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">📈</div>Daily Training Volume</div><span class="cm" id="trend-m">–</span></div>
@@ -540,7 +432,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:var(--red2);">🌐</div>Virtual Language</div><span class="cm" id="lang-tot">–</span></div><div class="cb" id="lang-body"></div></div>
       </div>
     </div>
- 
+
     <!-- TRAINER DETAILS -->
     <div class="view" id="view-trainers">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -567,7 +459,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         </div>
       </div>
     </div>
- 
+
     <!-- VIRTUAL CALLS -->
     <div class="view" id="view-virtual">
       <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
@@ -591,7 +483,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
       <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">📅</div>Virtual Call Status</div></div><div class="cb" id="virt-status-body"></div></div>
     </div>
- 
+
     <!-- CITIES -->
     <div class="view" id="view-cities">
       <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
@@ -614,7 +506,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         </div>
       </div>
     </div>
- 
+
     <!-- OFS -->
     <div class="view" id="view-ofs">
       <div class="ofs-note">
@@ -658,7 +550,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         </div>
       </div>
     </div>
- 
+
     <!-- KPI OF THE WEEK -->
     <div class="view" id="view-weekly">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
@@ -704,31 +596,21 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div style="overflow-x:auto;"><table class="tbl"><thead><tr style="background:rgba(183,28,28,0.25);"><th>Sr.</th><th>Trainer Name</th><th class="tc">Days Worked</th><th class="tc">Normal Visits</th><th class="tc">Outstation (×2)</th><th class="tc">Weighted Achieved</th><th class="tc">Target</th><th class="tc">Ach %</th></tr></thead><tbody id="weekly-body-below"></tbody><tfoot id="weekly-foot-below"></tfoot></table></div>
       </div>
     </div>
- 
+
     <!-- SETTINGS -->
     <div class="view" id="view-settings">
-
-      <!-- ══ SETTINGS LOCK OVERLAY ══ -->
       <div id="settings-lock-overlay">
         <div class="lock-box">
           <div class="lock-icon">🔐</div>
           <div class="lock-title">Settings Access</div>
           <div class="lock-sub">This area is restricted to authorised admins only.<br>Enter your admin PIN to continue.</div>
-
-          <!-- Session bar (shown when already authenticated) -->
           <div id="lock-session-bar" class="lock-session-bar" style="display:none;width:100%;">
             <div class="lock-session-left">✅ <span id="lock-session-name">Admin</span> — Authenticated</div>
             <button class="lock-out-btn" onclick="settingsLockOut()">🔒 Lock</button>
           </div>
-
-          <!-- PIN form (shown when not authenticated) -->
           <div id="lock-form" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;">
             <div class="lock-input-wrap">
-              <input class="lock-input" type="password" id="lock-pin-input"
-                placeholder="Enter PIN"
-                maxlength="20"
-                onkeydown="if(event.key==='Enter')settingsUnlock()"
-                oninput="document.getElementById('lock-err').textContent=''"/>
+              <input class="lock-input" type="password" id="lock-pin-input" placeholder="Enter PIN" maxlength="20" onkeydown="if(event.key==='Enter')settingsUnlock()" oninput="document.getElementById('lock-err').textContent=''"/>
               <button class="lock-eye" onclick="toggleLockEye()" id="lock-eye-btn" title="Show/Hide">👁</button>
             </div>
             <div class="lock-error" id="lock-err"></div>
@@ -738,7 +620,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             </div>
             <button class="lock-btn" onclick="settingsUnlock()">🔓 Unlock Settings</button>
           </div>
-
           <div class="lock-divider"></div>
           <div class="lock-admin-hint">
             Authorised admins: <span>Parth · Karp · Noman · Antareksh · Deepak</span><br>
@@ -746,11 +627,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           </div>
         </div>
       </div>
-      <!-- ══ END LOCK OVERLAY ══ -->
 
       <div class="settings-grid">
- 
-        <!-- ── SOURCE DATA ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔗</div>Source Data</div>
           <div class="settings-group">
@@ -759,34 +637,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             <div class="settings-info">The endpoint URL for your Google Sheet data. Changing this will trigger a reload.</div>
           </div>
         </div>
- 
-        <!-- ── DASHBOARD IDENTITY ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🏢</div>Dashboard Identity</div>
-          <div class="settings-group">
-            <label>Main Title</label>
-            <input type="text" id="set-dash-title" placeholder="OnSite OpsVision Dashboard" onchange="saveSettings()">
-          </div>
-          <div class="settings-group">
-            <label>Sub-title / Description</label>
-            <input type="text" id="set-dash-sub" placeholder="Petpooja · Trainer Productivity..." onchange="saveSettings()">
-          </div>
+          <div class="settings-group"><label>Main Title</label><input type="text" id="set-dash-title" placeholder="OnSite OpsVision Dashboard" onchange="saveSettings()"></div>
+          <div class="settings-group"><label>Sub-title / Description</label><input type="text" id="set-dash-sub" placeholder="Petpooja · Trainer Productivity..." onchange="saveSettings()"></div>
         </div>
- 
-        <!-- ── USER PROFILE ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--green3);">👤</div>User Profile</div>
-          <div class="settings-group">
-            <label>Display Name</label>
-            <input type="text" id="set-user-name" placeholder="Admin" onchange="saveSettings()">
-          </div>
-          <div class="settings-group">
-            <label>Designation / Role</label>
-            <input type="text" id="set-user-role" placeholder="Manager" onchange="saveSettings()">
-          </div>
+          <div class="settings-group"><label>Display Name</label><input type="text" id="set-user-name" placeholder="Admin" onchange="saveSettings()"></div>
+          <div class="settings-group"><label>Designation / Role</label><input type="text" id="set-user-role" placeholder="Manager" onchange="saveSettings()"></div>
         </div>
- 
-        <!-- ── PERFORMANCE TARGETS ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">🎯</div>Performance Targets</div>
           <div class="settings-group">
@@ -800,33 +660,14 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
             <div class="settings-info">The target applied to the Out of Station performance view (after 2× OFS credit).</div>
           </div>
         </div>
- 
-        <!-- ── TAB VISIBILITY ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">👁️</div>Tab Visibility</div>
-          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
-            <label>Virtual Calls</label>
-            <input type="checkbox" id="set-show-virtual" checked onchange="saveSettings()" style="width:auto;">
-          </div>
-          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
-            <label>Cities</label>
-            <input type="checkbox" id="set-show-cities" checked onchange="saveSettings()" style="width:auto;">
-          </div>
-          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
-            <label>Out of Station Visits</label>
-            <input type="checkbox" id="set-show-ofs" checked onchange="saveSettings()" style="width:auto;">
-          </div>
-          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
-            <label>KPI of the Week</label>
-            <input type="checkbox" id="set-show-weekly" checked onchange="saveSettings()" style="width:auto;">
-          </div>
-          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
-            <label>Mode Matrix</label>
-            <input type="checkbox" id="set-show-matrix" checked onchange="saveSettings()" style="width:auto;">
-          </div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;"><label>Virtual Calls</label><input type="checkbox" id="set-show-virtual" checked onchange="saveSettings()" style="width:auto;"></div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;"><label>Cities</label><input type="checkbox" id="set-show-cities" checked onchange="saveSettings()" style="width:auto;"></div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;"><label>Out of Station Visits</label><input type="checkbox" id="set-show-ofs" checked onchange="saveSettings()" style="width:auto;"></div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;"><label>KPI of the Week</label><input type="checkbox" id="set-show-weekly" checked onchange="saveSettings()" style="width:auto;"></div>
+          <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;"><label>Mode Matrix</label><input type="checkbox" id="set-show-matrix" checked onchange="saveSettings()" style="width:auto;"></div>
         </div>
- 
-        <!-- ── KPI VISIBILITY ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">📊</div>KPI Visibility</div>
           <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;"><label>Total Tickets</label><input type="checkbox" id="set-kpi-total" checked onchange="saveSettings()" style="width:auto;"></div>
@@ -837,8 +678,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;"><label>Virtual Calls KPI</label><input type="checkbox" id="set-kpi-virt" checked onchange="saveSettings()" style="width:auto;"></div>
           <div class="settings-group" style="flex-direction:row;align-items:center;justify-content:space-between;"><label>Active Trainers</label><input type="checkbox" id="set-kpi-active" checked onchange="saveSettings()" style="width:auto;"></div>
         </div>
- 
-        <!-- ── ORIGINAL VISUAL THEME CARD ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🎨</div>Accent Colors</div>
           <div class="settings-group">
@@ -855,25 +694,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <option value="slate">Slate Purple</option>
               <option value="copper">Copper Bronze</option>
             </select>
-            <div class="settings-info">You can also use the Color Themes card for quick visual switching.</div>
           </div>
           <div class="settings-group" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-            <div>
-              <label>Primary Color</label>
-              <input type="color" id="set-color-primary" value="#ef5350" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;">
-            </div>
-            <div>
-              <label>Success Accent</label>
-              <input type="color" id="set-color-green" value="#3fb950" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;">
-            </div>
-            <div>
-              <label>Danger Accent</label>
-              <input type="color" id="set-color-red" value="#f85149" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;">
-            </div>
+            <div><label>Primary Color</label><input type="color" id="set-color-primary" value="#ef5350" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;"></div>
+            <div><label>Success Accent</label><input type="color" id="set-color-green" value="#3fb950" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;"></div>
+            <div><label>Danger Accent</label><input type="color" id="set-color-red" value="#f85149" onchange="saveSettings()" style="height:32px;width:100%;border:none;padding:0;background:none;cursor:pointer;"></div>
           </div>
         </div>
- 
-        <!-- ── DATA SYNC ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🔄</div>Data Synchronization</div>
           <div class="settings-group">
@@ -884,15 +711,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <option value="300000">Every 5 Minutes</option>
               <option value="600000">Every 10 Minutes</option>
             </select>
-            <div class="settings-info">How often the dashboard pulls fresh data from the Google Sheet.</div>
           </div>
         </div>
- 
-        <!-- ══════════════════════════════
-             NEW SETTINGS CARDS BELOW
-             ══════════════════════════════ -->
- 
-        <!-- ── FONT FAMILY ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🔤</div>Font Family</div>
           <div class="settings-group">
@@ -906,31 +726,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <option value="lexend">Lexend — High Readability</option>
               <option value="mono">IBM Plex Mono — Terminal Style</option>
             </select>
-            <div class="settings-info">Changes the primary font across the entire dashboard. Click a card below to preview instantly.</div>
           </div>
           <div class="font-preview-grid">
-            <div class="font-opt active" onclick="quickSetFont('dm-sans')" style="font-family:'DM Sans',sans-serif;">
-              <div class="fo-name">DM Sans</div><div class="fo-sample">Trainer Dashboard 123 — Default</div>
-            </div>
-            <div class="font-opt" onclick="quickSetFont('sora')" style="font-family:'Sora',sans-serif;">
-              <div class="fo-name">Sora</div><div class="fo-sample">Trainer Dashboard 123 — Modern</div>
-            </div>
-            <div class="font-opt" onclick="quickSetFont('outfit')" style="font-family:'Outfit',sans-serif;">
-              <div class="fo-name">Outfit</div><div class="fo-sample">Trainer Dashboard 123 — Geometric</div>
-            </div>
-            <div class="font-opt" onclick="quickSetFont('nunito')" style="font-family:'Nunito',sans-serif;">
-              <div class="fo-name">Nunito</div><div class="fo-sample">Trainer Dashboard 123 — Rounded</div>
-            </div>
-            <div class="font-opt" onclick="quickSetFont('jakarta')" style="font-family:'Plus Jakarta Sans',sans-serif;">
-              <div class="fo-name">Jakarta Sans</div><div class="fo-sample">Trainer Dashboard 123 — Pro</div>
-            </div>
-            <div class="font-opt" onclick="quickSetFont('mono')" style="font-family:'IBM Plex Mono',monospace;">
-              <div class="fo-name">IBM Plex Mono</div><div class="fo-sample">Dashboard 123 — Terminal</div>
-            </div>
+            <div class="font-opt active" onclick="quickSetFont('dm-sans')" style="font-family:'DM Sans',sans-serif;"><div class="fo-name">DM Sans</div><div class="fo-sample">Trainer Dashboard 123 — Default</div></div>
+            <div class="font-opt" onclick="quickSetFont('sora')" style="font-family:'Sora',sans-serif;"><div class="fo-name">Sora</div><div class="fo-sample">Trainer Dashboard 123 — Modern</div></div>
+            <div class="font-opt" onclick="quickSetFont('outfit')" style="font-family:'Outfit',sans-serif;"><div class="fo-name">Outfit</div><div class="fo-sample">Trainer Dashboard 123 — Geometric</div></div>
+            <div class="font-opt" onclick="quickSetFont('nunito')" style="font-family:'Nunito',sans-serif;"><div class="fo-name">Nunito</div><div class="fo-sample">Trainer Dashboard 123 — Rounded</div></div>
+            <div class="font-opt" onclick="quickSetFont('jakarta')" style="font-family:'Plus Jakarta Sans',sans-serif;"><div class="fo-name">Jakarta Sans</div><div class="fo-sample">Trainer Dashboard 123 — Pro</div></div>
+            <div class="font-opt" onclick="quickSetFont('mono')" style="font-family:'IBM Plex Mono',monospace;"><div class="fo-name">IBM Plex Mono</div><div class="fo-sample">Dashboard 123 — Terminal</div></div>
           </div>
         </div>
- 
-        <!-- ── COLOR THEMES (SWATCHES) ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">🌈</div>Color Themes</div>
           <div class="settings-group">
@@ -947,179 +752,44 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <div class="theme-swatch" data-theme="slate" onclick="quickSetTheme('slate')" style="background:linear-gradient(135deg,#0a0c10,#181d2e);"><span>Slate</span></div>
               <div class="theme-swatch" data-theme="copper" onclick="quickSetTheme('copper')" style="background:linear-gradient(135deg,#0d0905,#22180d);"><span>Copper</span></div>
             </div>
-            <div class="settings-info" style="margin-top:8px;">Click any swatch to apply instantly. Your choice is remembered.</div>
           </div>
         </div>
- 
-        <!-- ── DISPLAY & LAYOUT ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--blue2);">🖥️</div>Display &amp; Layout</div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Compact Mode</span>
-              <span class="set-row-desc">Reduce padding &amp; spacing for a denser view</span>
-            </div>
-            <label class="toggle-sw"><input type="checkbox" id="set-compact" onchange="saveSettings()"><span class="toggle-slider"></span></label>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Disable Animations</span>
-              <span class="set-row-desc">Turn off all transitions &amp; animations</span>
-            </div>
-            <label class="toggle-sw"><input type="checkbox" id="set-no-anim" onchange="saveSettings()"><span class="toggle-slider"></span></label>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Mini Sidebar (Icon Only)</span>
-              <span class="set-row-desc">Collapse sidebar to icons by default on load</span>
-            </div>
-            <label class="toggle-sw"><input type="checkbox" id="set-mini-sidebar" onchange="saveSettings()"><span class="toggle-slider"></span></label>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Table Density</span>
-              <span class="set-row-desc">Row height in all data tables</span>
-            </div>
-            <select id="set-table-density" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;">
-              <option value="default">Default</option>
-              <option value="comfortable">Comfortable</option>
-              <option value="compact">Compact</option>
-            </select>
-          </div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Compact Mode</span><span class="set-row-desc">Reduce padding &amp; spacing for a denser view</span></div><label class="toggle-sw"><input type="checkbox" id="set-compact" onchange="saveSettings()"><span class="toggle-slider"></span></label></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Disable Animations</span><span class="set-row-desc">Turn off all transitions &amp; animations</span></div><label class="toggle-sw"><input type="checkbox" id="set-no-anim" onchange="saveSettings()"><span class="toggle-slider"></span></label></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Mini Sidebar (Icon Only)</span><span class="set-row-desc">Collapse sidebar to icons by default on load</span></div><label class="toggle-sw"><input type="checkbox" id="set-mini-sidebar" onchange="saveSettings()"><span class="toggle-slider"></span></label></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Table Density</span><span class="set-row-desc">Row height in all data tables</span></div><select id="set-table-density" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;"><option value="default">Default</option><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></div>
         </div>
- 
-        <!-- ── DATA DISPLAY ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--green3);">📋</div>Data Display</div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Number Format</span>
-              <span class="set-row-desc">How large numbers are displayed</span>
-            </div>
-            <select id="set-num-format" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;">
-              <option value="locale">1,000 (Comma)</option>
-              <option value="indian">1,00,000 (Indian)</option>
-              <option value="plain">1000 (Plain)</option>
-            </select>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Date Display Format</span>
-              <span class="set-row-desc">Format used in table cells &amp; exports</span>
-            </div>
-            <select id="set-date-format" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;">
-              <option value="iso">YYYY-MM-DD</option>
-              <option value="dmy">DD/MM/YYYY</option>
-              <option value="short">DD MMM YYYY</option>
-            </select>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Leaderboard Rows</span>
-              <span class="set-row-desc">How many top performers to show</span>
-            </div>
-            <select id="set-lb-rows" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;">
-              <option value="10">Top 10</option>
-              <option value="20" selected>Top 20</option>
-              <option value="30">Top 30</option>
-              <option value="999">All</option>
-            </select>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Chart Curve Style</span>
-              <span class="set-row-desc">Shape of lines in trend charts</span>
-            </div>
-            <select id="set-chart-style" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;">
-              <option value="smooth">Smooth Curve</option>
-              <option value="linear">Linear / Straight</option>
-              <option value="stepped">Stepped</option>
-            </select>
-          </div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Number Format</span><span class="set-row-desc">How large numbers are displayed</span></div><select id="set-num-format" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;"><option value="locale">1,000 (Comma)</option><option value="indian">1,00,000 (Indian)</option><option value="plain">1000 (Plain)</option></select></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Date Display Format</span><span class="set-row-desc">Format used in table cells &amp; exports</span></div><select id="set-date-format" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;"><option value="iso">YYYY-MM-DD</option><option value="dmy">DD/MM/YYYY</option><option value="short">DD MMM YYYY</option></select></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Leaderboard Rows</span><span class="set-row-desc">How many top performers to show</span></div><select id="set-lb-rows" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;"><option value="10">Top 10</option><option value="20" selected>Top 20</option><option value="30">Top 30</option><option value="999">All</option></select></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Chart Curve Style</span><span class="set-row-desc">Shape of lines in trend charts</span></div><select id="set-chart-style" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;"><option value="smooth">Smooth Curve</option><option value="linear">Linear / Straight</option><option value="stepped">Stepped</option></select></div>
         </div>
- 
-        <!-- ── BRANDING ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--red2);">🖼️</div>Branding</div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Show Background Watermark</span>
-              <span class="set-row-desc">Petpooja logo faintly in the background</span>
-            </div>
-            <label class="toggle-sw"><input type="checkbox" id="set-watermark" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Watermark Opacity</span>
-              <span class="set-row-desc">How visible the background logo is (2–20%)</span>
-            </div>
-            <input type="range" id="set-wm-opacity" min="2" max="20" value="10" onchange="saveSettings()" style="width:90px;accent-color:var(--primary);cursor:pointer;">
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Show Sidebar Logo</span>
-              <span class="set-row-desc">Petpooja logo in the sidebar header</span>
-            </div>
-            <label class="toggle-sw"><input type="checkbox" id="set-show-logo" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
-          </div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Show Background Watermark</span><span class="set-row-desc">Petpooja logo faintly in the background</span></div><label class="toggle-sw"><input type="checkbox" id="set-watermark" checked onchange="saveSettings()"><span class="toggle-slider"></span></label></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Watermark Opacity</span><span class="set-row-desc">How visible the background logo is (2–20%)</span></div><input type="range" id="set-wm-opacity" min="2" max="20" value="10" onchange="saveSettings()" style="width:90px;accent-color:var(--primary);cursor:pointer;"></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Show Sidebar Logo</span><span class="set-row-desc">Petpooja logo in the sidebar header</span></div><label class="toggle-sw"><input type="checkbox" id="set-show-logo" checked onchange="saveSettings()"><span class="toggle-slider"></span></label></div>
         </div>
- 
-        <!-- ── ALERTS & HIGHLIGHTS ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--orange2);">🔔</div>Alerts &amp; Highlights</div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Highlight Inactive Trainers</span>
-              <span class="set-row-desc">Red-tint rows for trainers with no activity for &gt;7 days</span>
-            </div>
-            <label class="toggle-sw"><input type="checkbox" id="set-highlight-inactive" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Show Live Status Pill</span>
-              <span class="set-row-desc">LIVE / SYNCING indicator in the top bar</span>
-            </div>
-            <label class="toggle-sw"><input type="checkbox" id="set-show-live" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
-          </div>
- 
-          <div class="set-row">
-            <div class="set-row-left">
-              <span class="set-row-label">Target Miss Threshold</span>
-              <span class="set-row-desc">% below target to mark row as red "miss"</span>
-            </div>
-            <select id="set-miss-threshold" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;">
-              <option value="0.7">70% (Strict)</option>
-              <option value="0.8" selected>80% (Default)</option>
-              <option value="0.9">90% (Lenient)</option>
-            </select>
-          </div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Highlight Inactive Trainers</span><span class="set-row-desc">Red-tint rows for trainers with no activity for &gt;7 days</span></div><label class="toggle-sw"><input type="checkbox" id="set-highlight-inactive" checked onchange="saveSettings()"><span class="toggle-slider"></span></label></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Show Live Status Pill</span><span class="set-row-desc">LIVE / SYNCING indicator in the top bar</span></div><label class="toggle-sw"><input type="checkbox" id="set-show-live" checked onchange="saveSettings()"><span class="toggle-slider"></span></label></div>
+          <div class="set-row"><div class="set-row-left"><span class="set-row-label">Target Miss Threshold</span><span class="set-row-desc">% below target to mark row as red "miss"</span></div><select id="set-miss-threshold" onchange="saveSettings()" style="background:var(--card3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;outline:none;font-family:inherit;font-size:11px;"><option value="0.7">70% (Strict)</option><option value="0.8" selected>80% (Default)</option><option value="0.9">90% (Lenient)</option></select></div>
         </div>
- 
-        <!-- ── RESET ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">💾</div>Reset</div>
           <div class="settings-group">
-            <div class="settings-info" style="margin-bottom:8px;">Reset all settings back to their original defaults (2.5 standard target, 3.0 OFS target, GitHub Dark theme, DM Sans font, 1 minute refresh).</div>
+            <div class="settings-info" style="margin-bottom:8px;">Reset all settings back to their original defaults.</div>
             <button class="rs-btn" style="width:100%;border-color:var(--red);color:var(--red);" onclick="resetToDefaults()">↺ Reset to Default Settings</button>
           </div>
         </div>
- 
       </div>
     </div>
- 
+
     <!-- MATRIX -->
     <div class="view" id="view-matrix">
       <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
@@ -1138,7 +808,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         </div>
       </div>
     </div>
- 
+
     <!-- TEAM INFO -->
     <div class="view" id="view-team">
       <div class="card">
@@ -1164,10 +834,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         </div>
       </div>
     </div>
- 
+
   </div>
 </div>
- 
+
 <script>
 var DEFAULT_API="https://script.google.com/macros/s/AKfycbxWLVUVTFupspgeV8JCIvQEu3iQi-4d9YbiYeJgkBmcigxAMCN7_B64Z8264K04bVzSZg/exec";
 var API=localStorage.getItem('api_url')||DEFAULT_API;
@@ -1216,8 +886,10 @@ var TEAM_DATA=[
 var SC={"Done":"#3fb950","Close":"#f85149","Re-schedule":"#bc8cff","Not related to inventory/Done by someone":"#58a6ff","Tech concern":"#ffa657","Need other languge / Physical visit":"#39d353"};
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",city2:"",status:"",mode:"",lang:""};
 var curTab="overview";
-var currentTrainerDetailsData=[],currentVirtualTrainersData=[],currentOFSData=[],currentTeamInfoData=[];
- 
+
+/* ── CHANGE 2: dataLoadedOnce flag — prevents showing error if data was already loaded ── */
+var dataLoadedOnce=false;
+
 function normalizeTrainerName(name){return(name||"").toLowerCase().trim();}
 function isMatch(n1,n2){if(!n1||!n2)return false;var a=n1.toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/).filter(function(x){return x.length>1;});var b=n2.toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/).filter(function(x){return x.length>1;});if(!a.length||!b.length)return false;var shorter=a.length<=b.length?a:b,longer=a.length<=b.length?b:a;return shorter.every(function(s){return longer.some(function(l){return l.indexOf(s)!==-1||s.indexOf(l)!==-1;});});}
 function matches(a,b){if(!a||!b)return false;return a.trim().toLowerCase()===b.trim().toLowerCase();}
@@ -1225,16 +897,15 @@ function contains(a,b){if(!a||!b)return false;return a.toLowerCase().includes(b.
 function pct(a,b){return b?Math.round(a/b*100)+"%":"0%";}
 function pn(a,b){return b?a/b*100:0;}
 function gv(id){return document.getElementById(id).value;}
- 
+
 function toggleSidebar(){
   var sb=document.getElementById('sidebar'),main=document.getElementById('main'),btn=document.getElementById('sb-toggle');
-  // If mini mode is active, toggle mini off first
   if(sb.classList.contains('mini-mode')){sb.classList.remove('mini-mode');main.classList.remove('sb-mini');btn.textContent='☰';return;}
   var collapsed=sb.classList.toggle('collapsed');
   main.classList.toggle('sb-gone',collapsed);
   btn.textContent=collapsed?'▶':'☰';
 }
- 
+
 function showTab(t){
   curTab=t;
   ["overview","trainers","virtual","cities","ofs","weekly","matrix","settings","team"].forEach(function(n){
@@ -1246,8 +917,7 @@ function showTab(t){
   var navs=document.querySelectorAll(".nav");
   if(nm[t]!==undefined&&navs[nm[t]])navs[nm[t]].classList.add("on");
 }
- 
-/* ═══════════════════ NEW SETTINGS HELPERS ═══════════════════ */
+
 function applyFont(font){
   var body=document.body;
   ['sora','outfit','nunito','jakarta','lexend','mono'].forEach(function(f){body.classList.remove('font-'+f);});
@@ -1262,14 +932,12 @@ function quickSetFont(font){
   var sel=document.getElementById('set-font');if(sel)sel.value=font;
   applyFont(font);try{localStorage.setItem('font',font);}catch(e){}
 }
- 
 function quickSetTheme(theme){
   var thSel=document.getElementById('set-theme');if(thSel)thSel.value=theme;
   applyTheme(theme);
   try{localStorage.setItem('theme',theme);}catch(e){}
   document.querySelectorAll('.theme-swatch').forEach(function(sw){sw.classList.toggle('active',sw.getAttribute('data-theme')===theme);});
 }
- 
 function applyCompact(on){document.body.classList.toggle('compact',on);}
 function applyNoAnim(on){document.body.classList.toggle('no-anim',on);}
 function applyTableDensity(val){document.body.classList.remove('tbl-comfortable','tbl-compact');if(val==='comfortable')document.body.classList.add('tbl-comfortable');if(val==='compact')document.body.classList.add('tbl-compact');}
@@ -1287,86 +955,61 @@ function applyWatermark(show,opacity){
 }
 function applyLivePill(show){var pill=document.querySelector('.live-pill');if(pill)pill.style.display=show?'':'none';}
 function applySidebarLogo(show){var logo=document.querySelector('.sb-logo');if(logo)logo.style.display=show?'':'none';}
- 
+
 function initNewSettings(){
   var font=localStorage.getItem('font')||'dm-sans';
   var fSel=document.getElementById('set-font');if(fSel)fSel.value=font;applyFont(font);
- 
   var theme=localStorage.getItem('theme')||'default';
   document.querySelectorAll('.theme-swatch').forEach(function(sw){sw.classList.toggle('active',sw.getAttribute('data-theme')===theme);});
- 
   var compact=localStorage.getItem('compact')==='true';
   var cEl=document.getElementById('set-compact');if(cEl)cEl.checked=compact;applyCompact(compact);
- 
   var noAnim=localStorage.getItem('no_anim')==='true';
   var naEl=document.getElementById('set-no-anim');if(naEl)naEl.checked=noAnim;applyNoAnim(noAnim);
- 
   var miniSb=localStorage.getItem('mini_sidebar')==='true';
   var msEl=document.getElementById('set-mini-sidebar');if(msEl)msEl.checked=miniSb;applyMiniSidebar(miniSb);
- 
   var td=localStorage.getItem('table_density')||'default';
   var tdEl=document.getElementById('set-table-density');if(tdEl)tdEl.value=td;applyTableDensity(td);
- 
   var wmShow=localStorage.getItem('watermark')!=='false';
   var wmEl=document.getElementById('set-watermark');if(wmEl)wmEl.checked=wmShow;
   var wmOp=localStorage.getItem('wm_opacity')||'10';
   var wmOpEl=document.getElementById('set-wm-opacity');if(wmOpEl)wmOpEl.value=wmOp;
   applyWatermark(wmShow,wmOp);
- 
   var liveShow=localStorage.getItem('show_live')!=='false';
   var lpEl=document.getElementById('set-show-live');if(lpEl)lpEl.checked=liveShow;applyLivePill(liveShow);
- 
   var sbLogo=localStorage.getItem('show_logo')!=='false';
   var slEl=document.getElementById('set-show-logo');if(slEl)slEl.checked=sbLogo;applySidebarLogo(sbLogo);
- 
   var hi=localStorage.getItem('highlight_inactive')!=='false';
   var hiEl=document.getElementById('set-highlight-inactive');if(hiEl)hiEl.checked=hi;
- 
   var nf=localStorage.getItem('num_format')||'locale';
   var nfEl=document.getElementById('set-num-format');if(nfEl)nfEl.value=nf;
- 
   var df=localStorage.getItem('date_format')||'iso';
   var dfEl=document.getElementById('set-date-format');if(dfEl)dfEl.value=df;
- 
   var lbr=localStorage.getItem('lb_rows')||'20';
   var lbrEl=document.getElementById('set-lb-rows');if(lbrEl)lbrEl.value=lbr;
- 
   var cs=localStorage.getItem('chart_style')||'smooth';
   var csEl=document.getElementById('set-chart-style');if(csEl)csEl.value=cs;
- 
   var mt=localStorage.getItem('miss_threshold')||'0.8';
   var mtEl=document.getElementById('set-miss-threshold');if(mtEl)mtEl.value=mt;
 }
- 
+
 function saveNewSettings(){
-  // Font
   var fSel=document.getElementById('set-font');if(fSel){try{localStorage.setItem('font',fSel.value);}catch(e){}applyFont(fSel.value);}
-  // Theme swatch sync
   var theme=document.getElementById('set-theme');if(theme){document.querySelectorAll('.theme-swatch').forEach(function(sw){sw.classList.toggle('active',sw.getAttribute('data-theme')===theme.value);});}
-  // Compact
   var cEl=document.getElementById('set-compact');if(cEl){try{localStorage.setItem('compact',cEl.checked);}catch(e){}applyCompact(cEl.checked);}
-  // No anim
   var naEl=document.getElementById('set-no-anim');if(naEl){try{localStorage.setItem('no_anim',naEl.checked);}catch(e){}applyNoAnim(naEl.checked);}
-  // Mini sidebar
   var msEl=document.getElementById('set-mini-sidebar');if(msEl){try{localStorage.setItem('mini_sidebar',msEl.checked);}catch(e){}applyMiniSidebar(msEl.checked);}
-  // Table density
   var tdEl=document.getElementById('set-table-density');if(tdEl){try{localStorage.setItem('table_density',tdEl.value);}catch(e){}applyTableDensity(tdEl.value);}
-  // Watermark
   var wmEl=document.getElementById('set-watermark');var wmOpEl=document.getElementById('set-wm-opacity');
   if(wmEl){var ws=wmEl.checked,wo=wmOpEl?wmOpEl.value:'10';try{localStorage.setItem('watermark',ws);localStorage.setItem('wm_opacity',wo);}catch(e){}applyWatermark(ws,wo);}
-  // Live pill
   var lpEl=document.getElementById('set-show-live');if(lpEl){try{localStorage.setItem('show_live',lpEl.checked);}catch(e){}applyLivePill(lpEl.checked);}
-  // Sidebar logo
   var slEl=document.getElementById('set-show-logo');if(slEl){try{localStorage.setItem('show_logo',slEl.checked);}catch(e){}applySidebarLogo(slEl.checked);}
-  // Other simple saves
   ['set-highlight-inactive','set-num-format','set-date-format','set-lb-rows','set-chart-style','set-miss-threshold'].forEach(function(id){
     var el=document.getElementById(id);if(!el)return;
     var key=id.replace('set-','').replace(/-/g,'_');
     try{localStorage.setItem(key,el.type==='checkbox'?el.checked:el.value);}catch(e){}
   });
 }
-/* ═══════════════════════════════════════════════════════════ */
- 
+
 function initSettings(){
   try{
     var std=parseFloat(localStorage.getItem('target_std'));
@@ -1408,7 +1051,7 @@ function initSettings(){
     initNewSettings();
   }catch(e){startSync(60000);}
 }
- 
+
 function saveSettings(){
   TARGET_PER_DAY=parseFloat(document.getElementById('set-target-std').value)||2.5;
   OFS_TARGET_PER_DAY=parseFloat(document.getElementById('set-target-ofs').value)||3.0;
@@ -1444,7 +1087,7 @@ function saveSettings(){
   saveNewSettings();
   render();
 }
- 
+
 function updateTargetLabels(){
   var lbl=document.getElementById('lbl-std-target');if(lbl)lbl.textContent=TARGET_PER_DAY+"/day";
   var lbl2=document.getElementById('lbl-ofs-target');if(lbl2)lbl2.textContent=OFS_TARGET_PER_DAY;
@@ -1463,7 +1106,6 @@ function applyTabVisibility(){
 function applyTheme(theme){
   if(theme==='default')document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme',theme);
-  // Sync swatches
   document.querySelectorAll('.theme-swatch').forEach(function(sw){sw.classList.toggle('active',sw.getAttribute('data-theme')===theme);});
 }
 function applyAccents(g,r,p){
@@ -1489,31 +1131,67 @@ function resetToDefaults(){
   applyWatermark(true,'10');applyLivePill(true);applySidebarLogo(true);
   initSettings();render();alert("Settings reset to defaults.");
 }
- 
+
+/* ══════════════════════════════════════════
+   CHANGE 3: Fixed loadData — silent retry + smart error suppression
+   ══════════════════════════════════════════ */
 function loadData(){
   document.getElementById("lmsg").textContent="Fetching data from Google Sheet...";
   document.getElementById("live-txt").textContent="SYNCING";
-  return fetch(API,{method:"GET",redirect:"follow"})
-    .then(function(r){return r.text();})
-    .then(function(txt){
-      var js=JSON.parse(txt);
-      if(js.status==="error")throw new Error(js.message);
-      if(!js.data||!js.data.length)throw new Error("No data returned from sheet");
-      allRows=parseRows(js.data);
-      document.getElementById("live-txt").textContent="LIVE";
-      document.getElementById("sync-txt").textContent="Synced "+new Date().toLocaleTimeString();
-      document.getElementById("total-bd").textContent=allRows.length.toLocaleString();
-      populateFilters();applyFilters();
-    })
-    .catch(function(e){
-      var al=document.getElementById("alert-box");al.textContent="Could not load data: "+e.message;al.style.display="block";
-      document.getElementById("live-txt").textContent="ERROR";
-    });
+
+  function doFetch(isRetry){
+    return fetch(API,{method:"GET",redirect:"follow"})
+      .then(function(r){return r.text();})
+      .then(function(txt){
+        var js=JSON.parse(txt);
+        if(js.status==="error")throw new Error(js.message);
+        if(!js.data||!js.data.length)throw new Error("No data returned from sheet");
+
+        /* ✅ SUCCESS — clear any existing error banner immediately */
+        dataLoadedOnce=true;
+        var al=document.getElementById("alert-box");
+        al.style.opacity="0";
+        setTimeout(function(){al.style.display="none";al.textContent="";al.style.opacity="1";},300);
+
+        allRows=parseRows(js.data);
+        document.getElementById("live-txt").textContent="LIVE";
+        document.getElementById("sync-txt").textContent="Synced "+new Date().toLocaleTimeString();
+        document.getElementById("total-bd").textContent=allRows.length.toLocaleString();
+        populateFilters();applyFilters();
+      })
+      .catch(function(e){
+        if(!isRetry){
+          /* Silent retry after 3 seconds — no UI change yet */
+          return new Promise(function(res){setTimeout(res,3000);})
+            .then(function(){return doFetch(true);});
+        }
+        /* Both attempts failed */
+        document.getElementById("live-txt").textContent="ERROR";
+        /* Only show banner if we have NEVER loaded data successfully */
+        if(!dataLoadedOnce){
+          var al=document.getElementById("alert-box");
+          al.textContent="Could not load data: "+e.message;
+          al.style.display="block";
+          al.style.opacity="1";
+          /* Auto-dismiss after 5 seconds with fade */
+          setTimeout(function(){
+            al.style.opacity="0";
+            setTimeout(function(){
+              al.style.display="none";
+              al.textContent="";
+              al.style.opacity="1";
+            },500);
+          },5000);
+        }
+      });
+  }
+
+  return doFetch(false);
 }
- 
+
 var CITY_MAP={"Bengaluru":"Bengaluru","Bangalore":"Bengaluru","Bhubneshwar":"Bhubneshwar","Bhubaneswar":"Bhubneshwar","Vijaywada":"Vijaywada","Vijayawada":"Vijaywada","Gaziabad":"Gaziabad","Ghaziabad":"Gaziabad","Gurugram":"Gurugram","Gurgaon":"Gurugram","Navi Mumbai":"Navi Mumbai","Mumbai":"Mumbai","Kochi":"Kochi","Coimbatore":"Coimbatore","Delhi":"Delhi","New Delhi":"Delhi"};
 function normalizeCity(city){return CITY_MAP[city]||city;}
- 
+
 function parseRows(raw){
   if(!raw.length)return[];
   var headers=Object.keys(raw[0]),hmap={};
@@ -1535,7 +1213,7 @@ function parseRows(raw){
     return{date:d,ts:isNaN(tsObj.getTime())?null:tsObj,trainer:normalizeTrainerName(g(COL.trainer)),city:g(COL.city)||g(COL.city2),status:g(COL.status),mode:g(COL.mode),lang:g(COL.lang)};
   }).filter(function(r){return r.trainer||r.date;});
 }
- 
+
 function uniq(k){var s={};allRows.forEach(function(r){if(r[k])s[r[k]]=1;});return Object.keys(s).sort();}
 function fillSel(id,vals){var el=document.getElementById(id),cv=el.value,f=el.options[0];el.innerHTML="";el.appendChild(f);vals.forEach(function(v){el.appendChild(new Option(v,v));});if(cv&&vals.indexOf(cv)!==-1)el.value=cv;}
 function populateFilters(){fillSel("f-trainer",uniq("trainer"));fillSel("f-city",uniq("city"));fillSel("f-status",uniq("status"));fillSel("f-mode",uniq("mode"));}
@@ -1551,7 +1229,7 @@ function resetFilters(){
   populateFilters();applyFilters();
 }
 function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rCityDetail();rMatrix();renderTrainerDetail();rVirtual();rTeam();rWeekly();rOFS();}
- 
+
 function rKPI(){
   var tot=filteredRows.length;
   var done=filteredRows.filter(function(r){return matches(r.status,"Done");}).length;
@@ -1570,82 +1248,28 @@ function rKPI(){
     {l:"Virtual Calls",v:virt,p:pct(virt,tot),dc:"#58a6ff",ic:"💻",fill:pn(virt,tot),bd:"badge-b"},
     {l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"}
   ];
-var kpiIds=['total','done','closed','resch','notrel','virt','active'];
+  var kpiIds=['total','done','closed','resch','notrel','virt','active'];
+  var activeKpis=kpis.filter(function(k,i){return localStorage.getItem('kpi_'+kpiIds[i])!=='false';});
+  var uniqueDates={};
+  filteredRows.forEach(function(r){if(r.date){uniqueDates[r.date]=1;}});
+  var totalDays=Object.keys(uniqueDates).length||1;
+  var avgVisitPerDay=(done/totalDays).toFixed(1);
+  var totalReceived=filteredRows.length;
+  var avgTicketReceivedPerDay=(totalReceived/totalDays).toFixed(1);
+  var avgVisitCard='<div class="kpi"><div class="kpi-top"><div class="kpi-ic">📅</div><span class="badge badge-b">'+totalDays+' Days</span></div><div class="kpi-v" style="color:#58a6ff">'+avgVisitPerDay+'</div><div class="kpi-l">Avg Visits / Day</div><div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#58a6ff"></div></div></div>';
+  var avgReceivedCard='<div class="kpi"><div class="kpi-top"><div class="kpi-ic">📨</div><span class="badge badge-o">'+totalDays+' Days</span></div><div class="kpi-v" style="color:#f39c12">'+avgTicketReceivedPerDay+'</div><div class="kpi-l">Avg Tickets Received / Day</div><div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#f39c12"></div></div></div>';
+  var kpiHTML='';
+  activeKpis.forEach(function(k,i){
+    var card='<div class="kpi"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';
+    kpiHTML+=card;
+    if(i===1){kpiHTML+=avgVisitCard;kpiHTML+=avgReceivedCard;}
+  });
+  document.getElementById("kpi-grid").innerHTML=kpiHTML;
+}
 
-var activeKpis=kpis.filter(function(k,i){
-   return localStorage.getItem('kpi_'+kpiIds[i])!=='false';
-});
-
-var uniqueDates={};
-
-filteredRows.forEach(function(r){
-
-   if(r.date){
-      uniqueDates[r.date]=1;
-   }
-
-});
-
-var totalDays=Object.keys(uniqueDates).length || 1;
-
-
-/* TOTAL VISITS DONE AVERAGE - only Done status */
-var avgVisitPerDay=(done/totalDays).toFixed(1);
-
-
-/* TOTAL TICKETS RECEIVED */
-
-var totalReceived=filteredRows.length;
-
-
-/* RECEIVED TICKETS AVERAGE */
-
-var avgTicketReceivedPerDay=
-(totalReceived/totalDays).toFixed(1);
-
-
-/* AVG VISITS PER DAY card */
-var avgVisitCard='<div class="kpi">'
-   +'<div class="kpi-top"><div class="kpi-ic">📅</div>'
-   +'<span class="badge badge-b">'+totalDays+' Days</span></div>'
-   +'<div class="kpi-v" style="color:#58a6ff">'+avgVisitPerDay+'</div>'
-   +'<div class="kpi-l">Avg Visits / Day</div>'
-   +'<div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#58a6ff"></div></div>'
-   +'</div>';
-
-/* AVG RECEIVED TICKETS PER DAY card */
-var avgReceivedCard='<div class="kpi">'
-   +'<div class="kpi-top"><div class="kpi-ic">📨</div>'
-   +'<span class="badge badge-o">'+totalDays+' Days</span></div>'
-   +'<div class="kpi-v" style="color:#f39c12">'+avgTicketReceivedPerDay+'</div>'
-   +'<div class="kpi-l">Avg Tickets Received / Day</div>'
-   +'<div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#f39c12"></div></div>'
-   +'</div>';
-
-/* Build KPI grid — inject avg cards at position 3 & 4 (after Done) */
-var kpiHTML='';
-activeKpis.forEach(function(k,i){
-   var card='<div class="kpi">'
-      +'<div class="kpi-top">'
-      +'<div class="kpi-ic">'+k.ic+'</div>'
-      +'<span class="badge '+k.bd+'">'+k.p+'</span>'
-      +'</div>'
-      +'<div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div>'
-      +'<div class="kpi-l">'+k.l+'</div>'
-      +'<div class="kpi-bar">'
-      +'<div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div>'
-      +'</div>'
-      +'</div>';
-   kpiHTML+=card;
-   if(i===1){ kpiHTML+=avgVisitCard; kpiHTML+=avgReceivedCard; }
-});
-
-document.getElementById("kpi-grid").innerHTML=kpiHTML;
-  }
- 
 function getChartTension(){var cs=localStorage.getItem('chart_style')||'smooth';if(cs==='linear')return 0;if(cs==='stepped')return 0;return 0.4;}
 function getChartStepped(){return(localStorage.getItem('chart_style')||'smooth')==='stepped';}
- 
+
 function rTrend(){
   var bd={};filteredRows.forEach(function(r){if(r.date)bd[r.date]=(bd[r.date]||0)+1;});
   var lbls=Object.keys(bd).sort();
@@ -1655,7 +1279,7 @@ function rTrend(){
   var gr=ctx.createLinearGradient(0,0,0,220);gr.addColorStop(0,"rgba(63,185,80,0.25)");gr.addColorStop(1,"rgba(63,185,80,0.02)");
   charts.t=new Chart(ctx,{type:"line",data:{labels:lbls.map(function(d){return d.slice(5);}),datasets:[{data:lbls.map(function(l){return bd[l];}),borderColor:"#3fb950",backgroundColor:gr,borderWidth:2,pointRadius:3,pointBackgroundColor:"#3fb950",tension:getChartTension(),stepped:getChartStepped(),fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9},maxTicksLimit:15}},y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9}}}}}});
 }
- 
+
 function rLeader(){
   var map={};
   filteredRows.forEach(function(r){if(!r.trainer)return;if(!map[r.trainer])map[r.trainer]={total:0,done:0,dates:{}};map[r.trainer].total++;if(matches(r.status,"Done"))map[r.trainer].done++;if(r.date)map[r.trainer].dates[r.date]=1;});
@@ -1669,134 +1293,30 @@ function rLeader(){
     return "<tr><td><span class='rnk "+(i===0?"g":i===1?"s":i===2?"b":"")+"'>"+(i+1)+"</span></td><td style='font-weight:600;max-width:140px;overflow:hidden;text-overflow:ellipsis;color:var(--text);'>"+t.n+"</td><td class='tc'>"+t.total+"</td><td class='tc' style='color:#3fb950;font-weight:700;'>"+t.done+"</td><td class='tc' style='color:#58a6ff;font-weight:600;'>"+t.days+" day"+(t.days>1?"s":"")+"</td><td class='tc'><span class='"+tgtClass+"'>"+t.target+tgtIcon+"</span></td><td class='tc'>"+avgBar+"</td></tr>";
   }).join("");
 }
- 
+
 function rDate(){
   var mbd={},ds={};
-
-  filteredRows.forEach(function(r){
-    if(!r.date)return;
-    ds[r.date]=1;
-
-    if(!mbd[r.mode]) mbd[r.mode]={};
-
-    mbd[r.mode][r.date]=(mbd[r.mode][r.date]||0)+1;
-  });
-
+  filteredRows.forEach(function(r){if(!r.date)return;ds[r.date]=1;if(!mbd[r.mode])mbd[r.mode]={};mbd[r.mode][r.date]=(mbd[r.mode][r.date]||0)+1;});
   var dates=Object.keys(ds).sort();
-
-  var am=MODES.filter(function(m){
-    return filteredRows.some(function(r){
-      return r.mode===m;
-    });
-  });
-
-  var ds2=am.map(function(mode,i){
-    return {
-      label:mode,
-      data:dates.map(function(d){
-        return mbd[mode] ? mbd[mode][d] || 0 : 0;
-      }),
-      borderColor:COLORS[i],
-      backgroundColor:COLORS[i]+"22",
-      borderWidth:2,
-      pointRadius:3,
-      pointBackgroundColor:COLORS[i],
-      tension:getChartTension(),
-      stepped:getChartStepped(),
-      fill:false
-    };
-  });
-
-  if(charts.d) charts.d.destroy();
-
+  var am=MODES.filter(function(m){return filteredRows.some(function(r){return r.mode===m;});});
+  var ds2=am.map(function(mode,i){return{label:mode,data:dates.map(function(d){return mbd[mode]?mbd[mode][d]||0:0;}),borderColor:COLORS[i],backgroundColor:COLORS[i]+"22",borderWidth:2,pointRadius:3,pointBackgroundColor:COLORS[i],tension:getChartTension(),stepped:getChartStepped(),fill:false};});
+  if(charts.d)charts.d.destroy();
   var ctx=document.getElementById("dateChart").getContext("2d");
-
-  charts.d=new Chart(ctx,{
-    type:"line",
-
-    data:{
-      labels:dates.map(function(d){
-        return d.slice(5);
-      }),
-      datasets:ds2
-    },
-
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-
-      plugins:{
-        legend:{
-          labels:{
-            color:"#8b949e",
-            font:{size:9},
-            boxWidth:8,
-            padding:10
-          }
-        },
-
-        tooltip:{
-          mode:'index',
-          intersect:false
-        },
-
-        datalabels:{
-          color:'#ffffff',
-          anchor:'end',
-          align:'bottom',
-          offset:4,
-
-          font:{
-            weight:'bold',
-            size:10
-          },
-
-          formatter:function(value){
-            return value > 0 ? value : '';
-          }
-        }
-      },
-
-      scales:{
-        x:{
-          grid:{
-            color:"rgba(255,255,255,0.04)"
-          },
-          ticks:{
-            color:"#8b949e",
-            font:{size:9},
-            maxTicksLimit:20
-          }
-        },
-
-        y:{
-          grid:{
-            color:"rgba(255,255,255,0.04)"
-          },
-          ticks:{
-            color:"#8b949e",
-            font:{size:9}
-          }
-        }
-      }
-    },
-
-    plugins:[ChartDataLabels]
-  });
+  charts.d=new Chart(ctx,{type:"line",data:{labels:dates.map(function(d){return d.slice(5);}),datasets:ds2},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#8b949e",font:{size:9},boxWidth:8,padding:10}},tooltip:{mode:'index',intersect:false},datalabels:{color:'#ffffff',anchor:'end',align:'bottom',offset:4,font:{weight:'bold',size:10},formatter:function(value){return value>0?value:'';}}}},scales:{x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9},maxTicksLimit:20}},y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9}}}}},plugins:[ChartDataLabels]});
 }
- 
+
 function rMode(){
   var cnt={};filteredRows.forEach(function(r){if(r.mode)cnt[r.mode]=(cnt[r.mode]||0)+1;});
   var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];});var max=sorted[0]?cnt[sorted[0]]:1;
   document.getElementById("mode-body").innerHTML='<div class="hbars">'+sorted.map(function(m,i){return '<div class="hbar"><div class="hl" title="'+m+'">'+m+'</div><div class="ht"><div class="hf" style="width:'+cnt[m]/max*100+'%;background:'+COLORS[i%COLORS.length]+';"></div></div><div class="hn">'+cnt[m]+'</div></div>';}).join("")+'</div>';
 }
- 
+
 function rStatus(){
   var cnt={};filteredRows.forEach(function(r){if(r.status)cnt[r.status]=(cnt[r.status]||0)+1;});
   var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];});
   document.getElementById("status-body").innerHTML='<div class="slist">'+sorted.map(function(s){var col=SC[s]||"#8b949e";return '<div class="srow"><div class="sleft"><div class="sdot" style="background:'+col+';"></div><span class="sname">'+s+'</span></div><span class="scnt" style="color:'+col+';">'+cnt[s]+'</span></div>';}).join("")+'</div>';
 }
- 
+
 function rLang(){
   var cnt={};filteredRows.filter(function(r){return r.lang;}).forEach(function(r){cnt[r.lang]=(cnt[r.lang]||0)+1;});
   var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];});
@@ -1804,14 +1324,14 @@ function rLang(){
   document.getElementById("lang-tot").textContent=tot+" virtual";
   document.getElementById("lang-body").innerHTML='<div class="llist">'+sorted.map(function(l,i){return '<div class="lrow"><div class="ll"><div class="ldot" style="background:'+COLORS[i%COLORS.length]+';"></div><span style="color:var(--text3)">'+l+'</span></div><span class="lcnt" style="color:'+COLORS[i%COLORS.length]+';">'+cnt[l]+'</span></div>';}).join("")+'<div class="lrow" style="border-top:1px solid var(--border);margin-top:4px;"><div class="ll" style="font-weight:700;color:var(--green);">Grand Total</div><span class="lcnt" style="color:var(--green);">'+tot+'</span></div></div>';
 }
- 
+
 function rCity(){
   var cnt={};filteredRows.forEach(function(r){if(r.city)cnt[r.city]=(cnt[r.city]||0)+1;});
   var sorted=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).slice(0,40);var max=sorted[0]?cnt[sorted[0]]:1;
   document.getElementById("city-count").textContent=Object.keys(cnt).length+" cities";
   document.getElementById("city-bars").innerHTML=sorted.map(function(city,i){var h=Math.max(10,Math.round(cnt[city]/max*100));return '<div class="ccol"><div class="cnum">'+cnt[city]+'</div><div class="cbar" style="height:'+h+'px;background:'+COLORS[i%COLORS.length]+'" data-tip="'+city+': '+cnt[city]+'"></div><div class="clbl">'+city+'</div></div>';}).join("");
 }
- 
+
 function rCityDetail(){
   var map={};
   filteredRows.forEach(function(r){var c=r.city||"(Unknown)";if(!map[c])map[c]={total:0,done:0,virt:0,phys:0,trainers:{}};map[c].total++;if(matches(r.status,"Done"))map[c].done++;if(matches(r.mode,"Virtual"))map[c].virt++;if(contains(r.mode,"Physical"))map[c].phys++;if(r.trainer)map[c].trainers[r.trainer]=1;});
@@ -1820,7 +1340,7 @@ function rCityDetail(){
   document.getElementById("city-detail-body").innerHTML=sorted.map(function(city,i){var d=map[city],dp=d.total?Math.round(d.done/d.total*100):0;var col=dp>=80?"#3fb950":dp>=50?"#ffa657":"#f85149";return "<tr><td style='color:var(--text2);'>"+(i+1)+"</td><td style='font-weight:600;color:var(--text);'>"+city+"</td><td class='tc'>"+d.total+"</td><td class='tc' style='color:#3fb950;font-weight:600;'>"+d.done+"</td><td class='tc' style='color:#58a6ff;'>"+d.virt+"</td><td class='tc'>"+d.phys+"</td><td class='tc'>"+Object.keys(d.trainers).length+"</td><td class='tc'><span style='color:"+col+";font-weight:600;'>"+dp+"%</span></td></tr>";}).join("");
   document.getElementById("city-detail-foot").innerHTML="<tr><td colspan='2'>Total</td><td class='tc'>"+gT+"</td><td class='tc'>"+gD+"</td><td class='tc'>"+gV+"</td><td class='tc'>"+gP+"</td><td class='tc'></td><td class='tc'>"+pct(gD,gT)+"</td></tr>";
 }
- 
+
 function rOFS(){
   var map={};
   filteredRows.forEach(function(r){
@@ -1845,7 +1365,9 @@ function rOFS(){
   }).join("")||'<tr><td colspan="11" class="empty">No data available</td></tr>';
   document.getElementById("ofs-foot").innerHTML="<tr><td></td><td>Grand Total</td><td class='tc'>"+gT+"</td><td class='tc'>"+gRD+"</td><td class='tc'>"+gOT+"</td><td class='tc'>"+gOD+"</td><td class='tc'>"+gED+"</td><td class='tc'></td><td class='tc'></td><td class='tc'></td><td class='tc'></td></tr>";
 }
- 
+
+var currentOFSData=[],currentTrainerDetailsData=[],currentVirtualTrainersData=[],currentTeamInfoData=[];
+
 function exportOFS(){
   if(!currentOFSData||!currentOFSData.length){alert("No OFS data to export.");return;}
   var wsData=[["#","Trainer Name","Total Tickets","Raw Done","OFS Visits","OFS Done","Effective Done (OFS×2)","Working Days","Target ("+OFS_TARGET_PER_DAY+"/day)","Eff. Avg/Day","Status"]];
@@ -1855,7 +1377,7 @@ function exportOFS(){
   var now=new Date(),stamp=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);
   XLSX.writeFile(wb,"OFS_Performance_"+stamp+".xlsx");
 }
- 
+
 function buildTrainerMap(){
   var map={};
   filteredRows.forEach(function(r){
@@ -1880,7 +1402,7 @@ function renderTrainerDetail(){
   document.getElementById("trainer-detail-body").innerHTML=arr.map(function(t,i){var d=t.d,col=t.pct>=80?"#3fb950":t.pct>=50?"#ffa657":"#f85149";gT+=d.total;gD+=d.done;gC+=d.close;gR+=d.resch;gN+=d.notrel;gP+=d.phys;gRe+=d.retrain;gO+=d.ofs;gV+=d.virt;gOt+=d.other;return "<tr><td style='color:var(--text2);'>"+(i+1)+"</td><td style='font-weight:600;min-width:130px;color:var(--text);'>"+t.n+"</td><td class='tc'>"+d.total+"</td><td class='tc' style='color:#3fb950;font-weight:700;'>"+d.done+"</td><td class='tc' style='color:#f85149;'>"+d.close+"</td><td class='tc' style='color:#bc8cff;'>"+d.resch+"</td><td class='tc' style='color:#ffa657;'>"+d.notrel+"</td><td class='tc'>"+d.phys+"</td><td class='tc'>"+d.retrain+"</td><td class='tc'>"+d.ofs+"</td><td class='tc' style='color:#58a6ff;font-weight:600;'>"+d.virt+"</td><td class='tc'>"+d.other+"</td><td class='tc' style='color:var(--text2);'>"+t.days+"</td><td class='tc' style='color:#3fb950;font-weight:600;'>"+t.avg+"</td><td class='tc'><span style='color:"+col+";font-weight:700;'>"+t.pct+"%</span></td></tr>";}).join("")||'<tr><td colspan="15" class="empty">No trainers found</td></tr>';
   document.getElementById("trainer-detail-foot").innerHTML="<tr><td></td><td>Grand Total</td><td class='tc'>"+gT+"</td><td class='tc'>"+gD+"</td><td class='tc'>"+gC+"</td><td class='tc'>"+gR+"</td><td class='tc'>"+gN+"</td><td class='tc'>"+gP+"</td><td class='tc'>"+gRe+"</td><td class='tc'>"+gO+"</td><td class='tc'>"+gV+"</td><td class='tc'>"+gOt+"</td><td class='tc'></td><td class='tc'></td><td class='tc'>"+pct(gD,gT)+"</td></tr>";
 }
- 
+
 function rVirtual(){
   var virtRows=filteredRows.filter(function(r){return matches(r.mode,"Virtual");});
   var tot=virtRows.length,done=virtRows.filter(function(r){return matches(r.status,"Done");}).length;
@@ -1900,7 +1422,7 @@ function rVirtual(){
   var ssorted=Object.keys(scnt).sort(function(a,b){return scnt[b]-scnt[a];});
   document.getElementById("virt-status-body").innerHTML='<div class="slist">'+ssorted.map(function(s){var col=SC[s]||"#8b949e";return '<div class="srow"><div class="sleft"><div class="sdot" style="background:'+col+';"></div><span class="sname">'+s+'</span></div><span class="scnt" style="color:'+col+';">'+scnt[s]+'</span></div>';}).join("")+(ssorted.length===0?'<div class="empty">No virtual call data found</div>':'')+'</div>';
 }
- 
+
 function rMatrix(){
   var mk=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
   var map={},totals={},grand=0;mk.forEach(function(m){totals[m]=0;});
@@ -1909,7 +1431,7 @@ function rMatrix(){
   document.getElementById("mx-body").innerHTML=rows.map(function(name){var rt=mk.reduce(function(s,m){return s+map[name][m];},0);grand+=rt;mk.forEach(function(m){totals[m]+=map[name][m];});return "<tr><td style='font-weight:600;min-width:130px;color:var(--text);'>"+name+"</td>"+mk.map(function(m){var v=map[name][m];var c=m==="Virtual"?"color:#58a6ff;":m==="Physical Visit"?"color:#3fb950;":"";return "<td class='tc' style='"+c+"'>"+(v||"–")+"</td>";}).join("")+"<td class='tc' style='font-weight:800;color:var(--green);'>"+rt+"</td></tr>";}).join("");
   document.getElementById("mx-foot").innerHTML="<tr><td>Grand Total</td>"+mk.map(function(m){return "<td class='tc'>"+totals[m]+"</td>";}).join("")+"<td class='tc'>"+grand+"</td></tr>";
 }
- 
+
 function applyWeeklyFilter(){
   var weekVal=document.getElementById("f-week-picker").value;if(!weekVal)return;
   var parts=weekVal.split("-W"),year=parseInt(parts[0]),week=parseInt(parts[1]);
@@ -1925,7 +1447,7 @@ function resetWeeklyFilter(){
   var yearStart=new Date(d.getFullYear(),0,1),weekNo=Math.ceil(((d-yearStart)/86400000+1)/7);
   document.getElementById("f-week-picker").value=d.getFullYear()+"-W"+("0"+weekNo).slice(-2);applyWeeklyFilter();
 }
- 
+
 function buildWeeklyData(){
   var wt=3.0,map={};
   filteredRows.forEach(function(r){
@@ -1969,7 +1491,7 @@ function rWeekly(){
   document.getElementById("weekly-body-80").innerHTML=makeBandRows(b80,1);document.getElementById("weekly-foot-80").innerHTML=makeBandFoot(b80);
   document.getElementById("weekly-body-below").innerHTML=makeBandRows(bBelow,1);document.getElementById("weekly-foot-below").innerHTML=makeBandFoot(bBelow);
 }
- 
+
 function exportWeekly(){
   var all=buildWeeklyData(),b100=all.filter(function(t){return t.achPct>=100;}),b90=all.filter(function(t){return t.achPct>=90&&t.achPct<100;}),b80=all.filter(function(t){return t.achPct>=80&&t.achPct<90;}),bBelow=all.filter(function(t){return t.achPct<80;});
   var headers=["Sr.","Trainer Name","Days Worked","Normal Visits","Outstation (×2)","Weighted Achieved","Target","Ach %"],wsData=[["TRAINER PERFORMANCE REPORT — RATIO BIFURCATION"],[],["Total Trainers: "+all.length+" | Overall Ach%: "+(all.reduce(function(s,t){return s+t.weighted;},0)/Math.max(1,all.reduce(function(s,t){return s+t.target;},0))*100).toFixed(2)+"%"],[]] ;
@@ -1979,7 +1501,7 @@ function exportWeekly(){
   XLSX.utils.book_append_sheet(wb,ws,"Weekly KPI");
   var now=new Date(),stamp=now.getFullYear()+"-"+("0"+(now.getMonth()+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2);XLSX.writeFile(wb,"Weekly_KPI_"+stamp+".xlsx");
 }
- 
+
 function populateTeamLeadFilter(){
   var sel=document.getElementById("team-lead-filter");if(!sel)return;
   while(sel.options.length>1)sel.remove(1);
@@ -2021,7 +1543,6 @@ function rTeam(){
   document.getElementById("team-body").innerHTML=teamRows.join("")||'<tr><td colspan="13" class="empty">No team members found</td></tr>';
 }
 
-/* ── EXPORTS ── */
 function exportLeaderboard(){
   var map={};filteredRows.forEach(function(r){if(!r.trainer)return;if(!map[r.trainer])map[r.trainer]={total:0,done:0,dates:{}};map[r.trainer].total++;if(matches(r.status,"Done"))map[r.trainer].done++;if(r.date)map[r.trainer].dates[r.date]=1;});
   var arr=Object.keys(map).map(function(n){var d=map[n],days=Object.keys(d.dates).length||1,avg=parseFloat((d.done/days).toFixed(1)),target=Math.ceil(days*TARGET_PER_DAY);var tgtPct=target>0?d.done/target:0,status=tgtPct>=1?"✓ Target Met":tgtPct>=0.8?"Near Target":"Below Target";return{n:n,total:d.total,done:d.done,days:days,target:target,avg:avg,status:status};}).sort(function(a,b){return b.done-a.done;});
@@ -2045,268 +1566,100 @@ function exportTeamInfo(){
   XLSX.writeFile(wb,"Team_Info_"+stamp+".xlsx");
 }
 
-/* ══════════════════════════════════════════
-   PDF & SCREENSHOT UTILITIES
-   ══════════════════════════════════════════ */
-
-/* ── Stamp: today date string ── */
-function stampNow(){
-  var n=new Date();
-  return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)+"-"+("0"+n.getDate()).slice(-2);
-}
-
-/* ── Generic: snapshot any section to PNG download ── */
+function stampNow(){var n=new Date();return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)+"-"+("0"+n.getDate()).slice(-2);}
 function snapSection(viewId,filename){
-  var el=document.getElementById(viewId);
-  if(!el){alert("View not found.");return;}
-  var btn=event&&event.target?event.target:null;
-  if(btn)btn.textContent="⏳ Capturing...";
-  html2canvas(el,{
-    backgroundColor:"#0d1117",
-    scale:2,
-    useCORS:true,
-    allowTaint:true,
-    scrollX:0,scrollY:0,
-    width:el.scrollWidth,
-    height:el.scrollHeight
-  }).then(function(canvas){
-    var link=document.createElement('a');
-    link.download=filename+"_"+stampNow()+".png";
-    link.href=canvas.toDataURL('image/png');
-    link.click();
-    if(btn)btn.textContent="📸 Screenshot";
-  }).catch(function(e){
-    alert("Screenshot failed: "+e.message);
-    if(btn)btn.textContent="📸 Screenshot";
-  });
+  var el=document.getElementById(viewId);if(!el){alert("View not found.");return;}
+  var btn=event&&event.target?event.target:null;if(btn)btn.textContent="⏳ Capturing...";
+  html2canvas(el,{backgroundColor:"#0d1117",scale:2,useCORS:true,allowTaint:true,scrollX:0,scrollY:0,width:el.scrollWidth,height:el.scrollHeight}).then(function(canvas){var link=document.createElement('a');link.download=filename+"_"+stampNow()+".png";link.href=canvas.toDataURL('image/png');link.click();if(btn)btn.textContent="📸 Screenshot";}).catch(function(e){alert("Screenshot failed: "+e.message);if(btn)btn.textContent="📸 Screenshot";});
 }
-
-/* ── WEEKLY FULL SCREENSHOT: captures all 4 bands + summary ── */
 function snapWeeklyFull(){
-  var el=document.getElementById('view-weekly');
-  if(!el){alert("Weekly view not found.");return;}
-  var btn=event&&event.target?event.target:null;
-  if(btn)btn.textContent="⏳ Capturing...";
-  // Temporarily expand all scrollable tables
-  var scrollDivs=el.querySelectorAll('[style*="overflow-x:auto"]');
-  var origStyles=[];
-  scrollDivs.forEach(function(d,i){
-    origStyles[i]=d.style.overflow;
-    d.style.overflow='visible';
-  });
-  html2canvas(el,{
-    backgroundColor:"#0d1117",
-    scale:2,
-    useCORS:true,
-    allowTaint:true,
-    scrollX:0,scrollY:0,
-    width:el.scrollWidth,
-    height:el.scrollHeight
-  }).then(function(canvas){
-    scrollDivs.forEach(function(d,i){d.style.overflow=origStyles[i]||'';});
-    var link=document.createElement('a');
-    link.download="Weekly_KPI_Full_"+stampNow()+".png";
-    link.href=canvas.toDataURL('image/png');
-    link.click();
-    if(btn)btn.textContent="📸 Full Screenshot";
-  }).catch(function(e){
-    scrollDivs.forEach(function(d,i){d.style.overflow=origStyles[i]||'';});
-    alert("Screenshot failed: "+e.message);
-    if(btn)btn.textContent="📸 Full Screenshot";
-  });
+  var el=document.getElementById('view-weekly');if(!el){alert("Weekly view not found.");return;}
+  var btn=event&&event.target?event.target:null;if(btn)btn.textContent="⏳ Capturing...";
+  var scrollDivs=el.querySelectorAll('[style*="overflow-x:auto"]');var origStyles=[];
+  scrollDivs.forEach(function(d,i){origStyles[i]=d.style.overflow;d.style.overflow='visible';});
+  html2canvas(el,{backgroundColor:"#0d1117",scale:2,useCORS:true,allowTaint:true,scrollX:0,scrollY:0,width:el.scrollWidth,height:el.scrollHeight}).then(function(canvas){scrollDivs.forEach(function(d,i){d.style.overflow=origStyles[i]||'';});var link=document.createElement('a');link.download="Weekly_KPI_Full_"+stampNow()+".png";link.href=canvas.toDataURL('image/png');link.click();if(btn)btn.textContent="📸 Full Screenshot";}).catch(function(e){scrollDivs.forEach(function(d,i){d.style.overflow=origStyles[i]||'';});alert("Screenshot failed: "+e.message);if(btn)btn.textContent="📸 Full Screenshot";});
 }
-
-/* ── Helper: get PDF page title ── */
 function pdfHeader(doc,title){
   var dTitle=localStorage.getItem('dash_title')||"OnSite OpsVision Dashboard";
-  doc.setFontSize(14);doc.setTextColor(239,83,80);
-  doc.text(dTitle,14,16);
-  doc.setFontSize(10);doc.setTextColor(139,148,158);
-  doc.text(title+" — Generated: "+stampNow(),14,23);
+  doc.setFontSize(14);doc.setTextColor(239,83,80);doc.text(dTitle,14,16);
+  doc.setFontSize(10);doc.setTextColor(139,148,158);doc.text(title+" — Generated: "+stampNow(),14,23);
 }
-
-/* ── Helper: build autoTable from a tbody/tfoot ── */
 function getTableData(tbodyId,tfootId){
-  var rows=[];
-  document.getElementById(tbodyId).querySelectorAll('tr').forEach(function(tr){
-    var row=[];
-    tr.querySelectorAll('td').forEach(function(td){row.push(td.innerText.trim());});
-    if(row.length)rows.push(row);
-  });
-  var foot=[];
-  if(tfootId){
-    document.getElementById(tfootId).querySelectorAll('tr').forEach(function(tr){
-      var row=[];
-      tr.querySelectorAll('td').forEach(function(td){row.push(td.innerText.trim());});
-      if(row.length)foot.push(row);
-    });
-  }
+  var rows=[];document.getElementById(tbodyId).querySelectorAll('tr').forEach(function(tr){var row=[];tr.querySelectorAll('td').forEach(function(td){row.push(td.innerText.trim());});if(row.length)rows.push(row);});
+  var foot=[];if(tfootId){document.getElementById(tfootId).querySelectorAll('tr').forEach(function(tr){var row=[];tr.querySelectorAll('td').forEach(function(td){row.push(td.innerText.trim());});if(row.length)foot.push(row);});}
   return{body:rows,foot:foot};
 }
-
-/* ── OVERVIEW PDF: KPI cards + Leaderboard ── */
 function exportOverviewPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Overview — KPI & Top Performers");
-  // KPI cards as a summary table
-  var kpiRows=[];
-  document.getElementById('kpi-grid').querySelectorAll('.kpi').forEach(function(card){
-    var label=card.querySelector('.kpi-l')?card.querySelector('.kpi-l').innerText:'';
-    var value=card.querySelector('.kpi-v')?card.querySelector('.kpi-v').innerText:'';
-    var pct=card.querySelector('.badge')?card.querySelector('.badge').innerText:'';
-    kpiRows.push([label,value,pct]);
-  });
-  doc.autoTable({startY:28,head:[['KPI Metric','Value','%']],body:kpiRows,theme:'grid',
-    headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:9},
-    bodyStyles:{fontSize:9},columnStyles:{0:{cellWidth:70},1:{cellWidth:30,halign:'center'},2:{cellWidth:30,halign:'center'}},
-    margin:{left:14,right:14}});
-  var y=doc.lastAutoTable.finalY+6;
-  doc.setFontSize(10);doc.setTextColor(239,83,80);doc.text("Top Performers",14,y);
+  var kpiRows=[];document.getElementById('kpi-grid').querySelectorAll('.kpi').forEach(function(card){var label=card.querySelector('.kpi-l')?card.querySelector('.kpi-l').innerText:'';var value=card.querySelector('.kpi-v')?card.querySelector('.kpi-v').innerText:'';var p=card.querySelector('.badge')?card.querySelector('.badge').innerText:'';kpiRows.push([label,value,p]);});
+  doc.autoTable({startY:28,head:[['KPI Metric','Value','%']],body:kpiRows,theme:'grid',headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:9},bodyStyles:{fontSize:9},columnStyles:{0:{cellWidth:70},1:{cellWidth:30,halign:'center'},2:{cellWidth:30,halign:'center'}},margin:{left:14,right:14}});
+  var y=doc.lastAutoTable.finalY+6;doc.setFontSize(10);doc.setTextColor(239,83,80);doc.text("Top Performers",14,y);
   var td=getTableData('lb-body',null);
-  doc.autoTable({startY:y+3,head:[['#','Trainer','Total','Done','Working Days','Target','Avg/Day']],body:td.body,theme:'striped',
-    headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:8},
-    bodyStyles:{fontSize:8},
-    columnStyles:{0:{cellWidth:10},1:{cellWidth:55},2:{cellWidth:18,halign:'center'},3:{cellWidth:18,halign:'center'},4:{cellWidth:28,halign:'center'},5:{cellWidth:20,halign:'center'},6:{cellWidth:25,halign:'center'}},
-    margin:{left:14,right:14}});
+  doc.autoTable({startY:y+3,head:[['#','Trainer','Total','Done','Working Days','Target','Avg/Day']],body:td.body,theme:'striped',headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:8},bodyStyles:{fontSize:8},columnStyles:{0:{cellWidth:10},1:{cellWidth:55},2:{cellWidth:18,halign:'center'},3:{cellWidth:18,halign:'center'},4:{cellWidth:28,halign:'center'},5:{cellWidth:20,halign:'center'},6:{cellWidth:25,halign:'center'}},margin:{left:14,right:14}});
   doc.save("Overview_"+stampNow()+".pdf");
 }
-
-/* ── exportTablePDF: generic single-table PDF ── */
 function exportTablePDF(tbodyId,headers,title){
-  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  pdfHeader(doc,title);
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfHeader(doc,title);
   var td=getTableData(tbodyId,null);
-  doc.autoTable({startY:28,head:[headers],body:td.body,theme:'striped',
-    headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:8},
-    bodyStyles:{fontSize:8},margin:{left:14,right:14}});
+  doc.autoTable({startY:28,head:[headers],body:td.body,theme:'striped',headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:8},bodyStyles:{fontSize:8},margin:{left:14,right:14}});
   doc.save(title.replace(/\s+/g,'_')+"_"+stampNow()+".pdf");
 }
-
-/* ── TRAINER DETAIL PDF ── */
 function exportTrainerDetailPDF(){
-  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  pdfHeader(doc,"Trainer Details");
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfHeader(doc,"Trainer Details");
   var td=getTableData('trainer-detail-body','trainer-detail-foot');
-  var heads=[['#','Trainer','Total','Done','Closed','Re-sch','Not Rel','Physical','Re-train','OFS','Virtual','Other','Days','Avg/Day','Done%']];
-  doc.autoTable({startY:28,head:heads,body:td.body,foot:td.foot,theme:'striped',
-    headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:7},
-    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},
-    bodyStyles:{fontSize:7},margin:{left:8,right:8}});
+  doc.autoTable({startY:28,head:[['#','Trainer','Total','Done','Closed','Re-sch','Not Rel','Physical','Re-train','OFS','Virtual','Other','Days','Avg/Day','Done%']],body:td.body,foot:td.foot,theme:'striped',headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:7},footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},bodyStyles:{fontSize:7},margin:{left:8,right:8}});
   doc.save("Trainer_Details_"+stampNow()+".pdf");
 }
-
-/* ── VIRTUAL CALLS PDF ── */
 function exportVirtualPDF(){
-  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  pdfHeader(doc,"Virtual Calls");
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfHeader(doc,"Virtual Calls");
   var td=getTableData('virt-trainer-body','virt-trainer-foot');
-  doc.autoTable({startY:28,head:[['#','Trainer','Virtual Total','Done','Other','Languages','Done%']],body:td.body,foot:td.foot,theme:'striped',
-    headStyles:{fillColor:[88,166,255],textColor:255,fontStyle:'bold',fontSize:8},
-    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},
-    bodyStyles:{fontSize:8},margin:{left:14,right:14}});
+  doc.autoTable({startY:28,head:[['#','Trainer','Virtual Total','Done','Other','Languages','Done%']],body:td.body,foot:td.foot,theme:'striped',headStyles:{fillColor:[88,166,255],textColor:255,fontStyle:'bold',fontSize:8},footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},bodyStyles:{fontSize:8},margin:{left:14,right:14}});
   doc.save("Virtual_Calls_"+stampNow()+".pdf");
 }
-
-/* ── CITIES PDF ── */
 function exportCitiesPDF(){
-  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  pdfHeader(doc,"City-wise Breakdown");
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfHeader(doc,"City-wise Breakdown");
   var td=getTableData('city-detail-body','city-detail-foot');
-  doc.autoTable({startY:28,head:[['#','City','Total','Done','Virtual','Physical','Trainers','Done%']],body:td.body,foot:td.foot,theme:'striped',
-    headStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},
-    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},
-    bodyStyles:{fontSize:8},margin:{left:14,right:14}});
+  doc.autoTable({startY:28,head:[['#','City','Total','Done','Virtual','Physical','Trainers','Done%']],body:td.body,foot:td.foot,theme:'striped',headStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:8},bodyStyles:{fontSize:8},margin:{left:14,right:14}});
   doc.save("Cities_"+stampNow()+".pdf");
 }
-
-/* ── OFS PDF ── */
 function exportOFSPDF(){
-  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  pdfHeader(doc,"Out of Station Performance (Target: "+OFS_TARGET_PER_DAY+"/day)");
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfHeader(doc,"Out of Station Performance (Target: "+OFS_TARGET_PER_DAY+"/day)");
   var td=getTableData('ofs-body','ofs-foot');
-  doc.autoTable({startY:28,head:[['#','Trainer','Total','Raw Done','OFS Visits','OFS Done','Eff.Done','Days','Target','Eff.Avg','Status']],body:td.body,foot:td.foot,theme:'striped',
-    headStyles:{fillColor:[255,166,87],textColor:[30,30,30],fontStyle:'bold',fontSize:7},
-    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},
-    bodyStyles:{fontSize:7},margin:{left:8,right:8}});
+  doc.autoTable({startY:28,head:[['#','Trainer','Total','Raw Done','OFS Visits','OFS Done','Eff.Done','Days','Target','Eff.Avg','Status']],body:td.body,foot:td.foot,theme:'striped',headStyles:{fillColor:[255,166,87],textColor:[30,30,30],fontStyle:'bold',fontSize:7},footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},bodyStyles:{fontSize:7},margin:{left:8,right:8}});
   doc.save("OFS_Performance_"+stampNow()+".pdf");
 }
-
-/* ── MATRIX PDF ── */
 function exportMatrixPDF(){
-  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  pdfHeader(doc,"Trainer × Training Mode Matrix");
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfHeader(doc,"Trainer × Training Mode Matrix");
   var td=getTableData('mx-body','mx-foot');
-  doc.autoTable({startY:28,head:[['Trainer','Phys.Visit','Phys.Retrain','Out of Station','OFS Support','Virtual','Incomplete','Feedback','Total']],body:td.body,foot:td.foot,theme:'striped',
-    headStyles:{fillColor:[188,140,255],textColor:255,fontStyle:'bold',fontSize:7},
-    footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},
-    bodyStyles:{fontSize:7},margin:{left:8,right:8}});
+  doc.autoTable({startY:28,head:[['Trainer','Phys.Visit','Phys.Retrain','Out of Station','OFS Support','Virtual','Incomplete','Feedback','Total']],body:td.body,foot:td.foot,theme:'striped',headStyles:{fillColor:[188,140,255],textColor:255,fontStyle:'bold',fontSize:7},footStyles:{fillColor:[63,185,80],textColor:255,fontStyle:'bold',fontSize:7},bodyStyles:{fontSize:7},margin:{left:8,right:8}});
   doc.save("Mode_Matrix_"+stampNow()+".pdf");
 }
-
-/* ── TEAM PDF ── */
 function exportTeamPDF(){
-  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  pdfHeader(doc,"Petpooja Training Team");
+  var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdfHeader(doc,"Petpooja Training Team");
   var td=getTableData('team-body',null);
-  doc.autoTable({startY:28,head:[['Sr','Name','City','State','Languages','Zone','Email','Designation','Team Lead','W.Days','Absent','Last Active','Status']],body:td.body,theme:'striped',
-    headStyles:{fillColor:[88,166,255],textColor:255,fontStyle:'bold',fontSize:6},
-    bodyStyles:{fontSize:6},margin:{left:5,right:5}});
+  doc.autoTable({startY:28,head:[['Sr','Name','City','State','Languages','Zone','Email','Designation','Team Lead','W.Days','Absent','Last Active','Status']],body:td.body,theme:'striped',headStyles:{fillColor:[88,166,255],textColor:255,fontStyle:'bold',fontSize:6},bodyStyles:{fontSize:6},margin:{left:5,right:5}});
   doc.save("Team_Info_"+stampNow()+".pdf");
 }
-
-/* ── WEEKLY KPI PDF — all 4 bands on separate sections ── */
 function exportWeeklyPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Weekly KPI — Ratio Bifurcation");
-  var bands=[
-    {id:'weekly-body-100',foot:'weekly-foot-100',label:'🏆 100% ACHIEVED',color:[27,94,32],tColor:255},
-    {id:'weekly-body-90',foot:'weekly-foot-90',label:'✅ 90% to <100% ACHIEVED',color:[26,35,126],tColor:255},
-    {id:'weekly-body-80',foot:'weekly-foot-80',label:'⚠️ 80% to <90% ACHIEVED',color:[230,81,0],tColor:255},
-    {id:'weekly-body-below',foot:'weekly-foot-below',label:'❌ BELOW 80% ACHIEVED',color:[183,28,28],tColor:255}
-  ];
-  // Summary bar
+  var bands=[{id:'weekly-body-100',foot:'weekly-foot-100',label:'🏆 100% ACHIEVED',color:[27,94,32],tColor:255},{id:'weekly-body-90',foot:'weekly-foot-90',label:'✅ 90% to <100% ACHIEVED',color:[26,35,126],tColor:255},{id:'weekly-body-80',foot:'weekly-foot-80',label:'⚠️ 80% to <90% ACHIEVED',color:[230,81,0],tColor:255},{id:'weekly-body-below',foot:'weekly-foot-below',label:'❌ BELOW 80% ACHIEVED',color:[183,28,28],tColor:255}];
   var summaryEl=document.getElementById('weekly-summary-bar');
-  if(summaryEl){
-    doc.setFontSize(8);doc.setTextColor(100,100,100);
-    doc.text(summaryEl.innerText.replace(/\|/g,'  |  '),14,27);
-  }
+  if(summaryEl){doc.setFontSize(8);doc.setTextColor(100,100,100);doc.text(summaryEl.innerText.replace(/\|/g,'  |  '),14,27);}
   var startY=33;
   var heads=[['Sr.','Trainer Name','Days Worked','Normal Visits','Outstation (×2)','Weighted Achieved','Target','Ach %']];
   bands.forEach(function(band,idx){
     var td=getTableData(band.id,band.foot);
-    var titleEl=document.getElementById(band.id.replace('body','title'));
-    var label=titleEl?titleEl.innerText:band.label;
+    var titleEl=document.getElementById(band.id.replace('body','title'));var label=titleEl?titleEl.innerText:band.label;
     if(idx>0){doc.addPage();startY=20;pdfHeader(doc,"Weekly KPI — Ratio Bifurcation (cont.)");}
-    doc.setFontSize(10);doc.setTextColor(band.color[0],band.color[1],band.color[2]);
-    doc.text(label,14,startY);
-    doc.autoTable({
-      startY:startY+4,
-      head:heads,
-      body:td.body,
-      foot:td.foot,
-      theme:'striped',
-      headStyles:{fillColor:band.color,textColor:band.tColor,fontStyle:'bold',fontSize:8},
-      footStyles:{fillColor:[45,51,59],textColor:[200,200,200],fontStyle:'bold',fontSize:8},
-      bodyStyles:{fontSize:8,textColor:[30,30,30]},
-      margin:{left:14,right:14},
-      didParseCell:function(data){
-        if(data.section==='body'&&data.column.index===7){
-          var txt=data.cell.raw||'';
-          var pct=parseFloat(txt);
-          if(pct>=100)data.cell.styles.textColor=[27,94,32];
-          else if(pct>=90)data.cell.styles.textColor=[26,35,126];
-          else if(pct>=80)data.cell.styles.textColor=[230,81,0];
-          else data.cell.styles.textColor=[183,28,28];
-          data.cell.styles.fontStyle='bold';
-        }
-      }
-    });
+    doc.setFontSize(10);doc.setTextColor(band.color[0],band.color[1],band.color[2]);doc.text(label,14,startY);
+    doc.autoTable({startY:startY+4,head:heads,body:td.body,foot:td.foot,theme:'striped',headStyles:{fillColor:band.color,textColor:band.tColor,fontStyle:'bold',fontSize:8},footStyles:{fillColor:[45,51,59],textColor:[200,200,200],fontStyle:'bold',fontSize:8},bodyStyles:{fontSize:8,textColor:[30,30,30]},margin:{left:14,right:14},didParseCell:function(data){if(data.section==='body'&&data.column.index===7){var txt=data.cell.raw||'';var pct=parseFloat(txt);if(pct>=100)data.cell.styles.textColor=[27,94,32];else if(pct>=90)data.cell.styles.textColor=[26,35,126];else if(pct>=80)data.cell.styles.textColor=[230,81,0];else data.cell.styles.textColor=[183,28,28];data.cell.styles.fontStyle='bold';}}});
     startY=doc.lastAutoTable.finalY+8;
   });
   doc.save("Weekly_KPI_PDF_"+stampNow()+".pdf");
 }
 
-/* ── INIT ── */
 window.addEventListener("DOMContentLoaded",function(){
   var now=new Date(),y=now.getFullYear(),mo=("0"+(now.getMonth()+1)).slice(-2),d=("0"+now.getDate()).slice(-2);
   document.getElementById("f-from").value=y+"-"+mo+"-01";
@@ -2324,262 +1677,49 @@ window.addEventListener("DOMContentLoaded",function(){
   });
 });
 
-/* ══════════════════════════════════════════════════════════════
-   SETTINGS ACCESS CONTROL
-   - 5 admin PINs pre-configured (hashed with SHA-256)
-   - 5 wrong attempts → 5-minute cooldown
-   - Session stored in sessionStorage (clears on tab close)
-   - Lock button available inside settings once authenticated
-══════════════════════════════════════════════════════════════ */
-
-/* ── Admin roster: name + SHA-256 hash of their PIN ──
-   PINs:
-     Parth        → ParthAdmin@2024
-     Karp         → KarpSecure#99
-     Noman        → NomanAccess$1
-     Antareksh    → AntaAdmin!007
-     Deepak       → DeepakPass^88
-
-   To change a PIN: run this in browser console:
-     crypto.subtle.digest('SHA-256', new TextEncoder().encode('YourNewPIN'))
-       .then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
-─────────────────────────────────────────────────────── */
-var ADMIN_PINS = [
-  { name:"Parth",     hash:"d0f0bc745cb7418f79201a5100abce8a835e7d8f116a614a6117852a92b0cfc7" },
-  { name:"Karp",      hash:"3d49d8eeaae032230d2a6addfbcad3ae7d6475c46da52f9e678ee7fb91e61430" },
-  { name:"Noman",     hash:"91a990d97671ccfea4c569bd2d33dc048c18730c0be5f95a87f921c06ca2f76b" },
-  { name:"Antareksh", hash:"afe785c9505fa1244f86faa47cc495c7d4b04177c4001054d984422a3295790b" },
-  { name:"Deepak",    hash:"a30ef9a72f329f0359b360b5681782c24318facabcce216626872bd5caccb37c" }
+/* Settings Lock System */
+var ADMIN_PINS=[
+  {name:"Parth",hash:"d0f0bc745cb7418f79201a5100abce8a835e7d8f116a614a6117852a92b0cfc7"},
+  {name:"Karp",hash:"3d49d8eeaae032230d2a6addfbcad3ae7d6475c46da52f9e678ee7fb91e61430"},
+  {name:"Noman",hash:"91a990d97671ccfea4c569bd2d33dc048c18730c0be5f95a87f921c06ca2f76b"},
+  {name:"Antareksh",hash:"afe785c9505fa1244f86faa47cc495c7d4b04177c4001054d984422a3295790b"},
+  {name:"Deepak",hash:"a30ef9a72f329f0359b360b5681782c24318facabcce216626872bd5caccb37c"}
 ];
-
-var SETTINGS_SESSION_KEY = 'pp_settings_auth';
-var SETTINGS_AUTH_NAME   = 'pp_settings_name';
-var LOCK_MAX_ATTEMPTS    = 5;
-var LOCK_COOLDOWN_MS     = 5 * 60 * 1000; // 5 minutes
-var LOCK_ATTEMPTS_KEY    = 'pp_lock_attempts';
-var LOCK_COOLDOWN_KEY    = 'pp_lock_until';
-
-/* ── Hash a string with SHA-256, return hex ── */
-function sha256hex(str) {
-  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
-    .then(function(buf){
-      return Array.from(new Uint8Array(buf))
-        .map(function(b){return b.toString(16).padStart(2,'0');})
-        .join('');
-    });
+var SETTINGS_SESSION_KEY='pp_settings_auth',SETTINGS_AUTH_NAME='pp_settings_name',LOCK_MAX_ATTEMPTS=5,LOCK_COOLDOWN_MS=5*60*1000,LOCK_ATTEMPTS_KEY='pp_lock_attempts',LOCK_COOLDOWN_KEY='pp_lock_until';
+function sha256hex(str){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(str)).then(function(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');});}
+function isSettingsAuthenticated(){return sessionStorage.getItem(SETTINGS_SESSION_KEY)==='1';}
+function getAuthName(){return sessionStorage.getItem(SETTINGS_AUTH_NAME)||'Admin';}
+function refreshLockOverlay(){
+  var overlay=document.getElementById('settings-lock-overlay');if(!overlay)return;
+  if(isSettingsAuthenticated()){overlay.style.display='none';var bar=document.getElementById('lock-session-bar');if(bar){bar.style.display='flex';}var form=document.getElementById('lock-form');if(form)form.style.display='none';var nameEl=document.getElementById('lock-session-name');if(nameEl)nameEl.textContent=getAuthName();}
+  else{overlay.style.display='flex';var bar=document.getElementById('lock-session-bar');if(bar)bar.style.display='none';var form=document.getElementById('lock-form');if(form)form.style.display='flex';updateCooldownUI();}
 }
-
-/* ── Check if currently authenticated ── */
-function isSettingsAuthenticated() {
-  return sessionStorage.getItem(SETTINGS_SESSION_KEY) === '1';
-}
-
-/* ── Get authenticated admin name ── */
-function getAuthName() {
-  return sessionStorage.getItem(SETTINGS_AUTH_NAME) || 'Admin';
-}
-
-/* ── Show/hide the lock overlay based on auth state ── */
-function refreshLockOverlay() {
-  var overlay = document.getElementById('settings-lock-overlay');
-  if (!overlay) return;
-
-  if (isSettingsAuthenticated()) {
-    /* Authenticated — hide overlay */
-    overlay.style.display = 'none';
-    /* Show session bar in the lock box (for lock-out button in settings) */
-    var bar = document.getElementById('lock-session-bar');
-    if (bar) { bar.style.display = 'flex'; }
-    var form = document.getElementById('lock-form');
-    if (form) form.style.display = 'none';
-    var nameEl = document.getElementById('lock-session-name');
-    if (nameEl) nameEl.textContent = getAuthName();
-  } else {
-    /* Not authenticated — show overlay */
-    overlay.style.display = 'flex';
-    var bar = document.getElementById('lock-session-bar');
-    if (bar) bar.style.display = 'none';
-    var form = document.getElementById('lock-form');
-    if (form) form.style.display = 'flex';
-    /* Check cooldown */
-    updateCooldownUI();
-  }
-}
-
-/* ── Cooldown logic ── */
-function getLockAttempts() {
-  return parseInt(localStorage.getItem(LOCK_ATTEMPTS_KEY) || '0');
-}
-function getLockUntil() {
-  return parseInt(localStorage.getItem(LOCK_COOLDOWN_KEY) || '0');
-}
-function isInCooldown() {
-  return Date.now() < getLockUntil();
-}
-function updateCooldownUI() {
-  var until = getLockUntil();
-  var cdWrap = document.getElementById('lock-cooldown-wrap');
-  var cdTxt  = document.getElementById('lock-cooldown-txt');
-  var btn    = document.querySelector('.lock-btn');
-  var input  = document.getElementById('lock-pin-input');
-  if (!cdWrap) return;
-
-  if (isInCooldown()) {
-    cdWrap.style.display = 'block';
-    if (btn)  btn.disabled = true;
-    if (input) input.disabled = true;
-    /* Countdown timer */
-    var tick = setInterval(function(){
-      var remaining = Math.max(0, getLockUntil() - Date.now());
-      if (remaining <= 0) {
-        clearInterval(tick);
-        localStorage.setItem(LOCK_ATTEMPTS_KEY, '0');
-        localStorage.removeItem(LOCK_COOLDOWN_KEY);
-        cdWrap.style.display = 'none';
-        if (btn)  btn.disabled = false;
-        if (input) { input.disabled = false; input.focus(); }
-        document.getElementById('lock-attempts-txt').textContent = '';
-      } else {
-        var secs = Math.ceil(remaining / 1000);
-        var mins = Math.floor(secs / 60);
-        var s    = secs % 60;
-        if (cdTxt) cdTxt.textContent =
-          '🔒 Too many wrong attempts. Locked for ' +
-          mins + 'm ' + (s < 10 ? '0' : '') + s + 's';
-      }
-    }, 500);
-  } else {
-    cdWrap.style.display = 'none';
-    if (btn)  btn.disabled = false;
-    if (input) input.disabled = false;
-    var attempts = getLockAttempts();
-    var attTxt = document.getElementById('lock-attempts-txt');
-    if (attTxt) {
-      attTxt.textContent = attempts > 0
-        ? (LOCK_MAX_ATTEMPTS - attempts) + ' attempt' + (LOCK_MAX_ATTEMPTS - attempts !== 1 ? 's' : '') + ' remaining'
-        : '';
-    }
-  }
-}
-
-/* ── Attempt unlock ── */
-function settingsUnlock() {
-  if (isInCooldown()) return;
-
-  var pin = (document.getElementById('lock-pin-input').value || '').trim();
-  var errEl = document.getElementById('lock-err');
-  var input = document.getElementById('lock-pin-input');
-
-  if (!pin) {
-    errEl.textContent = 'Please enter your PIN.';
-    input.classList.add('error');
-    setTimeout(function(){ input.classList.remove('error'); }, 400);
-    return;
-  }
-
-  sha256hex(pin).then(function(hash) {
-    /* Check against all admin hashes */
-    var matched = null;
-    for (var i = 0; i < ADMIN_PINS.length; i++) {
-      if (ADMIN_PINS[i].hash === hash) { matched = ADMIN_PINS[i]; break; }
-    }
-
-    if (matched) {
-      /* ✅ Correct PIN */
-      localStorage.setItem(LOCK_ATTEMPTS_KEY, '0');
-      localStorage.removeItem(LOCK_COOLDOWN_KEY);
-      sessionStorage.setItem(SETTINGS_SESSION_KEY, '1');
-      sessionStorage.setItem(SETTINGS_AUTH_NAME, matched.name);
-      document.getElementById('lock-pin-input').value = '';
-      refreshLockOverlay();
-    } else {
-      /* ❌ Wrong PIN */
-      var attempts = getLockAttempts() + 1;
-      localStorage.setItem(LOCK_ATTEMPTS_KEY, String(attempts));
-      input.classList.add('error');
-      setTimeout(function(){ input.classList.remove('error'); }, 400);
-      input.value = '';
-
-      if (attempts >= LOCK_MAX_ATTEMPTS) {
-        /* Trigger cooldown */
-        localStorage.setItem(LOCK_COOLDOWN_KEY, String(Date.now() + LOCK_COOLDOWN_MS));
-        localStorage.setItem(LOCK_ATTEMPTS_KEY, '0');
-        errEl.textContent = '';
-        updateCooldownUI();
-      } else {
-        var left = LOCK_MAX_ATTEMPTS - attempts;
-        errEl.textContent = '❌ Wrong PIN — ' + left + ' attempt' + (left !== 1 ? 's' : '') + ' left';
-        var attTxt = document.getElementById('lock-attempts-txt');
-        if (attTxt) attTxt.textContent = left + ' attempt' + (left !== 1 ? 's' : '') + ' remaining';
-      }
-    }
+function getLockAttempts(){return parseInt(localStorage.getItem(LOCK_ATTEMPTS_KEY)||'0');}
+function getLockUntil(){return parseInt(localStorage.getItem(LOCK_COOLDOWN_KEY)||'0');}
+function isInCooldown(){return Date.now()<getLockUntil();}
+function updateCooldownUI(){
+  var until=getLockUntil();var cdWrap=document.getElementById('lock-cooldown-wrap');var cdTxt=document.getElementById('lock-cooldown-txt');var btn=document.querySelector('.lock-btn');var input=document.getElementById('lock-pin-input');if(!cdWrap)return;
+  if(isInCooldown()){cdWrap.style.display='block';if(btn)btn.disabled=true;if(input)input.disabled=true;var tick=setInterval(function(){var remaining=Math.max(0,getLockUntil()-Date.now());if(remaining<=0){clearInterval(tick);localStorage.setItem(LOCK_ATTEMPTS_KEY,'0');localStorage.removeItem(LOCK_COOLDOWN_KEY);cdWrap.style.display='none';if(btn)btn.disabled=false;if(input){input.disabled=false;input.focus();}document.getElementById('lock-attempts-txt').textContent='';}else{var secs=Math.ceil(remaining/1000);var mins=Math.floor(secs/60);var s=secs%60;if(cdTxt)cdTxt.textContent='🔒 Too many wrong attempts. Locked for '+mins+'m '+(s<10?'0':'')+s+'s';}},500);}
+  else{cdWrap.style.display='none';if(btn)btn.disabled=false;if(input)input.disabled=false;var attempts=getLockAttempts();var attTxt=document.getElementById('lock-attempts-txt');if(attTxt){attTxt.textContent=attempts>0?(LOCK_MAX_ATTEMPTS-attempts)+' attempt'+(LOCK_MAX_ATTEMPTS-attempts!==1?'s':'')+' remaining':'';}}}
+function settingsUnlock(){
+  if(isInCooldown())return;
+  var pin=(document.getElementById('lock-pin-input').value||'').trim();var errEl=document.getElementById('lock-err');var input=document.getElementById('lock-pin-input');
+  if(!pin){errEl.textContent='Please enter your PIN.';input.classList.add('error');setTimeout(function(){input.classList.remove('error');},400);return;}
+  sha256hex(pin).then(function(hash){
+    var matched=null;for(var i=0;i<ADMIN_PINS.length;i++){if(ADMIN_PINS[i].hash===hash){matched=ADMIN_PINS[i];break;}}
+    if(matched){localStorage.setItem(LOCK_ATTEMPTS_KEY,'0');localStorage.removeItem(LOCK_COOLDOWN_KEY);sessionStorage.setItem(SETTINGS_SESSION_KEY,'1');sessionStorage.setItem(SETTINGS_AUTH_NAME,matched.name);document.getElementById('lock-pin-input').value='';refreshLockOverlay();}
+    else{var attempts=getLockAttempts()+1;localStorage.setItem(LOCK_ATTEMPTS_KEY,String(attempts));input.classList.add('error');setTimeout(function(){input.classList.remove('error');},400);input.value='';if(attempts>=LOCK_MAX_ATTEMPTS){localStorage.setItem(LOCK_COOLDOWN_KEY,String(Date.now()+LOCK_COOLDOWN_MS));localStorage.setItem(LOCK_ATTEMPTS_KEY,'0');errEl.textContent='';updateCooldownUI();}else{var left=LOCK_MAX_ATTEMPTS-attempts;errEl.textContent='❌ Wrong PIN — '+left+' attempt'+(left!==1?'s':'')+' left';var attTxt=document.getElementById('lock-attempts-txt');if(attTxt)attTxt.textContent=left+' attempt'+(left!==1?'s':'')+' remaining';}}
   });
 }
-
-/* ── Lock out (sign out of settings) ── */
-function settingsLockOut() {
-  sessionStorage.removeItem(SETTINGS_SESSION_KEY);
-  sessionStorage.removeItem(SETTINGS_AUTH_NAME);
-  refreshLockOverlay();
-  /* Clear the PIN input */
-  var inp = document.getElementById('lock-pin-input');
-  if (inp) { inp.value = ''; inp.disabled = false; }
-  var err = document.getElementById('lock-err');
-  if (err) err.textContent = '';
-}
-
-/* ── Toggle PIN visibility ── */
-function toggleLockEye() {
-  var inp = document.getElementById('lock-pin-input');
-  var btn = document.getElementById('lock-eye-btn');
-  if (!inp) return;
-  if (inp.type === 'password') {
-    inp.type = 'text';
-    inp.style.letterSpacing = '0';
-    if (btn) btn.textContent = '🙈';
-  } else {
-    inp.type = 'password';
-    inp.style.letterSpacing = '3px';
-    if (btn) btn.textContent = '👁';
-  }
-}
-
-/* ── Guard saveSettings — block if not authenticated ── */
-var _origSaveSettings = saveSettings;
-saveSettings = function() {
-  if (!isSettingsAuthenticated()) {
-    refreshLockOverlay();
-    return;
-  }
-  _origSaveSettings();
-};
-
-/* ── Guard resetToDefaults ── */
-var _origResetToDefaults = resetToDefaults;
-resetToDefaults = function() {
-  if (!isSettingsAuthenticated()) {
-    refreshLockOverlay();
-    return;
-  }
-  _origResetToDefaults();
-};
-
-/* ── Intercept showTab to trigger lock overlay when navigating to settings ── */
-var _origShowTab = showTab;
-showTab = function(t) {
-  _origShowTab(t);
-  if (t === 'settings') {
-    /* Small delay so the view is visible before overlay renders */
-    setTimeout(refreshLockOverlay, 30);
-  }
-};
-
-/* ── Init: check session on page load ── */
-document.addEventListener('DOMContentLoaded', function(){
-  /* Refresh overlay state after everything loads */
-  setTimeout(refreshLockOverlay, 100);
-});
-
+function settingsLockOut(){sessionStorage.removeItem(SETTINGS_SESSION_KEY);sessionStorage.removeItem(SETTINGS_AUTH_NAME);refreshLockOverlay();var inp=document.getElementById('lock-pin-input');if(inp){inp.value='';inp.disabled=false;}var err=document.getElementById('lock-err');if(err)err.textContent='';}
+function toggleLockEye(){var inp=document.getElementById('lock-pin-input');var btn=document.getElementById('lock-eye-btn');if(!inp)return;if(inp.type==='password'){inp.type='text';inp.style.letterSpacing='0';if(btn)btn.textContent='🙈';}else{inp.type='password';inp.style.letterSpacing='3px';if(btn)btn.textContent='👁';}}
+var _origSaveSettings=saveSettings;
+saveSettings=function(){if(!isSettingsAuthenticated()){refreshLockOverlay();return;}_origSaveSettings();};
+var _origResetToDefaults=resetToDefaults;
+resetToDefaults=function(){if(!isSettingsAuthenticated()){refreshLockOverlay();return;}_origResetToDefaults();};
+var _origShowTab=showTab;
+showTab=function(t){_origShowTab(t);if(t==='settings'){setTimeout(refreshLockOverlay,30);}};
+document.addEventListener('DOMContentLoaded',function(){setTimeout(refreshLockOverlay,100);});
 </script>
 </body>
 </html>
