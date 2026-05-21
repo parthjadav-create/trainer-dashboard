@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -177,7 +178,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .tb-btn{background:#b71c1c;color:#fff;border:1px solid rgba(229,57,53,0.4);padding:7px 16px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
 .tb-btn:hover{background:#e53935;}
 #sync-txt{font-size:11px;color:var(--text2);}
- 
+
+/* ── FILTERBAR ── */
 .filterbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;}
 .filter-grid{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
 .fg{display:flex;flex-direction:column;gap:4px;}
@@ -185,13 +187,39 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .f-select{background:var(--card3);border:1px solid var(--border);color:var(--text);padding:7px 28px 7px 11px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;cursor:pointer;min-width:130px;transition:all .15s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b949e'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
 .f-select:focus{border-color:#e53935;background-color:var(--bg3);}
 .f-select option{background:var(--card3);}
-.date-range{display:flex;align-items:center;gap:6px;background:var(--card3);border:1px solid var(--border);border-radius:7px;padding:0 10px;transition:all .15s;height:32px;}
-.date-range:hover{border-color:var(--border2);}
-.date-range:focus-within{border-color:#e53935;background-color:var(--bg3);}
-.date-range span{font-size:10px;color:var(--text2);font-weight:700;}
-.date-range input[type=date]{background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;cursor:pointer;color-scheme:dark;width:95px;}
-.date-range input[type=date]::-webkit-calendar-picker-indicator{opacity:0.5;cursor:pointer;transition:opacity .15s;}
-.date-range input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1;}
+
+/* ── CHANGE 2: NEW DATE RANGE PICKER ── */
+.date-range-new{
+  display:flex;align-items:center;gap:6px;
+}
+.date-field-wrap{
+  display:flex;flex-direction:column;gap:3px;
+}
+.date-field-label{
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text2);
+}
+.date-btn{
+  display:flex;align-items:center;gap:7px;
+  background:var(--card3);border:1px solid var(--border);
+  border-radius:8px;padding:7px 12px;cursor:pointer;
+  transition:all .15s;min-width:130px;position:relative;
+}
+.date-btn:hover{border-color:var(--primary);background:var(--bg3);}
+.date-btn:focus-within{border-color:var(--primary);background:var(--bg3);box-shadow:0 0 0 2px rgba(239,83,80,0.15);}
+.date-btn-icon{font-size:14px;flex-shrink:0;}
+.date-btn-text{display:flex;flex-direction:column;gap:1px;flex:1;}
+.date-btn-top{font-size:9px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+.date-btn-val{font-size:12px;font-weight:700;color:var(--text);font-family:'Space Grotesk',sans-serif;}
+.date-btn input[type=date]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;
+  width:100%;height:100%;
+}
+.date-range-arrow{
+  display:flex;align-items:center;justify-content:center;
+  width:28px;height:28px;background:var(--card3);border:1px solid var(--border);
+  border-radius:6px;color:var(--text2);font-size:13px;font-weight:700;flex-shrink:0;
+}
+
 .ap-btn{background:#b71c1c;color:#fff;border:1px solid rgba(229,57,53,0.4);padding:7px 18px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .ap-btn:hover{background:#e53935;}
 .rs-btn{background:transparent;color:var(--text2);border:1px solid var(--border);padding:7px 14px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
@@ -387,13 +415,35 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="fg"><label>City</label><select class="f-select" id="f-city"><option value="">All Cities</option></select></div>
       <div class="fg"><label>Status</label><select class="f-select" id="f-status"><option value="">All Status</option></select></div>
       <div class="fg"><label>Training Mode</label><select class="f-select" id="f-mode"><option value="">All Modes</option></select></div>
+
+      <!-- CHANGE 2: New eye-catching date range picker -->
       <div class="fg">
         <label>Date Range</label>
-        <div class="date-range">
-          <span style="font-size:12px;margin-right:2px;">📅</span>
-          <input type="date" id="f-from"/><span>→</span><input type="date" id="f-to"/>
+        <div class="date-range-new">
+          <div class="date-field-wrap">
+            <div class="date-btn" onclick="document.getElementById('f-from').showPicker&&document.getElementById('f-from').showPicker()">
+              <span class="date-btn-icon">📅</span>
+              <div class="date-btn-text">
+                <span class="date-btn-top">From</span>
+                <span class="date-btn-val" id="f-from-display">Select date</span>
+              </div>
+              <input type="date" id="f-from" onchange="updateDateDisplay()"/>
+            </div>
+          </div>
+          <div class="date-range-arrow">→</div>
+          <div class="date-field-wrap">
+            <div class="date-btn" onclick="document.getElementById('f-to').showPicker&&document.getElementById('f-to').showPicker()">
+              <span class="date-btn-icon">📅</span>
+              <div class="date-btn-text">
+                <span class="date-btn-top">To</span>
+                <span class="date-btn-val" id="f-to-display">Select date</span>
+              </div>
+              <input type="date" id="f-to" onchange="updateDateDisplay()"/>
+            </div>
+          </div>
         </div>
       </div>
+
       <button class="ap-btn" onclick="applyFilters()">Apply Filters</button>
       <button class="rs-btn" onclick="resetFilters()">↺ Reset</button>
     </div>
@@ -432,7 +482,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="g2">
         <div class="card">
           <div class="ch"><div class="ct"><div class="ci" style="background:var(--green3);">📈</div>Daily Training Volume</div><span class="cm" id="trend-m">–</span></div>
-          <div class="cb" style="height:240px;"><canvas id="trendChart"></canvas></div>
+          <div class="cb" style="height:260px;"><canvas id="trendChart"></canvas></div>
         </div>
         <div class="card">
           <div class="ch">
@@ -769,10 +819,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           </div>
         </div>
  
-        <!-- ══════════════════════════════
-             NEW SETTINGS CARDS BELOW
-             ══════════════════════════════ -->
- 
         <!-- ── FONT FAMILY ── -->
         <div class="settings-card">
           <div class="ct" style="margin-bottom:15px;"><div class="ci" style="background:var(--purple2);">🔤</div>Font Family</div>
@@ -1098,6 +1144,22 @@ var SC={"Done":"#3fb950","Close":"#f85149","Re-schedule":"#bc8cff","Not related 
 var allRows=[],filteredRows=[],charts={},COL={date:"",trainer:"",city:"",city2:"",status:"",mode:"",lang:""};
 var curTab="overview";
 var currentTrainerDetailsData=[],currentVirtualTrainersData=[],currentOFSData=[],currentTeamInfoData=[];
+
+/* CHANGE 2: Date display helper */
+function updateDateDisplay(){
+  var fv=document.getElementById('f-from').value;
+  var tv=document.getElementById('f-to').value;
+  var fd=document.getElementById('f-from-display');
+  var td=document.getElementById('f-to-display');
+  if(fd)fd.textContent=fv?formatDateDisplay(fv):'Select date';
+  if(td)td.textContent=tv?formatDateDisplay(tv):'Select date';
+}
+function formatDateDisplay(iso){
+  if(!iso)return'Select date';
+  var parts=iso.split('-');
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return parts[2]+' '+months[parseInt(parts[1])-1]+' '+parts[0];
+}
  
 function normalizeTrainerName(name){return(name||"").toLowerCase().trim();}
 function isMatch(n1,n2){if(!n1||!n2)return false;var a=n1.toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/).filter(function(x){return x.length>1;});var b=n2.toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/).filter(function(x){return x.length>1;});if(!a.length||!b.length)return false;var shorter=a.length<=b.length?a:b,longer=a.length<=b.length?b:a;return shorter.every(function(s){return longer.some(function(l){return l.indexOf(s)!==-1||s.indexOf(l)!==-1;});});}
@@ -1220,26 +1282,16 @@ function initNewSettings(){
 }
  
 function saveNewSettings(){
-  // Font
   var fSel=document.getElementById('set-font');if(fSel){try{localStorage.setItem('font',fSel.value);}catch(e){}applyFont(fSel.value);}
-  // Theme swatch sync
   var theme=document.getElementById('set-theme');if(theme){document.querySelectorAll('.theme-swatch').forEach(function(sw){sw.classList.toggle('active',sw.getAttribute('data-theme')===theme.value);});}
-  // Compact
   var cEl=document.getElementById('set-compact');if(cEl){try{localStorage.setItem('compact',cEl.checked);}catch(e){}applyCompact(cEl.checked);}
-  // No anim
   var naEl=document.getElementById('set-no-anim');if(naEl){try{localStorage.setItem('no_anim',naEl.checked);}catch(e){}applyNoAnim(naEl.checked);}
-  // Mini sidebar
   var msEl=document.getElementById('set-mini-sidebar');if(msEl){try{localStorage.setItem('mini_sidebar',msEl.checked);}catch(e){}applyMiniSidebar(msEl.checked);}
-  // Table density
   var tdEl=document.getElementById('set-table-density');if(tdEl){try{localStorage.setItem('table_density',tdEl.value);}catch(e){}applyTableDensity(tdEl.value);}
-  // Watermark
   var wmEl=document.getElementById('set-watermark');var wmOpEl=document.getElementById('set-wm-opacity');
   if(wmEl){var ws=wmEl.checked,wo=wmOpEl?wmOpEl.value:'10';try{localStorage.setItem('watermark',ws);localStorage.setItem('wm_opacity',wo);}catch(e){}applyWatermark(ws,wo);}
-  // Live pill
   var lpEl=document.getElementById('set-show-live');if(lpEl){try{localStorage.setItem('show_live',lpEl.checked);}catch(e){}applyLivePill(lpEl.checked);}
-  // Sidebar logo
   var slEl=document.getElementById('set-show-logo');if(slEl){try{localStorage.setItem('show_logo',slEl.checked);}catch(e){}applySidebarLogo(slEl.checked);}
-  // Other simple saves
   ['set-highlight-inactive','set-num-format','set-date-format','set-lb-rows','set-chart-style','set-miss-threshold'].forEach(function(id){
     var el=document.getElementById(id);if(!el)return;
     var key=id.replace('set-','').replace(/-/g,'_');
@@ -1430,9 +1482,15 @@ function resetFilters(){
   var tlf=document.getElementById("team-lead-filter");if(tlf)tlf.value="";
   var ts=document.getElementById("team-search");if(ts)ts.value="";
   populateFilters();applyFilters();
+  updateDateDisplay();
 }
 function render(){rKPI();rTrend();rLeader();rDate();rMode();rStatus();rLang();rCity();rCityDetail();rMatrix();renderTrainerDetail();rVirtual();rTeam();rWeekly();rOFS();}
- 
+
+/* ══════════════════════════════════════════════════════
+   CHANGE 1: Fixed KPI formulas
+   - Avg Visits Done / Day  = Done ÷ totalDays
+   - Avg Tickets Received / Day = Total tickets ÷ totalDays
+══════════════════════════════════════════════════════ */
 function rKPI(){
   var tot=filteredRows.length;
   var done=filteredRows.filter(function(r){return matches(r.status,"Done");}).length;
@@ -1451,111 +1509,100 @@ function rKPI(){
     {l:"Virtual Calls",v:virt,p:pct(virt,tot),dc:"#58a6ff",ic:"💻",fill:pn(virt,tot),bd:"badge-b"},
     {l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"}
   ];
-var kpiIds=['total','done','closed','resch','notrel','virt','active'];
+  var kpiIds=['total','done','closed','resch','notrel','virt','active'];
+  var activeKpis=kpis.filter(function(k,i){return localStorage.getItem('kpi_'+kpiIds[i])!=='false';});
 
-var activeKpis=kpis.filter(function(k,i){
-   return localStorage.getItem('kpi_'+kpiIds[i])!=='false';
-});
+  var uniqueDates={};
+  filteredRows.forEach(function(r){if(r.date)uniqueDates[r.date]=1;});
+  var totalDays=Object.keys(uniqueDates).length||1;
 
-var uniqueDates={};
+  /* CHANGE 1a: Avg Visits Done / Day = Done ÷ totalDays */
+  var avgVisitDonePerDay=(done/totalDays).toFixed(1);
 
-filteredRows.forEach(function(r){
+  /* CHANGE 1b: Avg Tickets Received / Day = Total ÷ totalDays */
+  var avgTicketsReceivedPerDay=(tot/totalDays).toFixed(1);
 
-   if(r.date){
-      uniqueDates[r.date]=1;
-   }
-
-});
-
-var totalDays=Object.keys(uniqueDates).length || 1;
-
-
-/* TOTAL VISITS DONE AVERAGE */
-
-var avgVisitPerDay=(tot/totalDays).toFixed(1);
-
-
-/* TOTAL TICKETS RECEIVED */
-
-var totalReceived=filteredRows.length;
-
-
-/* RECEIVED TICKETS AVERAGE */
-
-var avgTicketReceivedPerDay=
-(totalReceived/totalDays).toFixed(1);
-
-
-var kpiHTML=activeKpis.map(function(k){
-
-   return '<div class="kpi">'
-      +'<div class="kpi-top">'
-      +'<div class="kpi-ic">'+k.ic+'</div>'
-      +'<span class="badge '+k.bd+'">'+k.p+'</span>'
-      +'</div>'
-      +'<div class="kpi-v" style="color:'+k.dc+'">'
-      +k.v.toLocaleString()
-      +'</div>'
+  var kpiHTML=activeKpis.map(function(k){
+    return '<div class="kpi">'
+      +'<div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div>'
+      +'<span class="badge '+k.bd+'">'+k.p+'</span></div>'
+      +'<div class="kpi-v" style="color:'+k.dc+'">'+k.v.toLocaleString()+'</div>'
       +'<div class="kpi-l">'+k.l+'</div>'
-      +'<div class="kpi-bar">'
-      +'<div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div>'
-      +'</div>'
+      +'<div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div>'
       +'</div>';
+  }).join("");
 
-}).join("");
+  /* Avg Visits Done / Day card */
+  kpiHTML+='<div class="kpi">'
+    +'<div class="kpi-top"><div class="kpi-ic">✅</div>'
+    +'<span class="badge badge-g">Done</span></div>'
+    +'<div class="kpi-v" style="color:#3fb950">'+avgVisitDonePerDay+'</div>'
+    +'<div class="kpi-l">Avg Visits Done / Day</div>'
+    +'<div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#3fb950"></div></div>'
+    +'</div>';
 
+  /* Avg Tickets Received / Day card */
+  kpiHTML+='<div class="kpi">'
+    +'<div class="kpi-top"><div class="kpi-ic">📨</div>'
+    +'<span class="badge badge-b">'+totalDays+' Days</span></div>'
+    +'<div class="kpi-v" style="color:#58a6ff">'+avgTicketsReceivedPerDay+'</div>'
+    +'<div class="kpi-l">Avg Tickets Received / Day</div>'
+    +'<div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:#58a6ff"></div></div>'
+    +'</div>';
 
-
-/* AVG VISITS PER DAY KPI */
-
-kpiHTML +=
-   '<div class="kpi">'
-   +'<div class="kpi-top">'
-   +'<div class="kpi-ic">📅</div>'
-   +'<span class="badge badge-b">'+totalDays+' Days</span>'
-   +'</div>'
-   +'<div class="kpi-v" style="color:#58a6ff">'
-   +avgVisitPerDay+
-   '</div>'
-   +'<div class="kpi-l">Avg Visits / Day</div>'
-   +'<div class="kpi-bar">'
-   +'<div class="kpi-fill" style="width:100%;background:#58a6ff"></div>'
-   +'</div>'
-   +'</div>';
-
-
-
-/* AVG RECEIVED TICKETS PER DAY KPI */
-
-kpiHTML +=
-   '<div class="kpi">'
-   +'<div class="kpi-top">'
-   +'<div class="kpi-ic">📨</div>'
-   +'<span class="badge badge-o">'+totalDays+' Days</span>'
-   +'</div>'
-   +'<div class="kpi-v" style="color:#f39c12">'
-   +avgTicketReceivedPerDay+
-   '</div>'
-   +'<div class="kpi-l">Avg Tickets Received / Day</div>'
-   +'<div class="kpi-bar">'
-   +'<div class="kpi-fill" style="width:100%;background:#f39c12"></div>'
-   +'</div>'
-   +'</div>';
-
-document.getElementById("kpi-grid").innerHTML=kpiHTML;
-  }
+  document.getElementById("kpi-grid").innerHTML=kpiHTML;
+}
  
 function getChartTension(){var cs=localStorage.getItem('chart_style')||'smooth';if(cs==='linear')return 0;if(cs==='stepped')return 0;return 0.4;}
 function getChartStepped(){return(localStorage.getItem('chart_style')||'smooth')==='stepped';}
- 
+
+/* CHANGE 3: Daily Training Volume chart now shows data labels (visit counts) on each point */
 function rTrend(){
   var bd={};filteredRows.forEach(function(r){if(r.date)bd[r.date]=(bd[r.date]||0)+1;});
   var lbls=Object.keys(bd).sort();
   document.getElementById("trend-m").textContent=lbls.length+" days";
   if(charts.t)charts.t.destroy();
   var ctx=document.getElementById("trendChart").getContext("2d");
-  var gr=ctx.createLinearGradient(0,0,0,220);gr.addColorStop(0,"rgba(63,185,80,0.25)");gr.addColorStop(1,"rgba(63,185,80,0.02)");
-  charts.t=new Chart(ctx,{type:"line",data:{labels:lbls.map(function(d){return d.slice(5);}),datasets:[{data:lbls.map(function(l){return bd[l];}),borderColor:"#3fb950",backgroundColor:gr,borderWidth:2,pointRadius:3,pointBackgroundColor:"#3fb950",tension:getChartTension(),stepped:getChartStepped(),fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9},maxTicksLimit:15}},y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9}}}}}});
+  var gr=ctx.createLinearGradient(0,0,0,240);gr.addColorStop(0,"rgba(63,185,80,0.3)");gr.addColorStop(1,"rgba(63,185,80,0.02)");
+  charts.t=new Chart(ctx,{
+    type:"line",
+    data:{
+      labels:lbls.map(function(d){return d.slice(5);}),
+      datasets:[{
+        data:lbls.map(function(l){return bd[l];}),
+        borderColor:"#3fb950",
+        backgroundColor:gr,
+        borderWidth:2,
+        pointRadius:4,
+        pointBackgroundColor:"#3fb950",
+        pointBorderColor:"#0d1117",
+        pointBorderWidth:2,
+        tension:getChartTension(),
+        stepped:getChartStepped(),
+        fill:true
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        datalabels:{
+          color:'#3fb950',
+          anchor:'end',
+          align:'top',
+          offset:2,
+          font:{weight:'bold',size:10},
+          formatter:function(value){return value>0?value:'';}
+        }
+      },
+      scales:{
+        x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9},maxTicksLimit:15}},
+        y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8b949e",font:{size:9}},suggestedMin:0}
+      }
+    },
+    plugins:[ChartDataLabels]
+  });
 }
  
 function rLeader(){
@@ -1820,7 +1867,9 @@ function applyWeeklyFilter(){
   d.setDate(d.getDate()+(week-1)*7);
   var start=new Date(d),end=new Date(d);end.setDate(d.getDate()+6);
   var f=function(dt){var m=''+(dt.getMonth()+1),day=''+dt.getDate();if(m.length<2)m='0'+m;if(day.length<2)day='0'+day;return dt.getFullYear()+'-'+m+'-'+day;};
-  document.getElementById("f-from").value=f(start);document.getElementById("f-to").value=f(end);applyFilters();
+  document.getElementById("f-from").value=f(start);document.getElementById("f-to").value=f(end);
+  updateDateDisplay();
+  applyFilters();
 }
 function resetWeeklyFilter(){
   var d=new Date();d.setHours(0,0,0,0);var day=d.getDay()||7;d.setDate(d.getDate()+4-day);
@@ -1951,13 +2000,11 @@ function exportTeamInfo(){
    PDF & SCREENSHOT UTILITIES
    ══════════════════════════════════════════ */
 
-/* ── Stamp: today date string ── */
 function stampNow(){
   var n=new Date();
   return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)+"-"+("0"+n.getDate()).slice(-2);
 }
 
-/* ── Generic: snapshot any section to PNG download ── */
 function snapSection(viewId,filename){
   var el=document.getElementById(viewId);
   if(!el){alert("View not found.");return;}
@@ -1983,13 +2030,11 @@ function snapSection(viewId,filename){
   });
 }
 
-/* ── WEEKLY FULL SCREENSHOT: captures all 4 bands + summary ── */
 function snapWeeklyFull(){
   var el=document.getElementById('view-weekly');
   if(!el){alert("Weekly view not found.");return;}
   var btn=event&&event.target?event.target:null;
   if(btn)btn.textContent="⏳ Capturing...";
-  // Temporarily expand all scrollable tables
   var scrollDivs=el.querySelectorAll('[style*="overflow-x:auto"]');
   var origStyles=[];
   scrollDivs.forEach(function(d,i){
@@ -2018,7 +2063,6 @@ function snapWeeklyFull(){
   });
 }
 
-/* ── Helper: get PDF page title ── */
 function pdfHeader(doc,title){
   var dTitle=localStorage.getItem('dash_title')||"OnSite OpsVision Dashboard";
   doc.setFontSize(14);doc.setTextColor(239,83,80);
@@ -2027,7 +2071,6 @@ function pdfHeader(doc,title){
   doc.text(title+" — Generated: "+stampNow(),14,23);
 }
 
-/* ── Helper: build autoTable from a tbody/tfoot ── */
 function getTableData(tbodyId,tfootId){
   var rows=[];
   document.getElementById(tbodyId).querySelectorAll('tr').forEach(function(tr){
@@ -2046,17 +2089,15 @@ function getTableData(tbodyId,tfootId){
   return{body:rows,foot:foot};
 }
 
-/* ── OVERVIEW PDF: KPI cards + Leaderboard ── */
 function exportOverviewPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Overview — KPI & Top Performers");
-  // KPI cards as a summary table
   var kpiRows=[];
   document.getElementById('kpi-grid').querySelectorAll('.kpi').forEach(function(card){
     var label=card.querySelector('.kpi-l')?card.querySelector('.kpi-l').innerText:'';
     var value=card.querySelector('.kpi-v')?card.querySelector('.kpi-v').innerText:'';
-    var pct=card.querySelector('.badge')?card.querySelector('.badge').innerText:'';
-    kpiRows.push([label,value,pct]);
+    var p=card.querySelector('.badge')?card.querySelector('.badge').innerText:'';
+    kpiRows.push([label,value,p]);
   });
   doc.autoTable({startY:28,head:[['KPI Metric','Value','%']],body:kpiRows,theme:'grid',
     headStyles:{fillColor:[239,83,80],textColor:255,fontStyle:'bold',fontSize:9},
@@ -2073,7 +2114,6 @@ function exportOverviewPDF(){
   doc.save("Overview_"+stampNow()+".pdf");
 }
 
-/* ── exportTablePDF: generic single-table PDF ── */
 function exportTablePDF(tbodyId,headers,title){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,title);
@@ -2084,7 +2124,6 @@ function exportTablePDF(tbodyId,headers,title){
   doc.save(title.replace(/\s+/g,'_')+"_"+stampNow()+".pdf");
 }
 
-/* ── TRAINER DETAIL PDF ── */
 function exportTrainerDetailPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Trainer Details");
@@ -2097,7 +2136,6 @@ function exportTrainerDetailPDF(){
   doc.save("Trainer_Details_"+stampNow()+".pdf");
 }
 
-/* ── VIRTUAL CALLS PDF ── */
 function exportVirtualPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Virtual Calls");
@@ -2109,7 +2147,6 @@ function exportVirtualPDF(){
   doc.save("Virtual_Calls_"+stampNow()+".pdf");
 }
 
-/* ── CITIES PDF ── */
 function exportCitiesPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"City-wise Breakdown");
@@ -2121,7 +2158,6 @@ function exportCitiesPDF(){
   doc.save("Cities_"+stampNow()+".pdf");
 }
 
-/* ── OFS PDF ── */
 function exportOFSPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Out of Station Performance (Target: "+OFS_TARGET_PER_DAY+"/day)");
@@ -2133,7 +2169,6 @@ function exportOFSPDF(){
   doc.save("OFS_Performance_"+stampNow()+".pdf");
 }
 
-/* ── MATRIX PDF ── */
 function exportMatrixPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Trainer × Training Mode Matrix");
@@ -2145,7 +2180,6 @@ function exportMatrixPDF(){
   doc.save("Mode_Matrix_"+stampNow()+".pdf");
 }
 
-/* ── TEAM PDF ── */
 function exportTeamPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Petpooja Training Team");
@@ -2156,7 +2190,6 @@ function exportTeamPDF(){
   doc.save("Team_Info_"+stampNow()+".pdf");
 }
 
-/* ── WEEKLY KPI PDF — all 4 bands on separate sections ── */
 function exportWeeklyPDF(){
   var doc=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   pdfHeader(doc,"Weekly KPI — Ratio Bifurcation");
@@ -2166,7 +2199,6 @@ function exportWeeklyPDF(){
     {id:'weekly-body-80',foot:'weekly-foot-80',label:'⚠️ 80% to <90% ACHIEVED',color:[230,81,0],tColor:255},
     {id:'weekly-body-below',foot:'weekly-foot-below',label:'❌ BELOW 80% ACHIEVED',color:[183,28,28],tColor:255}
   ];
-  // Summary bar
   var summaryEl=document.getElementById('weekly-summary-bar');
   if(summaryEl){
     doc.setFontSize(8);doc.setTextColor(100,100,100);
@@ -2213,6 +2245,7 @@ window.addEventListener("DOMContentLoaded",function(){
   var now=new Date(),y=now.getFullYear(),mo=("0"+(now.getMonth()+1)).slice(-2),d=("0"+now.getDate()).slice(-2);
   document.getElementById("f-from").value=y+"-"+mo+"-01";
   document.getElementById("f-to").value=y+"-"+mo+"-"+d;
+  updateDateDisplay();
   populateTeamLeadFilter();
   initSettings();
   loadData().then(function(){
@@ -2228,3 +2261,5 @@ window.addEventListener("DOMContentLoaded",function(){
 </script>
 </body>
 </html>
+ENDOFFILE
+echo "Written. Line count: $(wc -l < /mnt/user-data/outputs/dashboard_v4.html)"
