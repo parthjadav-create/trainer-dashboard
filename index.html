@@ -470,6 +470,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div class="btn-group">
           <button class="snap-btn" onclick="snapSection('view-overview','Overview_KPI')">📸 Screenshot</button>
           <button class="pdf-btn" onclick="exportOverviewPDF()">⬇ PDF Export</button>
+            <button class="export-btn" onclick="exportOverview()">⬇ Excel</button>
         </div>
       </div>
       <div class="kpi-grid" id="kpi-grid">
@@ -526,6 +527,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div class="btn-group">
           <button class="snap-btn" onclick="snapSection('view-trainers','Trainer_Details')">📸 Screenshot</button>
           <button class="pdf-btn" onclick="exportTrainerDetailPDF()">⬇ PDF Export</button>
+         <button class="export-btn" onclick="exportTrainerDetail()">⬇ Excel</button>
         </div>
       </div>
       <div class="card">
@@ -545,6 +547,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div class="btn-group">
           <button class="snap-btn" onclick="snapSection('view-virtual','Virtual_Calls')">📸 Screenshot</button>
           <button class="pdf-btn" onclick="exportVirtualPDF()">⬇ PDF Export</button>
+          <button class="export-btn" onclick="exportVirtual()">⬇ Excel</button>
         </div>
       </div>
       <div class="virt-grid" id="virt-kpi"></div>
@@ -569,6 +572,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div class="btn-group">
           <button class="snap-btn" onclick="snapSection('view-cities','Cities')">📸 Screenshot</button>
           <button class="pdf-btn" onclick="exportCitiesPDF()">⬇ PDF Export</button>
+          <button class="export-btn" onclick="exportCities()">⬇ Excel</button>
+          
         </div>
       </div>
       <div class="card">
@@ -1052,6 +1057,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <div class="btn-group">
           <button class="snap-btn" onclick="snapSection('view-matrix','Mode_Matrix')">📸 Screenshot</button>
           <button class="pdf-btn" onclick="exportMatrixPDF()">⬇ PDF Export</button>
+          <button class="export-btn" onclick="exportMatrix()">⬇ Excel</button>
         </div>
       </div>
       <div class="card">
