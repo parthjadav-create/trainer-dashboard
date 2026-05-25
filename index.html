@@ -1882,7 +1882,7 @@ function buildWeeklyData(){
     if(!r.trainer)return;
     if(!map[r.trainer])map[r.trainer]={dates:{},normalDone:0,ofsDone:0};
     if(r.date)map[r.trainer].dates[r.date]=1;
-    var isDone=matches(r.status,"Done"),isOFS=contains(r.mode,"Out of Station")||contains(r.mode,"OFS");
+    var isDone=matches(r.status,"Done"),isOFS=contains(r.mode,"Out of Station");
     if(isDone){if(isOFS)map[r.trainer].ofsDone++;else map[r.trainer].normalDone++;}
   });
   return Object.keys(map).map(function(n){
