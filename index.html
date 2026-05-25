@@ -1775,7 +1775,7 @@ function rOFS(){
     if(!r.trainer)return;
     if(!map[r.trainer])map[r.trainer]={total:0,rawDone:0,ofsTotal:0,ofsDone:0,dates:{}};
     map[r.trainer].total++;
-    var isDone=matches(r.status,"Done"),isOFS=contains(r.mode,"Out of Station")||contains(r.mode,"OFS");
+    var isDone=matches(r.status,"Done"),isOFS=contains(r.mode,"Out of Station");
     if(isDone)map[r.trainer].rawDone++;
     if(isOFS){map[r.trainer].ofsTotal++;if(isDone)map[r.trainer].ofsDone++;}
     if(r.date)map[r.trainer].dates[r.date]=1;
