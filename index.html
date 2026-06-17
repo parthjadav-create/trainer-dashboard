@@ -2254,7 +2254,7 @@ function exportWeeklyPDF(){
    filename helper already used by exportOFS / exportLeaderboard / etc.
    ════════════════════════════════════════════════════════════════ */
 
-/* ── OVERVIEW: KPI summary + Top Performers (2 sheets) ── */
+── OVERVIEW: KPI summary + Top Performers (2 sheets) ── 
 function exportOverview(){
   if(!filteredRows.length){alert("No data to export.");return;}
 
@@ -2284,7 +2284,7 @@ function exportOverview(){
   XLSX.writeFile(wb,"Overview_"+stampNow()+".xlsx");
 }
 
-/* ── TRAINER DETAILS ── */
+── TRAINER DETAILS ──
 function exportTrainerDetail(){
   if(!currentTrainerDetailsData||!currentTrainerDetailsData.length){alert("No trainer data to export.");return;}
   var wsData=[["#","Trainer Name","Total","Done","Closed","Re-schedule","Not Related","Physical","Re-training","OFS","Virtual","Other","Days Active","Avg/Day","Done %"]];
@@ -2301,7 +2301,7 @@ function exportTrainerDetail(){
   XLSX.writeFile(wb,"Trainer_Details_"+stampNow()+".xlsx");
 }
 
-/* ── VIRTUAL CALLS ── */
+── VIRTUAL CALLS ──
 function exportVirtual(){
   if(!currentVirtualTrainersData||!currentVirtualTrainersData.length){alert("No virtual call data to export.");return;}
   var wsData=[["#","Trainer Name","Virtual Total","Done","Other","Languages","Done %"]];
@@ -2319,7 +2319,7 @@ function exportVirtual(){
   XLSX.writeFile(wb,"Virtual_Calls_"+stampNow()+".xlsx");
 }
 
-/* ── CITIES ── */
+ ── CITIES ── 
 function exportCities(){
   if(!filteredRows.length){alert("No city data to export.");return;}
   var map={};
@@ -2335,7 +2335,7 @@ function exportCities(){
   XLSX.writeFile(wb,"Cities_"+stampNow()+".xlsx");
 }
 
-/* ── MODE MATRIX ── */
+── MODE MATRIX ── 
 function exportMatrix(){
   if(!filteredRows.length){alert("No matrix data to export.");return;}
   var mk=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
@@ -2351,7 +2351,7 @@ function exportMatrix(){
   XLSX.writeFile(wb,"Mode_Matrix_"+stampNow()+".xlsx");
 }
 
-/* ── INIT ── */
+ ── INIT ── 
 window.addEventListener("DOMContentLoaded",function(){
   var now=new Date(),y=now.getFullYear(),mo=("0"+(now.getMonth()+1)).slice(-2),d=("0"+now.getDate()).slice(-2);
   document.getElementById("f-from").value=y+"-"+mo+"-01";
