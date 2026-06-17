@@ -2244,9 +2244,7 @@ function exportWeeklyPDF(){
   });
   doc.save("Weekly_KPI_PDF_"+stampNow()+".pdf");
 }
-
-/* ── INIT ── */
-  /* ════════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    MISSING EXCEL EXPORT FUNCTIONS
    Paste this whole block into the dashboard's <script>, immediately
    ABOVE the line:   /* ── INIT ── */
@@ -2352,6 +2350,8 @@ function exportMatrix(){
   XLSX.utils.book_append_sheet(wb,ws,"Mode Matrix");
   XLSX.writeFile(wb,"Mode_Matrix_"+stampNow()+".xlsx");
 }
+
+/* ── INIT ── */
 window.addEventListener("DOMContentLoaded",function(){
   var now=new Date(),y=now.getFullYear(),mo=("0"+(now.getMonth()+1)).slice(-2),d=("0"+now.getDate()).slice(-2);
   document.getElementById("f-from").value=y+"-"+mo+"-01";
