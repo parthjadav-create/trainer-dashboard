@@ -2246,6 +2246,112 @@ function exportWeeklyPDF(){
 }
 
 /* ── INIT ── */
+  /* ════════════════════════════════════════════════════════════════
+   MISSING EXCEL EXPORT FUNCTIONS
+   Paste this whole block into the dashboard's <script>, immediately
+   ABOVE the line:   /* ── INIT ── */
+   (right before the window.addEventListener("DOMContentLoaded", ...) block)
+
+   These reuse the same XLSX pattern, grand-total rows and stampNow()
+   filename helper already used by exportOFS / exportLeaderboard / etc.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── OVERVIEW: KPI summary + Top Performers (2 sheets) ── */
+function exportOverview(){
+  if(!filteredRows.length){alert("No data to export.");return;}
+
+  // Sheet 1 — KPI cards (read straight from the rendered grid)
+  var kpiData=[["KPI Metric","Value","Percentage"]];
+  document.getElementById('kpi-grid').querySelectorAll('.kpi').forEach(function(card){
+    var label=card.querySelector('.kpi-l')?card.querySelector('.kpi-l').innerText.trim():'';
+    var value=card.querySelector('.kpi-v')?card.querySelector('.kpi-v').innerText.trim():'';
+    var p=card.querySelector('.badge')?card.querySelector('.badge').innerText.trim():'';
+    if(label)kpiData.push([label,value,p]);
+  });
+
+  // Sheet 2 — Top performers (same calc as rLeader / exportLeaderboard)
+  var map={};
+  filteredRows.forEach(function(r){if(!r.trainer)return;if(!map[r.trainer])map[r.trainer]={total:0,done:0,dates:{}};map[r.trainer].total++;if(matches(r.status,"Done"))map[r.trainer].done++;if(r.date)map[r.trainer].dates[r.date]=1;});
+  var arr=Object.keys(map).map(function(n){var d=map[n],days=Object.keys(d.dates).length||1,avg=parseFloat((d.done/days).toFixed(1)),target=Math.ceil(days*TARGET_PER_DAY);return{n:n,total:d.total,done:d.done,days:days,target:target,avg:avg};}).sort(function(a,b){return b.done-a.done;});
+  var perfData=[["#","Trainer Name","Total","Done","Working Days","Target ("+TARGET_PER_DAY+"/day)","Avg/Day"]];
+  var gT=0,gD=0;
+  arr.forEach(function(t,i){gT+=t.total;gD+=t.done;perfData.push([i+1,t.n,t.total,t.done,t.days,t.target,t.avg]);});
+  perfData.push(["","Grand Total",gT,gD,"","",""]);
+
+  var wb=XLSX.utils.book_new();
+  var ws1=XLSX.utils.aoa_to_sheet(kpiData);ws1["!cols"]=[{wch:26},{wch:14},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws1,"KPI Summary");
+  var ws2=XLSX.utils.aoa_to_sheet(perfData);ws2["!cols"]=[{wch:4},{wch:24},{wch:10},{wch:10},{wch:14},{wch:18},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,ws2,"Top Performers");
+  XLSX.writeFile(wb,"Overview_"+stampNow()+".xlsx");
+}
+
+/* ── TRAINER DETAILS ── */
+function exportTrainerDetail(){
+  if(!currentTrainerDetailsData||!currentTrainerDetailsData.length){alert("No trainer data to export.");return;}
+  var wsData=[["#","Trainer Name","Total","Done","Closed","Re-schedule","Not Related","Physical","Re-training","OFS","Virtual","Other","Days Active","Avg/Day","Done %"]];
+  var gT=0,gD=0,gC=0,gR=0,gN=0,gP=0,gRe=0,gO=0,gV=0,gOt=0;
+  currentTrainerDetailsData.forEach(function(t,i){
+    var d=t.d;
+    gT+=d.total;gD+=d.done;gC+=d.close;gR+=d.resch;gN+=d.notrel;gP+=d.phys;gRe+=d.retrain;gO+=d.ofs;gV+=d.virt;gOt+=d.other;
+    wsData.push([i+1,t.n,d.total,d.done,d.close,d.resch,d.notrel,d.phys,d.retrain,d.ofs,d.virt,d.other,t.days,t.avg,t.pct+"%"]);
+  });
+  wsData.push(["","Grand Total",gT,gD,gC,gR,gN,gP,gRe,gO,gV,gOt,"","",pct(gD,gT)]);
+  var wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"]=[{wch:4},{wch:24},{wch:8},{wch:8},{wch:8},{wch:12},{wch:11},{wch:9},{wch:11},{wch:7},{wch:8},{wch:7},{wch:12},{wch:9},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws,"Trainer Details");
+  XLSX.writeFile(wb,"Trainer_Details_"+stampNow()+".xlsx");
+}
+
+/* ── VIRTUAL CALLS ── */
+function exportVirtual(){
+  if(!currentVirtualTrainersData||!currentVirtualTrainersData.length){alert("No virtual call data to export.");return;}
+  var wsData=[["#","Trainer Name","Virtual Total","Done","Other","Languages","Done %"]];
+  var gvt=0,gvd=0;
+  currentVirtualTrainersData.forEach(function(item,i){
+    var d=item.data,dp=d.total?Math.round(d.done/d.total*100):0;
+    var langs=Object.keys(d.langs).sort(function(a,b){return d.langs[b]-d.langs[a];}).join(", ")||"-";
+    gvt+=d.total;gvd+=d.done;
+    wsData.push([i+1,item.name,d.total,d.done,d.total-d.done,langs,dp+"%"]);
+  });
+  wsData.push(["","Grand Total",gvt,gvd,gvt-gvd,"",pct(gvd,gvt)]);
+  var wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"]=[{wch:4},{wch:24},{wch:14},{wch:8},{wch:8},{wch:30},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws,"Virtual Calls");
+  XLSX.writeFile(wb,"Virtual_Calls_"+stampNow()+".xlsx");
+}
+
+/* ── CITIES ── */
+function exportCities(){
+  if(!filteredRows.length){alert("No city data to export.");return;}
+  var map={};
+  filteredRows.forEach(function(r){var c=r.city||"(Unknown)";if(!map[c])map[c]={total:0,done:0,virt:0,phys:0,trainers:{}};map[c].total++;if(matches(r.status,"Done"))map[c].done++;if(matches(r.mode,"Virtual"))map[c].virt++;if(contains(r.mode,"Physical"))map[c].phys++;if(r.trainer)map[c].trainers[r.trainer]=1;});
+  var sorted=Object.keys(map).sort(function(a,b){return map[b].total-map[a].total;});
+  var wsData=[["#","City","Total","Done","Virtual","Physical","Trainers","Done %"]];
+  var gT=0,gD=0,gV=0,gP=0;
+  sorted.forEach(function(city,i){var d=map[city],dp=d.total?Math.round(d.done/d.total*100):0;gT+=d.total;gD+=d.done;gV+=d.virt;gP+=d.phys;wsData.push([i+1,city,d.total,d.done,d.virt,d.phys,Object.keys(d.trainers).length,dp+"%"]);});
+  wsData.push(["","Grand Total",gT,gD,gV,gP,"",pct(gD,gT)]);
+  var wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"]=[{wch:4},{wch:22},{wch:8},{wch:8},{wch:8},{wch:9},{wch:9},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws,"Cities");
+  XLSX.writeFile(wb,"Cities_"+stampNow()+".xlsx");
+}
+
+/* ── MODE MATRIX ── */
+function exportMatrix(){
+  if(!filteredRows.length){alert("No matrix data to export.");return;}
+  var mk=["Physical Visit","Physical Re-training","Out of Station Visit","OFS (On-Field Support)","Virtual","Incomplete Physical Visit","Feedback Visit"];
+  var map={},totals={},grand=0;mk.forEach(function(m){totals[m]=0;});
+  filteredRows.forEach(function(r){var k=r.trainer||"(Unknown)";if(!map[k]){map[k]={};mk.forEach(function(m){map[k][m]=0;});}var mm=mk.find(function(m){return matches(m,r.mode);});if(mm)map[k][mm]++;});
+  var rows=Object.keys(map).sort(function(a,b){return mk.reduce(function(s,m){return s+map[b][m];},0)-mk.reduce(function(s,m){return s+map[a][m];},0);});
+  var wsData=[["Trainer","Physical Visit","Physical Re-training","Out of Station","OFS Support","Virtual","Incomplete","Feedback","Total"]];
+  rows.forEach(function(name){var rt=mk.reduce(function(s,m){return s+map[name][m];},0);grand+=rt;mk.forEach(function(m){totals[m]+=map[name][m];});wsData.push([name].concat(mk.map(function(m){return map[name][m];})).concat([rt]));});
+  wsData.push(["Grand Total"].concat(mk.map(function(m){return totals[m];})).concat([grand]));
+  var wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws["!cols"]=[{wch:24},{wch:14},{wch:18},{wch:16},{wch:13},{wch:9},{wch:12},{wch:11},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws,"Mode Matrix");
+  XLSX.writeFile(wb,"Mode_Matrix_"+stampNow()+".xlsx");
+}
 window.addEventListener("DOMContentLoaded",function(){
   var now=new Date(),y=now.getFullYear(),mo=("0"+(now.getMonth()+1)).slice(-2),d=("0"+now.getDate()).slice(-2);
   document.getElementById("f-from").value=y+"-"+mo+"-01";
