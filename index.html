@@ -2244,15 +2244,7 @@ function exportWeeklyPDF(){
   });
   doc.save("Weekly_KPI_PDF_"+stampNow()+".pdf");
 }
-/* ════════════════════════════════════════════════════════════════
-   MISSING EXCEL EXPORT FUNCTIONS
-   Paste this whole block into the dashboard's <script>, immediately
-   ABOVE the line:   /* ── INIT ── */
-   (right before the window.addEventListener("DOMContentLoaded", ...) block)
-
-   These reuse the same XLSX pattern, grand-total rows and stampNow()
-   filename helper already used by exportOFS / exportLeaderboard / etc.
-   ════════════════════════════════════════════════════════════════ */
+/* ===== EXCEL EXPORTS: Overview / Trainer Details / Virtual / Cities / Matrix ===== */
 
 ── OVERVIEW: KPI summary + Top Performers (2 sheets) ── 
 function exportOverview(){
