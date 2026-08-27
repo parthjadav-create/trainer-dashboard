@@ -4,13 +4,18 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Petpooja Master Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<!-- Only what the first paint needs. The three fonts actually used by the UI;
+     the other six load on demand when Settings is opened or a font is picked. -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin/>
+<link rel="dns-prefetch" href="https://script.google.com"/>
+<link id="font-core" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<!-- Charts: deferred, so parsing/paint is not blocked. Export libraries
+     (SheetJS ~950KB, jsPDF, autoTable, html2canvas ~1.4MB combined) are NOT
+     loaded here any more — they are fetched the first time you click an
+     export/screenshot button. -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <style>
 :root{
   --primary:#ef5350;
@@ -1277,7 +1282,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
    never differ between machines (endpoint + targets + row limit),
    so re-sharing this file re-syncs everyone automatically.
    ══════════════════════════════════════════════════════════════════ */
-var APP_VERSION="2026.08.27-r2";
+var APP_VERSION="2026.08.27-r4";
 var DEFAULT_API="https://script.google.com/macros/s/AKfycbwsLFWRUU3UtQCXSWRiyHbDDFzUk6UpFrhKoLAEPtN0anOxikbC1pUolHJbvb28NxMvww/exec";
 
 /* localStorage can throw (private mode / disabled cookies) — never let it kill the app */
@@ -1393,6 +1398,148 @@ function fmtNum(n){
   return n.toLocaleString();
 }
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+
+/* ── COLUMN MATCHING ──────────────────────────────────────────────
+   Sheet headers drift ("Training Purpose" vs "Purpose of Training",
+   "Purpose of Training?" with a question mark, stray spaces…). An exact
+   lookup silently returned "" and every value became blank downstream —
+   which is why the bifurcation and the Purpose/Type widgets were empty.
+   Now: strip everything non-alphanumeric, try exact, then substring.   */
+function hkey(s){return String(s==null?"":s).toLowerCase().replace(/[^a-z0-9]/g,"");}
+function makeFinder(headers){
+  var hmap={},keys=[];
+  headers.forEach(function(h){var k=hkey(h);if(k&&!hmap[k]){hmap[k]=h;keys.push(k);}});
+  return function(exact,loose,avoid){
+    var i,j;
+    for(i=0;i<exact.length;i++){if(hmap[hkey(exact[i])])return hmap[hkey(exact[i])];}
+    if(loose){
+      for(j=0;j<loose.length;j++){
+        var needle=hkey(loose[j]);
+        for(i=0;i<keys.length;i++){
+          if(keys[i].indexOf(needle)===-1)continue;
+          if(avoid&&avoid.some(function(a){return keys[i].indexOf(hkey(a))!==-1;}))continue;
+          return hmap[keys[i]];
+        }
+      }
+    }
+    return"";
+  };
+}
+/* ══════════════════════════════════════════════════════════════════
+   1b.  ON-DEMAND LIBRARIES  +  WARM-START CACHE
+   ------------------------------------------------------------------
+   The export libraries used to be ~1.4 MB of render-blocking script in
+   <head> on every hard refresh, for buttons most sessions never press.
+   They now load on first click. And the last successful pull is kept in
+   localStorage, so a hard refresh paints real numbers immediately while
+   the fresh copy is fetched in the background.
+   ══════════════════════════════════════════════════════════════════ */
+var LIB_URLS={
+  xlsx:"https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+  jspdf:"https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+  autotable:"https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js",
+  html2canvas:"https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+};
+var LIB_LOADING={};
+function libPresent(name){
+  if(name==="xlsx")return typeof XLSX!=="undefined";
+  if(name==="jspdf")return typeof jspdf!=="undefined"&&!!jspdf.jsPDF;
+  if(name==="autotable")return typeof jspdf!=="undefined"&&!!jspdf.jsPDF&&!!jspdf.jsPDF.API.autoTable;
+  if(name==="html2canvas")return typeof html2canvas!=="undefined";
+  return false;
+}
+function loadScript(url){
+  if(LIB_LOADING[url])return LIB_LOADING[url];
+  LIB_LOADING[url]=new Promise(function(res,rej){
+    var s=document.createElement("script");
+    s.src=url;s.async=true;
+    s.onload=function(){res();};
+    s.onerror=function(){delete LIB_LOADING[url];rej(new Error("could not download "+url.split("/").pop()));};
+    document.head.appendChild(s);
+  });
+  return LIB_LOADING[url];
+}
+function ensureLibs(names){
+  var chain=Promise.resolve();
+  names.forEach(function(n){                       // sequential: autoTable needs jsPDF first
+    chain=chain.then(function(){return libPresent(n)?null:loadScript(LIB_URLS[n]);});
+  });
+  return chain;
+}
+var BUSY_LABEL=null;
+function withLibs(names,fn){
+  var btn=(typeof event!=="undefined"&&event&&event.target&&event.target.tagName==="BUTTON")?event.target:null;
+  var orig=btn?btn.textContent:"";
+  if(btn&&!names.every(libPresent))btn.textContent="⏳ Loading…";
+  ensureLibs(names).then(function(){
+    if(btn)btn.textContent=orig;
+    if(typeof flushPending==="function")flushPending();   // hidden views must exist before we read their tables
+    fn();
+  }).catch(function(e){
+    if(btn)btn.textContent=orig;
+    alert("Export unavailable: "+e.message+"\n\nThis machine could not reach cdnjs.cloudflare.com. Ask IT to allow it, or use a machine that can.");
+  });
+}
+/* Wrap the export/screenshot entry points so they fetch what they need first */
+function wireLazyExports(){
+  if(typeof window==="undefined")return;
+  var need={
+    exportOverview:["xlsx"],exportLeaderboard:["xlsx"],exportTrainerDetail:["xlsx"],exportVirtual:["xlsx"],
+    exportCities:["xlsx"],exportOFS:["xlsx"],exportMatrix:["xlsx"],exportWeekly:["xlsx"],exportTeamInfo:["xlsx"],
+    dExportOverview:["xlsx"],dExportTrainer:["xlsx"],dExportMatrix:["xlsx"],
+    exportOverviewPDF:["jspdf","autotable"],exportTablePDF:["jspdf","autotable"],exportTrainerDetailPDF:["jspdf","autotable"],
+    exportVirtualPDF:["jspdf","autotable"],exportCitiesPDF:["jspdf","autotable"],exportOFSPDF:["jspdf","autotable"],
+    exportMatrixPDF:["jspdf","autotable"],exportTeamPDF:["jspdf","autotable"],exportWeeklyPDF:["jspdf","autotable"],
+    dExportOverviewPDF:["jspdf","autotable"],dExportTrainerPDF:["jspdf","autotable"],dExportMatrixPDF:["jspdf","autotable"],
+    snapSection:["html2canvas"],snapWeeklyFull:["html2canvas"]
+  };
+  Object.keys(need).forEach(function(name){
+    var orig=window[name];
+    if(typeof orig!=="function")return;
+    window[name]=function(){
+      var args=Array.prototype.slice.call(arguments);
+      withLibs(need[name],function(){orig.apply(null,args);});
+    };
+  });
+}
+/* The six preview-only fonts are fetched only if they are actually wanted */
+var EXTRA_FONT_URL="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Sora:wght@400;600;700&family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=Lexend:wght@400;600&display=swap";
+function ensureExtraFonts(){
+  if(document.getElementById("font-extra"))return;
+  var l=document.createElement("link");
+  l.id="font-extra";l.rel="stylesheet";l.href=EXTRA_FONT_URL;
+  document.head.appendChild(l);
+}
+
+/* ── warm-start cache ── */
+function cacheKey(kind){return "rows_"+kind+"_"+hkey(API).slice(-14);}
+function saveCache(kind,rows,meta){
+  try{
+    if(!rows||rows.length>25000)return;
+    var o={v:APP_VERSION,at:Date.now(),rows:rows};
+    if(meta)for(var k in meta)o[k]=meta[k];
+    localStorage.setItem(cacheKey(kind),JSON.stringify(o));
+  }catch(e){/* quota or private mode — the app works fine without it */}
+}
+function readCache(kind){
+  try{
+    var raw=localStorage.getItem(cacheKey(kind));
+    if(!raw)return null;
+    var o=JSON.parse(raw);
+    if(!o||o.v!==APP_VERSION||!o.rows||!o.rows.length)return null;
+    return o;
+  }catch(e){return null;}
+}
+
+/* Collapse whitespace and fold case so "Demo", "demo " and "DEMO" are one column */
+var VALUE_LABELS={};
+function canonValue(v,blankLabel){
+  var c=String(v==null?"":v).replace(/\s+/g," ").trim();
+  if(!c)return blankLabel||"(Blank)";
+  var lc=c.toLowerCase();
+  if(!VALUE_LABELS[lc])VALUE_LABELS[lc]=c;
+  return VALUE_LABELS[lc];
+}
 function stampNow(){return todayISO();}
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1477,6 +1624,8 @@ function toggleSidebar(){
 }
 function showTab(t){
   curTab=t;
+  if(t==='settings')ensureExtraFonts();                 // font preview cards need them
+  if(typeof PENDING!=="undefined"&&PENDING[t])renderView(t);   // build the view the moment it is asked for
   ["overview","trainers","virtual","cities","ofs","weekly","matrix","settings","team"].forEach(function(n){
     var v=document.getElementById("view-"+n);if(v)v.classList.toggle("on",n===t);
     var tab=document.getElementById("tab-"+n);if(tab)tab.classList.toggle("on",n===t);
@@ -1491,6 +1640,7 @@ function showTab(t){
    4.  APPEARANCE SETTINGS
    ══════════════════════════════════════════════════════════════════ */
 function applyFont(font){
+  if(font&&font!=='dm-sans'&&font!=='mono')ensureExtraFonts();
   var body=document.body;
   ['sora','outfit','nunito','jakarta','lexend','mono'].forEach(function(f){body.classList.remove('font-'+f);});
   if(font&&font!=='dm-sans')body.classList.add('font-'+font);
@@ -1674,6 +1824,18 @@ function showAlert(id,msg){
   if(!msg){al.style.display='none';al.textContent='';return;}
   al.textContent=msg;al.style.display='block';
 }
+/* Paint from the last good pull so a hard refresh shows numbers straight away.
+   The live fetch is still fired immediately and overwrites this when it lands. */
+function bootFromCache(){
+  var c=readCache("main");
+  if(!c)return false;
+  allRows=c.rows.map(function(r){r.ts=r.ts?new Date(r.ts):null;return r;});
+  var st=document.getElementById("sync-txt");
+  if(st)st.textContent="cached "+tzTimeStr(new Date(c.at))+" · refreshing…";
+  var bd=document.getElementById("total-bd");if(bd)bd.textContent=allRows.length.toLocaleString();
+  populateFilters();applyFilters();
+  return true;
+}
 function loadData(){
   var lm=document.getElementById("lmsg");if(lm)lm.textContent="Fetching data from Google Sheet...";
   var lt=document.getElementById("live-txt");if(lt)lt.textContent="SYNCING";
@@ -1686,6 +1848,7 @@ function loadData(){
       if(js.status==="error")throw new Error(js.message);
       if(!js.data||!js.data.length)throw new Error("No rows returned from the sheet.");
       allRows=parseRows(js.data);
+      saveCache("main",allRows);
       if(lt)lt.textContent="LIVE";
       var st=document.getElementById("sync-txt");if(st)st.textContent="Synced "+tzTimeStr(new Date())+" IST";
       var bd=document.getElementById("total-bd");if(bd)bd.textContent=allRows.length.toLocaleString();
@@ -1707,18 +1870,18 @@ function normalizeCity(city){
   return hit?CITY_MAP[hit]:c;
 }
 
+var SHEET_HEADERS=[];
 function parseRows(raw){
   if(!raw.length)return[];
-  var headers=Object.keys(raw[0]),hmap={};
-  headers.forEach(function(h){hmap[h.toLowerCase().replace(/\s+/g,"")]=h;});
-  function find(vs){for(var i=0;i<vs.length;i++){var k=vs[i].toLowerCase().replace(/\s+/g,"");if(hmap[k])return hmap[k];}return"";}
-  COL.date=find(["date","timestamp"]);
-  COL.trainer=find(["trainername","trainer name","trainer"]);
-  COL.city=find(["cityname","city name","city"]);
-  COL.city2=find(["writecitynameifyoutravelthere.","writecitynameifyoutravelthere","travelcity"]);
-  COL.status=find(["status"]);
-  COL.mode=find(["trainingmode","training mode","mode"]);
-  COL.lang=find(["languages","language"]);
+  SHEET_HEADERS=Object.keys(raw[0]);
+  var find=makeFinder(SHEET_HEADERS);
+  COL.date=find(["date","timestamp"],["date","timestamp"]);
+  COL.trainer=find(["trainername","trainer"],["trainer"]);
+  COL.city=find(["cityname","city"],["city"],["travel","write"]);
+  COL.city2=find(["writecitynameifyoutravelthere","travelcity"],["travel"]);
+  COL.status=find(["status"],["status"]);
+  COL.mode=find(["trainingmode","mode"],["mode"]);
+  COL.lang=find(["languages","language"],["language"]);
   return raw.map(function(r){
     var g=function(c){return c?String(r[c]==null?"":r[c]).trim():"";};
     var rawDate=g(COL.date),d=normalizeDate(rawDate);
@@ -1820,20 +1983,50 @@ function copyFingerprint(){
    ══════════════════════════════════════════════════════════════════ */
 /* One broken renderer must never blank the rest of the dashboard
    (this is what a blocked CDN used to do on a locked-down laptop). */
-function safeRun(label,fn){try{fn();}catch(e){if(window.console&&console.error)console.error("["+label+"] "+e.message);}}
-function missingLibs(){
-  var m=[];
-  if(typeof Chart==="undefined")m.push("Chart.js");
-  if(typeof XLSX==="undefined")m.push("SheetJS (Excel export)");
-  if(typeof jspdf==="undefined")m.push("jsPDF (PDF export)");
-  if(typeof html2canvas==="undefined")m.push("html2canvas (screenshots)");
-  return m;
+function safeRun(label,fn){try{fn();}catch(e){if(typeof console!=="undefined"&&console.error)console.error("["+label+"] "+e.message);}}
+function missingLibs(){return typeof Chart==="undefined"?["Chart.js"]:[];}
+
+/* ── Render only what is on screen ───────────────────────────────────
+   Every filter change used to rebuild all nine views — ~1,500 table rows
+   of DOM for eight views nobody was looking at. Now the active view is
+   built immediately and the rest are queued for idle time (or built the
+   instant you click their tab).                                        */
+var VIEW_RENDERERS={
+  overview:[["KPI",rKPI],["Trend",rTrend],["Leaderboard",rLeader],["DateChart",rDate],["Mode",rMode],["Status",rStatus],["Language",rLang]],
+  trainers:[["TrainerDetail",renderTrainerDetail]],
+  virtual:[["Virtual",rVirtual]],
+  cities:[["CityBars",rCity],["CityTable",rCityDetail]],
+  ofs:[["OFS",rOFS]],
+  weekly:[["Weekly",rWeekly]],
+  matrix:[["Matrix",rMatrix]],
+  team:[["Team",rTeam]],
+  settings:[]
+};
+var PENDING={};
+function renderView(v){
+  var steps=VIEW_RENDERERS[v];
+  delete PENDING[v];
+  if(!steps)return;
+  steps.forEach(function(s){safeRun(s[0],s[1]);});
+}
+function drainPending(){
+  var keys=Object.keys(PENDING);
+  if(!keys.length)return;
+  renderView(keys[0]);
+  var next=function(){drainPending();};
+  if(typeof requestIdleCallback==="function")requestIdleCallback(next,{timeout:1200});
+  else setTimeout(next,0);
+}
+function flushPending(){
+  Object.keys(PENDING).forEach(renderView);
+  if(typeof dFlush==="function")dFlush();
 }
 function render(){
-  [["KPI",rKPI],["Trend",rTrend],["Leaderboard",rLeader],["DateChart",rDate],["Mode",rMode],["Status",rStatus],
-   ["Language",rLang],["CityBars",rCity],["CityTable",rCityDetail],["Matrix",rMatrix],["TrainerDetail",renderTrainerDetail],
-   ["Virtual",rVirtual],["Team",rTeam],["Weekly",rWeekly],["OFS",rOFS],["Fingerprint",renderFingerprint]
-  ].forEach(function(s){safeRun(s[0],s[1]);});
+  Object.keys(VIEW_RENDERERS).forEach(function(v){PENDING[v]=1;});
+  renderView(curTab||"overview");
+  if(curTab!=="overview")renderView("overview");   // KPI cards + sidebar badge
+  safeRun("Fingerprint",renderFingerprint);
+  drainPending();
 }
 
 function rKPI(){
@@ -2494,7 +2687,10 @@ function switchDash(which){
   document.getElementById('trainer-nav-group').style.display=which==='trainer'?'block':'none';
   document.getElementById('demo-nav-group').style.display=which==='demo'?'block':'none';
   document.querySelectorAll('.dash-switch-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-dash')===which);});
-  if(which==='demo'){if(!dLoaded)dLoadData();else dRender();}
+  if(which==='demo'){
+    if(!dLoaded){dBootFromCache();dLoadData();}
+    else dRender();
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -2514,12 +2710,25 @@ function dUpdateDateDisplay(){
 }
 function dShowTab(t){
   dCurTab=t;
+  if(typeof D_PENDING!=="undefined"&&D_PENDING[t])dRenderView(t);
   ['overview','trainers','breakdown'].forEach(function(n){
     var v=document.getElementById('d-view-'+n);if(v)v.classList.toggle('on',n===t);
     var tab=document.getElementById('d-tab-'+n);if(tab)tab.classList.toggle('on',n===t);
   });
   document.querySelectorAll('#demo-nav-group .nav').forEach(function(el){el.classList.remove('on');});
   var el=document.getElementById('d-nav-'+t);if(el)el.classList.add('on');
+}
+function dBootFromCache(){
+  var c=readCache("demo");
+  if(!c)return false;
+  dAllRows=c.rows;
+  var s=document.getElementById('d-sync-txt');
+  if(s)s.textContent='cached '+tzTimeStr(new Date(c.at))+' · refreshing…';
+  var bd=document.getElementById('d-total-bd');if(bd)bd.textContent=dAllRows.length.toLocaleString();
+  if(c.cols)DCOL=c.cols;
+  if(c.headers)D_HEADERS=c.headers;
+  dPopulateFilters();dApplyFilters();
+  return true;
 }
 function dLoadData(){
   var lt=document.getElementById('d-live-txt');if(lt)lt.textContent='SYNCING';
@@ -2532,6 +2741,7 @@ function dLoadData(){
       if(js.status==='error')throw new Error(js.message);
       if(!js.data)throw new Error('No data returned from the Track App sheet.');
       dAllRows=dParseRows(js.data);
+      saveCache("demo",dAllRows,{cols:DCOL,headers:D_HEADERS});
       dLoaded=true;
       if(lt)lt.textContent='LIVE';
       var s=document.getElementById('d-sync-txt');if(s)s.textContent='Synced '+tzTimeStr(new Date())+' IST';
@@ -2545,23 +2755,62 @@ function dLoadData(){
       dRenderFingerprint();
     });
 }
+var D_HEADERS=[],D_SNIFFED={purpose:false,type:false};
+/* Score every unused column on how many of its values match a pattern */
+function dSniffColumn(raw,rx,used){
+  var headers=Object.keys(raw[0]),best="",bestScore=0.6;
+  headers.forEach(function(h){
+    if(used.indexOf(h)!==-1)return;
+    var hits=0,vals=0,lim=Math.min(raw.length,400);
+    for(var i=0;i<lim;i++){
+      var v=String(raw[i][h]==null?"":raw[i][h]).trim();
+      if(!v)continue;
+      vals++;
+      if(rx.test(v))hits++;
+    }
+    if(vals>=3){var score=hits/vals;if(score>bestScore){bestScore=score;best=h;}}
+  });
+  return best;
+}
 function dParseRows(raw){
   if(!raw.length)return[];
-  var headers=Object.keys(raw[0]),hmap={};
-  headers.forEach(function(h){hmap[h.toLowerCase().replace(/\s+/g,"")]=h;});
-  function find(vs){for(var i=0;i<vs.length;i++){var k=vs[i].toLowerCase().replace(/\s+/g,"");if(hmap[k])return hmap[k];}return"";}
-  DCOL.date=find(["date","timestamp"]);
-  DCOL.trainer=find(["trainername","trainer name","trainer"]);
-  DCOL.mode=find(["trainingmode","training mode","mode"]);
-  DCOL.status=find(["status"]);
-  DCOL.purpose=find(["purposeoftraining","purpose of training","purpose"]);
-  DCOL.type=find(["trainingtype","training type","type"]);
-  DCOL.city=find(["cityname","city name","city"]);
+  D_HEADERS=Object.keys(raw[0]);
+  var find=makeFinder(D_HEADERS);
+  DCOL.date=find(["date","timestamp"],["date","timestamp"]);
+  DCOL.trainer=find(["trainername","trainer"],["trainer"],["type","purpose"]);
+  DCOL.mode=find(["trainingmode","mode"],["mode"]);
+  /* "Training Purpose", "Purpose of Training", "Purpose of the training?" … all match */
+  DCOL.purpose=find(["purposeoftraining","trainingpurpose","purpose"],["purpose"]);
+  /* anything with "type" that is not the mode column */
+  DCOL.type=find(["trainingtype","typeoftraining","type"],["type"],["mode","purpose"]);
+  DCOL.status=find(["status"],["status"]);
+  DCOL.city=find(["cityname","city"],["city"]);
+  /* Last resort: if the header is named something unexpected, find the column
+     whose VALUES look like purposes / training types. */
+  D_SNIFFED={purpose:false,type:false};
+  var used=[DCOL.date,DCOL.trainer,DCOL.mode,DCOL.status,DCOL.city].filter(Boolean);
+  if(!DCOL.purpose){
+    DCOL.purpose=dSniffColumn(raw,/^\s*(demo|training|issue|onboard|re-?training|support)/i,used.concat([DCOL.type]).filter(Boolean));
+    D_SNIFFED.purpose=!!DCOL.purpose;
+  }
+  if(!DCOL.type){
+    DCOL.type=dSniffColumn(raw,/^\s*(new|existing|issue|re-?training|old|repeat)/i,used.concat([DCOL.purpose]).filter(Boolean));
+    D_SNIFFED.type=!!DCOL.type;
+  }
   return raw.map(function(r){
     var g=function(c){return c?String(r[c]==null?"":r[c]).trim():"";};
     var rawDate=g(DCOL.date);
-    return{date:normalizeDate(rawDate),trainer:normalizeTrainerName(g(DCOL.trainer)),mode:g(DCOL.mode),status:g(DCOL.status),purpose:g(DCOL.purpose),type:g(DCOL.type),city:normalizeCity(g(DCOL.city))};
+    return{date:normalizeDate(rawDate),trainer:normalizeTrainerName(g(DCOL.trainer)),mode:g(DCOL.mode),
+      status:g(DCOL.status),purpose:canonValue(g(DCOL.purpose)),type:canonValue(g(DCOL.type)),city:normalizeCity(g(DCOL.city))};
   }).filter(function(r){return r.trainer||r.date||r.status;});
+}
+/* Which sheet column each field resolved to — shown in the diagnostics strip */
+function dColumnMapHTML(){
+  var pairs=[["purpose",DCOL.purpose,D_SNIFFED.purpose],["type",DCOL.type,D_SNIFFED.type],["date",DCOL.date],["status",DCOL.status],["trainer",DCOL.trainer]];
+  return pairs.map(function(p){
+    if(!p[1])return'<b>'+p[0]+'</b>=<span class="fp-bad">NOT FOUND</span>';
+    return'<b>'+p[0]+'</b>="'+esc(p[1])+'"'+(p[2]?'<span class="fp-warn">(auto)</span>':'');
+  }).join(" ");
 }
 function dUniq(k){var s={};dAllRows.forEach(function(r){if(r[k])s[r[k]]=1;});return Object.keys(s).sort();}
 function dFillSel(id,vals){var el=document.getElementById(id);if(!el)return;var cv=el.value,f=el.options[0];el.innerHTML="";el.appendChild(f);vals.forEach(function(v){el.appendChild(new Option(v,v));});if(cv&&vals.indexOf(cv)!==-1)el.value=cv;}
@@ -2598,36 +2847,72 @@ function dRenderFingerprint(){
     +'<span><b>filter</b> '+(fr?fmtDateOut(fr):'∞')+' → '+(to?fmtDateOut(to):'∞')+'</span><span class="fp-sep">|</span>'
     +'<span><b>showing</b> <span class="'+shownCls+'">'+fmtNum(dFilteredRows.length)+'</span></span><span class="fp-sep">|</span>'
     +'<span><b>source</b> <span class="'+(API===DEFAULT_API?'fp-ok':'fp-bad')+'">'+(API===DEFAULT_API?'default':'CUSTOM')+'</span> ?sheet=demo</span><span class="fp-sep">|</span>'
-    +'<span><b>tz</b> '+SHEET_TZ+'</span>';
-  if(dAllRows.length&&!dFilteredRows.length){
+    +'<span title="Sheet headers received: '+esc(D_HEADERS.join(" | "))+'"><b>columns</b> '+dColumnMapHTML()+'</span>';
+  if(dAllRows.length&&(!DCOL.purpose||!DCOL.type)){
+    var miss=[];if(!DCOL.purpose)miss.push("Purpose of Training");if(!DCOL.type)miss.push("Training Type");
+    showAlert('d-alert-box','Could not find the '+miss.join(" and ")+' column'+(miss.length>1?'s':'')+' in the sheet. Headers received: '+D_HEADERS.join(" | ")+'. Rename the sheet column (or tell me the exact header) and the bifurcation will fill in.');
+  }else if(dAllRows.length&&!dFilteredRows.length){
     showAlert('d-alert-box','0 of '+dAllRows.length+' rows match the selected range ('+fmtDateOut(fr)+' → '+fmtDateOut(to)+'). The sheet holds data from '+fmtDateOut(dated[0])+' to '+fmtDateOut(dated[dated.length-1])+'.');
   }
 }
+var D_VIEWS={
+  overview:[["KPI",dKPI],["Trend",dTrend],["Leaderboard",dLeader],["Purpose",dPurpose],["Type",dType],["Mode",dMode],["Status",dStatus]],
+  trainers:[["TrainerBifurcation",dTrainerDetail]],
+  breakdown:[["Matrix",dMatrix]]
+};
+var D_PENDING={};
+function dRenderView(v){delete D_PENDING[v];(D_VIEWS[v]||[]).forEach(function(s){safeRun(s[0],s[1]);});}
+function dDrain(){
+  var k=Object.keys(D_PENDING);
+  if(!k.length)return;
+  dRenderView(k[0]);
+  var next=function(){dDrain();};
+  if(typeof requestIdleCallback==="function")requestIdleCallback(next,{timeout:1200});else setTimeout(next,0);
+}
+function dFlush(){Object.keys(D_PENDING).forEach(dRenderView);}
 function dRender(){
-  [["KPI",dKPI],["Trend",dTrend],["Leaderboard",dLeader],["Purpose",dPurpose],["Type",dType],["Mode",dMode],
-   ["Status",dStatus],["TrainerBifurcation",dTrainerDetail],["Matrix",dMatrix],["Fingerprint",dRenderFingerprint]
-  ].forEach(function(s){safeRun(s[0],s[1]);});
+  Object.keys(D_VIEWS).forEach(function(v){D_PENDING[v]=1;});
+  dRenderView(dCurTab||'overview');
+  if(dCurTab!=='overview')dRenderView('overview');
+  safeRun('Fingerprint',dRenderFingerprint);
+  dDrain();
 }
 
+/* The Purpose / Type widgets are generated from the values in the sheet —
+   whatever the three (or five) purposes are called, each gets its own card. */
+var D_KPI_ICONS={demo:"🎬",training:"🎓",issue:"🛠️",issues:"🛠️",new:"🆕",existing:"🔁",onboarding:"🚀",retraining:"🔄"};
+function dValueIcon(label,fallback){
+  var k=String(label).toLowerCase().replace(/[^a-z]/g,"");
+  for(var n in D_KPI_ICONS){if(k.indexOf(n)!==-1)return D_KPI_ICONS[n];}
+  return fallback;
+}
 function dKPI(){
   var tot=dFilteredRows.length;
   var done=dFilteredRows.filter(function(r){return dIsDone(r.status);}).length;
-  var demo=dFilteredRows.filter(function(r){return contains(r.purpose,"demo");}).length;
-  var pIssues=dFilteredRows.filter(function(r){return contains(r.purpose,"issue");}).length;
-  var tNew=dFilteredRows.filter(function(r){return contains(r.type,"new");}).length;
-  var tIssues=dFilteredRows.filter(function(r){return contains(r.type,"issue");}).length;
   var trs=Object.keys(dFilteredRows.reduce(function(a,r){if(r.trainer)a[r.trainer]=1;return a;},{})).length;
   var cards=[
     {l:"Total Trainings",v:tot,p:"100%",dc:"#8b949e",ic:"🎫",fill:100,bd:"badge-n"},
     {l:"Completed",v:done,p:safePct(done,tot)+"%",dc:"#3fb950",ic:"✅",fill:pn(done,tot),bd:"badge-g"},
-    {l:"Demos",v:demo,p:pct(demo,tot),dc:"#58a6ff",ic:"🎬",fill:pn(demo,tot),bd:"badge-b"},
-    {l:"Training Issues",v:pIssues,p:pct(pIssues,tot),dc:"#ffa657",ic:"🛠️",fill:pn(pIssues,tot),bd:"badge-o"},
-    {l:"New Trainings",v:tNew,p:pct(tNew,tot),dc:"#bc8cff",ic:"🆕",fill:pn(tNew,tot),bd:"badge-p"},
-    {l:"Issue Type",v:tIssues,p:pct(tIssues,tot),dc:"#f85149",ic:"⚠️",fill:pn(tIssues,tot),bd:"badge-r"},
     {l:"Active Trainers",v:trs,p:"Active",dc:"#3fb950",ic:"👤",fill:100,bd:"badge-g"}
   ];
+  var pCnt=dCountBy(function(r){return r.purpose||"(Blank)";});
+  var tCnt=dCountBy(function(r){return r.type||"(Blank)";});
+  var pKeys=dRankKeys(pCnt,6).keys.filter(function(k){return k!=="Other";});
+  var tKeys=dRankKeys(tCnt,6).keys.filter(function(k){return k!=="Other";});
+  var blues=["#58a6ff","#79c0ff","#1f6feb","#388bfd","#a5d6ff","#0969da"];
+  var purples=["#bc8cff","#d2a8ff","#a371f7","#8957e5","#e2c5ff","#6e40c9"];
+  pKeys.forEach(function(k,i){
+    var v=pCnt[k]||0;
+    cards.push({l:"Purpose · "+k,v:v,p:pct(v,tot),dc:blues[i%blues.length],ic:dValueIcon(k,"🎯"),fill:pn(v,tot),bd:"badge-b"});
+  });
+  tKeys.forEach(function(k,i){
+    var v=tCnt[k]||0;
+    cards.push({l:"Type · "+k,v:v,p:pct(v,tot),dc:purples[i%purples.length],ic:dValueIcon(k,"🧩"),fill:pn(v,tot),bd:"badge-p"});
+  });
+  if(!DCOL.purpose)cards.push({l:"Purpose column not found",v:0,p:"check sheet",dc:"#f85149",ic:"⚠️",fill:0,bd:"badge-r"});
+  if(!DCOL.type)cards.push({l:"Training Type column not found",v:0,p:"check sheet",dc:"#f85149",ic:"⚠️",fill:0,bd:"badge-r"});
   document.getElementById('d-kpi-grid').innerHTML=cards.map(function(k){
-    return '<div class="kpi"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+fmtNum(k.v)+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';
+    return '<div class="kpi"><div class="kpi-top"><div class="kpi-ic">'+k.ic+'</div><span class="badge '+k.bd+'">'+k.p+'</span></div><div class="kpi-v" style="color:'+k.dc+'">'+fmtNum(k.v)+'</div><div class="kpi-l" title="'+esc(k.l)+'">'+esc(k.l)+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+k.fill+'%;background:'+k.dc+'"></div></div></div>';
   }).join("");
 }
 function dTrend(){
@@ -2692,18 +2977,18 @@ function dBuildGroups(){
   var mode=dgv('d-td-split')||'both',groups=[];
   if(mode==='none')return groups;
   if(mode==='cross'){
-    var kf=function(r){return(r.purpose||"(Unspecified)")+" | "+(r.type||"(Unspecified)");};
+    var kf=function(r){return(r.purpose||"(Blank)")+" | "+(r.type||"(Blank)");};
     var rk=dRankKeys(dCountBy(kf),10);
     groups.push({label:"Purpose | Training Type",cls:"grp-p",keys:rk.keys,capped:rk.capped,keyOf:kf,short:"P|T"});
     return groups;
   }
   if(mode==='both'||mode==='purpose'){
-    var pf=function(r){return r.purpose||"(Unspecified)";};
+    var pf=function(r){return r.purpose||"(Blank)";};
     var rp=dRankKeys(dCountBy(pf),D_MAX_COLS);
     groups.push({label:"Purpose of Training",cls:"grp-p",keys:rp.keys,capped:rp.capped,keyOf:pf,short:"Purpose"});
   }
   if(mode==='both'||mode==='type'){
-    var tf=function(r){return r.type||"(Unspecified)";};
+    var tf=function(r){return r.type||"(Blank)";};
     var rt=dRankKeys(dCountBy(tf),D_MAX_COLS);
     groups.push({label:"Training Type",cls:"grp-t",keys:rt.keys,capped:rt.capped,keyOf:tf,short:"Type"});
   }
@@ -2784,12 +3069,12 @@ function dTrainerExportRows(){
 }
 function dMatrix(){
   var purposes={},types={};
-  dFilteredRows.forEach(function(r){purposes[r.purpose||"(Unspecified)"]=1;types[r.type||"(Unspecified)"]=1;});
+  dFilteredRows.forEach(function(r){purposes[r.purpose||"(Blank)"]=1;types[r.type||"(Blank)"]=1;});
   var pRows=Object.keys(purposes).sort(),tCols=Object.keys(types).sort();
   document.getElementById('d-matrix-head').innerHTML='<tr><th>Purpose \\ Type</th>'+tCols.map(function(c){return '<th class="tc">'+esc(c)+'</th>';}).join('')+'<th class="tc">Total</th></tr>';
   var grid={},colTot={},grand=0;
   tCols.forEach(function(c){colTot[c]=0;});
-  dFilteredRows.forEach(function(r){var p=r.purpose||"(Unspecified)",c=r.type||"(Unspecified)";if(!grid[p])grid[p]={};grid[p][c]=(grid[p][c]||0)+1;});
+  dFilteredRows.forEach(function(r){var p=r.purpose||"(Blank)",c=r.type||"(Blank)";if(!grid[p])grid[p]={};grid[p][c]=(grid[p][c]||0)+1;});
   var body=pRows.map(function(p){
     var rt=0;
     var tds=tCols.map(function(c){var v=(grid[p]&&grid[p][c])||0;rt+=v;colTot[c]+=v;return '<td class="tc">'+(v||'–')+'</td>';}).join('');
@@ -2871,6 +3156,14 @@ function dExportMatrixPDF(){
 /* ══════════════════════════════════════════════════════════════════
    12.  INIT
    ══════════════════════════════════════════════════════════════════ */
+var LOADER_DONE=false;
+function revealDashboard(){
+  if(LOADER_DONE)return;
+  LOADER_DONE=true;
+  var l=document.getElementById("loader");if(l)l.style.display="none";
+  var c=document.getElementById("content");
+  if(c){c.style.display="flex";c.style.flexDirection="column";}
+}
 window.addEventListener("DOMContentLoaded",function(){
   var from=monthStartISO(),to=todayISO();
   ["f-from","d-f-from"].forEach(function(id){var e=document.getElementById(id);if(e)e.value=from;});
@@ -2880,13 +3173,13 @@ window.addEventListener("DOMContentLoaded",function(){
   if(wp)wp.value=w.year+"-W"+pad2(w.week);
   populateTeamLeadFilter();
   initSettings();
-  loadData().then(function(){
-    document.getElementById("loader").style.display="none";
-    var c=document.getElementById("content");c.style.display="flex";c.style.flexDirection="column";
-  }).catch(function(){
-    document.getElementById("loader").style.display="none";
-    var c=document.getElementById("content");c.style.display="flex";c.style.flexDirection="column";
-  });
+  wireLazyExports();
+  /* warm start: if the last pull is cached, show it now instead of staring
+     at the spinner for the length of an Apps Script round trip */
+  if(bootFromCache())revealDashboard();
+  loadData().then(revealDashboard,revealDashboard);
+  /* if the sheet is slow, show the (empty) shell rather than a spinner */
+  setTimeout(revealDashboard,3500);
 });
 </script>
 </body>
